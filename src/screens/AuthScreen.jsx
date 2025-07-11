@@ -5,7 +5,7 @@ import ScannerScreen from '../components/auth/ScannerScreen';
 import StudentsScreen from '../components/auth/StudentsScreen';
 import HomeScreen from '../components/auth/HomeScreen';
 
-const AuthScreen = () => {
+const AuthScreen = ({ navigation }) => {
   const [currentView, setCurrentView] = useState('home');
   const [scannedCode, setScannedCode] = useState('');
   const [selectedStudent, setSelectedStudent] = useState('');
@@ -35,6 +35,7 @@ const AuthScreen = () => {
             scannedCode={scannedCode}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
+            navigation={navigation}
           />
         );
       default:

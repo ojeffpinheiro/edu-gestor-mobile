@@ -10,8 +10,7 @@ const students = [
   { id: '004', name: 'João Pereira', class: '3B' }
 ];
 
-const StudentsScreen = ({ setCurrentView, scannedCode, selectedStudent, setSelectedStudent }) => {
-  return (
+const StudentsScreen = ({ navigation, scannedCode, selectedStudent, setSelectedStudent }) => {   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={styles.header}>
@@ -68,7 +67,7 @@ const StudentsScreen = ({ setCurrentView, scannedCode, selectedStudent, setSelec
         
         <TouchableOpacity 
           style={[styles.primaryButton, !selectedStudent && styles.disabledButton]}
-          onPress={() => Alert.alert('Próximo passo', 'Captura da folha de resposta')}
+          onPress={() => navigation.navigate('Capture')}
           disabled={!selectedStudent}
         >
           <Text style={styles.buttonText}>Continuar para Captura</Text>

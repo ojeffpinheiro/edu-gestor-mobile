@@ -5,18 +5,18 @@ import { Icon } from 'lucide-react-native';
 interface StatsCardProps {
   title: string;
   value: string | number;
-  icon: typeof Icon;
+  icon: React.ComponentType<{ size: number; color: string }>;
   color: string;
 }
 
-const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: Icon, color }) => (
+const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: IconComponent, color }) => (
   <View style={[styles.statsCard, { borderLeftColor: color }]}>
     <View style={styles.statsCardContent}>
       <View>
         <Text style={styles.statsTitle}>{title}</Text>
         <Text style={[styles.statsValue, { color }]}>{value}</Text>
       </View>
-      <Icon size={24} color={color} iconNode={Icon.iconNode} />
+      <IconComponent size={24} color={color} />
     </View>
   </View>
 );

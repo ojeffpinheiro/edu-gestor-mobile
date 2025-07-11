@@ -85,40 +85,6 @@ export const styles = StyleSheet.create({
     right: 16,
     top: 16,
   },
-  primaryButton: {
-    backgroundColor: '#2563eb',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  successButton: {
-    backgroundColor: '#16a34a',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  secondaryButton: {
-    backgroundColor: '#e5e7eb',
-    borderRadius: 12,
-    padding: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  secondaryButtonText: {
-    color: '#374151',
-    fontWeight: '600',
-    fontSize: 16,
-  },
-  disabledButton: {
-    opacity: 0.5,
-  },
   demoBox: {
     backgroundColor: '#fef3c7',
     borderRadius: 12,
@@ -129,50 +95,11 @@ export const styles = StyleSheet.create({
     color: '#92400e',
     fontSize: 14,
   },
-  scannerPlaceholder: {
-    backgroundColor: '#f3f4f6',
-    borderRadius: 12,
-    padding: 32,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 24,
-    height: 200,
-  },
   scannerActive: {
     alignItems: 'center',
   },
-  scannerInactive: {
-    alignItems: 'center',
-  },
-  scannerText: {
-    color: '#6b7280',
-    marginTop: 16,
-  },
-  successBox: {
-    backgroundColor: '#f0fdf4',
-    borderWidth: 1,
-    borderColor: '#bbf7d0',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-  },
-  successHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  successTitle: {
-    fontWeight: '600',
-    color: '#166534',
-    marginLeft: 8,
-  },
   successText: {
     color: '#166534',
-  },
-  successCode: {
-    color: '#166534',
-    fontFamily: 'monospace',
-    fontSize: 18,
   },
   studentsList: {
     maxHeight: 300,
@@ -209,5 +136,211 @@ export const styles = StyleSheet.create({
   studentId: {
     color: '#9ca3af',
     fontSize: 14,
+  },
+  scannerContainer: {
+    width: '100%',
+    height: 250,
+    borderRadius: 12,
+    overflow: 'hidden',
+    backgroundColor: '#f3f4f6',
+    marginBottom: 20,
+  },
+  
+  // Container da câmera
+  cameraContainer: {
+    flex: 1,
+    position: 'relative',
+  },
+  
+  // Estilo da câmera
+  camera: {
+    flex: 1,
+    width: '100%',
+    height: '100%',
+  },
+  
+  // Overlay do scanner
+  scannerOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  
+  // Frame do scanner
+  scannerFrame: {
+    width: 200,
+    height: 200,
+    position: 'relative',
+    borderWidth: 2,
+    borderColor: 'transparent',
+  },
+  
+  // Cantos do frame
+  scannerCorner: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderColor: '#2563eb',
+    borderWidth: 3,
+    borderTopWidth: 3,
+    borderLeftWidth: 3,
+    borderRightWidth: 0,
+    borderBottomWidth: 0,
+    top: -2,
+    left: -2,
+  },
+  
+  topRight: {
+    top: -2,
+    right: -2,
+    left: 'auto',
+    transform: [{ rotate: '90deg' }],
+  },
+  
+  bottomLeft: {
+    bottom: -2,
+    left: -2,
+    top: 'auto',
+    transform: [{ rotate: '270deg' }],
+  },
+  
+  bottomRight: {
+    bottom: -2,
+    right: -2,
+    top: 'auto',
+    left: 'auto',
+    transform: [{ rotate: '180deg' }],
+  },
+  
+  // Instruções do scanner
+  scannerInstructions: {
+    color: '#ffffff',
+    fontSize: 14,
+    textAlign: 'center',
+    marginTop: 20,
+    paddingHorizontal: 20,
+    fontWeight: '500',
+  },
+  
+  // Botão de fechar
+  closeButton: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  
+  // Container dos botões
+  buttonContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+  
+  // Botão desabilitado
+  disabledButton: {
+    backgroundColor: '#9ca3af',
+    opacity: 0.6,
+  },
+  
+  // Ajustes no placeholder do scanner
+  scannerPlaceholder: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f9fafb',
+    minHeight: 200,
+  },
+  
+  scannerInactive: {
+    alignItems: 'center',
+  },
+  
+  scannerText: {
+    fontSize: 14,
+    color: '#6b7280',
+    marginTop: 10,
+    textAlign: 'center',
+  },
+  
+  // Caixa de sucesso
+  successBox: {
+    backgroundColor: '#f0fdf4',
+    borderColor: '#16a34a',
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 20,
+  },
+  
+  successHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  
+  successTitle: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: '#16a34a',
+    marginLeft: 8,
+  },
+  successCode: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#15803d',
+    marginLeft: 28,
+  },
+  
+  // Botão de sucesso
+  successButton: {
+    backgroundColor: '#16a34a',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  
+  // Botões primário e secundário
+  primaryButton: {
+    backgroundColor: '#2563eb',
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#d1d5db',
+    borderWidth: 1,
+    paddingVertical: 14,
+    paddingHorizontal: 20,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  
+  buttonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  secondaryButtonText: {
+    color: '#6b7280',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

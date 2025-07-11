@@ -1,4 +1,15 @@
 {
   "name": "edu-gestor",
-  "slug": "edu-gestor"
+  "slug": "edu-gestor",
+  "android": {
+    "package": "com.anonymous.edugestor"
+  },
+  "plugins": [
+    [
+        "expo-barcode-scanner",
+        {
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access camera."
+        }
+      ]
+  ]
 }

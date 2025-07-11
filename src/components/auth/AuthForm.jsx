@@ -14,7 +14,7 @@ import { Lock, Eye, EyeOff, X } from 'lucide-react-native';
 import { styles } from './styles';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
-  const [password, setPassword] = useState('');
+  const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
   const passwordInputRef = useRef(null);

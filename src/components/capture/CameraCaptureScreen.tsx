@@ -1,8 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, Dimensions } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { X, Camera as CameraIcon, FileText } from 'lucide-react-native';
 import styles from './styles';
+
+const { width, height } = Dimensions.get('window');
 
 const CameraScreen = ({ 
   isCameraActive, 
@@ -25,11 +27,15 @@ const CameraScreen = ({
       </View>
     ) : (
       <View style={{ flex: 1 }}>
-        <CameraView 
-          ref={cameraRef}
-          facing="back"
-        />
+        <View style={styles.cameraWrapper}>
+          <CameraView 
+            ref={cameraRef}
+            facing="back"
+            style={styles.camera}
+          />
+        </View>
         
+        {/* Restante do código permanece igual */}
         <View style={styles.cameraHeader}>
           <TouchableOpacity
             onPress={() => {
@@ -47,6 +53,11 @@ const CameraScreen = ({
 
         <View style={styles.alignmentGuide}>
           <View style={styles.alignmentBox}>
+            <View style={styles.cornerCircleTopLeft} />
+            <View style={styles.cornerCircleTopRight} />
+            <View style={styles.cornerCircleBottomLeft} />
+            <View style={styles.cornerCircleBottomRight} />
+            
             <View style={styles.alignmentContent}>
               <FileText size={48} color="white" />
               <Text style={styles.alignmentText}>Alinhe a folha de resposta</Text>

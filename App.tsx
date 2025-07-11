@@ -8,6 +8,7 @@ import IdentificationScreen from './src/screens/IdentificationScreen';
 import CaptureScreen from './src/screens/CaptureScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
+import CorretionScreen from './src/screens/CorretionScreen';
 
 const Stack = createStackNavigator();
 
@@ -56,6 +57,11 @@ export default function App() {
           name="Report" 
           component={ReportScreen} 
           options={{ title: 'Relatório' }}
+        />
+        <Stack.Screen 
+          name="Correction" 
+          component={CorretionScreen} 
+          options={{ title: 'Correção' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
-import { X } from 'lucide-react-native';
+import { BookOpen, X } from 'lucide-react-native';
 import styles from './styles';
 
 const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentScreen }) => (

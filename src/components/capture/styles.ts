@@ -2,6 +2,10 @@ import { StyleSheet } from 'react-native';
 
 export default StyleSheet.create({
   // Base containers
+  container: {
+    flex: 1,
+    backgroundColor: 'black'
+  },
   homeContainer: {
     flex: 1,
     backgroundColor: '#f8fafc',
@@ -402,4 +406,26 @@ export default StyleSheet.create({
     color: '#64748b',
     marginTop: 8,
   },
+  cameraGuide: {
+    position: 'absolute',
+    top: '20%',
+    left: '10%',
+    right: '10%',
+    bottom: '20%',
+    borderWidth: 2,
+    borderColor: 'rgba(255, 255, 255, 0.7)',
+    borderStyle: 'dashed',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  guideText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: 8,
+    borderRadius: 8,
+    marginTop: 20
+  }
 });

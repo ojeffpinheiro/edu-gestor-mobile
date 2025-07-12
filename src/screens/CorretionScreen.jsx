@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, Alert, StyleSheet } from 'react-native';
-import { Exam } from '../types/examTypes';
 import { correctExam, generateReport } from '../utils/examUtils';
 import CorrectionTab from '../components/corretion/CorrectionTab';
 import ReportsTab from '../components/corretion/ReportsTab';
@@ -9,9 +8,9 @@ import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
 
-const CorretionScreen: React.FC = () => {
+const CorretionScreen = () => {
   const [activeTab, setActiveTab] = useState('correction');
-  const [exams, setExams] = useState<Exam[]>([
+  const [exams, setExams] = useState([
     {
       id: 1,
       studentName: 'João Silva',
@@ -58,7 +57,7 @@ const CorretionScreen: React.FC = () => {
         return {
           ...exam,
           score: parseFloat(score.toFixed(1)),
-          status: 'corrected' as 'corrected'
+          status: 'corrected'
         };
       }
       return exam;

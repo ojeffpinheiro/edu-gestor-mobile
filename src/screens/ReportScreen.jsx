@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { styles } from '../styles/commun';
 
-export default function ReportScreen({ navigation }) {
+const ReportScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Relatório</Text>
@@ -17,3 +17,5 @@ export default function ReportScreen({ navigation }) {
     </View>
   );
 }
+
+export default ReportScreen;

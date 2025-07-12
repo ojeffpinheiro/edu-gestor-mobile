@@ -9,7 +9,10 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
   const [isAligned, setIsAligned] = useState(false);
 
   const handleCapture = async () => {
-    if (!isAligned || !cameraRef.current) return;
+  if (!isAligned) {
+    Alert.alert('Alinhamento necessário', 'Por favor, alinhe a prova corretamente antes de capturar.');
+    return;
+  }
 
     try {
       const photo = await cameraRef.current.takePictureAsync({
@@ -23,9 +26,17 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
         Alert.alert('Erro', 'Função de captura não disponível');
       }
     } catch (error) {
-      console.error('Erro na captura:', error);
-      Alert.alert('Erro', 'Falha ao capturar imagem');
+    console.error('Erro na captura:', error);
+    
+    let errorMessage = 'Falha ao capturar imagem';
+    if (error.message.includes('storage')) {
+      errorMessage = 'Espaço insuficiente no dispositivo';
+    } else if (error.message.includes('permission')) {
+      errorMessage = 'Permissão negada para acessar a câmera';
     }
+    
+    Alert.alert('Erro', errorMessage);
+  }
   };
 
   return (

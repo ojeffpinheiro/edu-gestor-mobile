@@ -1,63 +1,73 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Alert } from 'react-native';
-import { X, CheckCircle, Download } from 'lucide-react-native';
-import styles from './styles';
+import { View, Text, ScrollView, StyleSheet } from 'react-native';
 
-const ResultsScreen = ({ results, setCurrentScreen }) => (
-  <View style={styles.resultsContainer}>
-    <View style={styles.maxWidthContainer}>
-      <View style={styles.screenHeader}>
-        <TouchableOpacity
-          onPress={() => setCurrentScreen('home')}
-          style={styles.headerButton}
-        >
-          <X size={24} color="#374151" />
-        </TouchableOpacity>
-        <Text style={styles.screenTitle}>Resultados</Text>
-        <View style={{ width: 32 }} />
+const ResultsScreen = ({ results }) => {
+  if (!results || !results.success) {
+    return (
+      <View style={styles.container}>
+        <Text>Erro no processamento: {results?.error || 'Desconhecido'}</Text>
       </View>
+    );
+  }
 
-      {results && (
-        <ScrollView contentContainerStyle={styles.resultsContent}>
-          <View style={styles.scoreCard}>
-            <Text style={styles.scoreText}>{results.score}%</Text>
-            <Text style={styles.scoreSubtext}>
-              {results.correctAnswers} de {results.totalQuestions} questões
-            </Text>
-          </View>
-
-          <View style={styles.detailsCard}>
-            <Text style={styles.detailsTitle}>Detalhes por Questão</Text>
-            <ScrollView style={styles.detailsList}>
-              {results.details.map((detail, index) => (
-                <View key={index} style={styles.detailItem}>
-                  <Text style={styles.detailQuestion}>Q{detail.question}</Text>
-                  <View style={styles.detailAnswerContainer}>
-                    <Text style={styles.detailAnswer}>
-                      {detail.studentAnswer} → {detail.correctAnswer}
-                    </Text>
-                    {detail.isCorrect ? (
-                      <CheckCircle size={16} color="#16a34a" />
-                    ) : (
-                      <X size={16} color="#dc2626" />
-                    )}
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => Alert.alert('Sucesso', 'Resultados exportados com sucesso!')}
-            style={[styles.button, styles.primaryButton, styles.exportButton]}
-          >
-            <Download size={20} color="white" />
-            <Text style={styles.buttonText}>Exportar Resultados</Text>
-          </TouchableOpacity>
-        </ScrollView>
+  return (
+    <ScrollView style={styles.container}>
+      <Text style={styles.title}>Resultados da Prova</Text>
+      
+      {results.questions.map((question, index) => (
+        <View key={index} style={styles.questionContainer}>
+          <Text style={styles.questionText}>
+            Questão {question.question}: {question.markedOption || 'Nenhuma'}
+          </Text>
+          {question.options.filter(o => o.filled).length > 1 && (
+            <Text style={styles.warningText}> (Múltiplas marcações detectadas)</Text>
+          )}
+        </View>
+      ))}
+      
+      {results.validation.errors.length > 0 && (
+        <View style={styles.errorContainer}>
+          <Text style={styles.errorTitle}>Problemas encontrados:</Text>
+          {results.validation.errors.map((error, i) => (
+            <Text key={i} style={styles.errorText}>- {error}</Text>
+          ))}
+        </View>
       )}
-    </View>
-  </View>
-);
+    </ScrollView>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    padding: 20
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20
+  },
+  questionContainer: {
+    marginBottom: 10
+  },
+  questionText: {
+    fontSize: 16
+  },
+  warningText: {
+    color: 'orange'
+  },
+  errorContainer: {
+    marginTop: 20,
+    padding: 10,
+    backgroundColor: '#ffeeee'
+  },
+  errorTitle: {
+    fontWeight: 'bold',
+    color: 'red'
+  },
+  errorText: {
+    color: 'red'
+  }
+});
 
 export default ResultsScreen;

@@ -50,8 +50,11 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange }) => {
         <View style={[styles.corner, styles.bottomLeft]} />
         <View style={[styles.corner, styles.bottomRight]} />
       </Animated.View>
-      
-      <Text style={styles.guideText}>
+
+      <Text style={[
+        styles.guideText,
+        !isAligned && styles.guideTextWarning
+      ]}>
         {isAligned ? 'Alinhamento correto!' : 'Alinhe a prova com a borda'}
       </Text>
     </View>
@@ -112,6 +115,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     padding: 8,
     borderRadius: 8
+  },
+  guideTextWarning: {
+    color: '#FECACA',
+    backgroundColor: '#991B1B'
   }
 });
 

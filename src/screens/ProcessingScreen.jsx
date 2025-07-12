@@ -36,14 +36,25 @@ const ProcessingScreen = () => {
     setStudents(sampleStudents);
   }, []);
 
-  const processImage = async (imageData) => {
+  const processImage = async (imageUri) => {
+  try {
+    await tf.ready();
+    const tensor = await getTensorFromURI(imageUri);
+    console.log('Tensor criado com sucesso:', tensor.shape);
+    
     setProcessingStatus('processing');
     await new Promise(resolve => setTimeout(resolve, 3000));
     const detectedAnswers = generateRandomAnswers(examTemplate.questions);
     const results = calculateResults(detectedAnswers, examTemplate.answerKey);
     setCorrectionResults(results);
     setProcessingStatus('completed');
-  };
+    
+    // Liberar memória
+    tf.dispose(tensor);
+  } catch (error) {
+    console.error('Falha ao processar imagem:', error);
+  }
+};
 
   const generateRandomAnswers = (numQuestions) => {
     const alternatives = ['A', 'B', 'C', 'D', 'E'];

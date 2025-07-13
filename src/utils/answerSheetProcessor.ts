@@ -85,24 +85,6 @@ async function loadImageTensor(uri: string): Promise<tf.Tensor3D> {
   }
 }
 
-async function preprocessImage(imageTensor: tf.Tensor3D): Promise<tf.Tensor2D> {
-  // Converter para escala de cinza
-  const gray = tf.mean(imageTensor, 2);
-  
-  // Implementação manual de min/max para normalização
-  const min = gray.min();
-  const max = gray.max();
-  const adjusted = tf.div(tf.sub(gray, min), tf.sub(max, min));
-  
-  // Binarização com threshold adaptativo
-  const mean = (await adjusted.mean().data())[0];
-  const threshold = mean * 0.7;
-  
-  // Criar máscara binária corretamente tipada
-  const mask = tf.greater(adjusted, tf.scalar(threshold));
-  return tf.cast(mask, 'float32') as tf.Tensor2D;
-}
-
 function detectAnswerGrid(imageTensor: tf.Tensor3D): tf.Tensor3D {
   const height = imageTensor.shape[0];
   const width = imageTensor.shape[1];
@@ -171,4 +153,38 @@ function validateResults(detectedAnswers: QuestionResult[]) {
     valid: errors.length === 0,
     errors
   };
+}
+
+// Adicione esta nova função para conversão para escala de cinza
+function convertToGrayscale(imageTensor: tf.Tensor3D): tf.Tensor3D {
+  // Usa a média ponderada dos canais RGB para conversão padrão
+  // Fórmula: 0.299 * R + 0.587 * G + 0.114 * B
+  const weights = tf.tensor1d([0.299, 0.587, 0.114]);
+  const grayscale = tf.sum(imageTensor.mul(weights), 2, false);
+  
+  // Expande as dimensões para manter o tensor 3D (height, width, 1)
+  return grayscale.expandDims(2) as tf.Tensor3D;
+}
+
+// Modifique a função preprocessImage para usar a nova conversão
+async function preprocessImage(imageTensor: tf.Tensor3D): Promise<tf.Tensor2D> {
+  // 1. Converter para escala de cinza
+  const grayscale = convertToGrayscale(imageTensor);
+  
+  // 2. Normalização
+  const min = grayscale.min();
+  const max = grayscale.max();
+  const adjusted = tf.div(tf.sub(grayscale, min), tf.sub(max, min));
+  
+  // 3. Binarização com threshold adaptativo
+  const mean = (await adjusted.mean().data())[0];
+  const threshold = mean * 0.7;
+  
+  // 4. Criar máscara binária
+  const mask = tf.greater(adjusted, tf.scalar(threshold));
+  
+  // Limpeza de tensores intermediários
+  tf.dispose([grayscale, min, max, adjusted]);
+  
+  return tf.cast(mask, 'float32') as tf.Tensor2D;
 }

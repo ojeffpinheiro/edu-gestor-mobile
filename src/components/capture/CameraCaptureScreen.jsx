@@ -3,40 +3,46 @@ import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { MaterialIcons } from '@expo/vector-icons';
 import GridDetectionOverlay from './GridDetectionOverlay';
+import { useErrorHandler } from '../ErrorBoundary';
 
 const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
   const cameraRef = useRef(null);
   const [isAligned, setIsAligned] = useState(false);
+  const { erro, limparErro, tratarErro } = useErrorHandler();
 
   const handleCapture = async () => {
-  if (!isAligned) {
-    Alert.alert('Alinhamento necessário', 'Por favor, alinhe a prova corretamente antes de capturar.');
-    return;
-  }
+    if (!isAligned) {
+      Alert.alert(
+        'Alinhamento Necessário',
+        'Por favor, alinhe a prova corretamente antes de capturar.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
 
     try {
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
         skipProcessing: true
       });
-      
+
       if (onPhotoCaptured) {
         onPhotoCaptured(photo.uri);
       } else {
         Alert.alert('Erro', 'Função de captura não disponível');
       }
     } catch (error) {
-    console.error('Erro na captura:', error);
-    
-    let errorMessage = 'Falha ao capturar imagem';
-    if (error.message.includes('storage')) {
-      errorMessage = 'Espaço insuficiente no dispositivo';
-    } else if (error.message.includes('permission')) {
-      errorMessage = 'Permissão negada para acessar a câmera';
+      console.error('Erro na captura:', error);
+
+      let errorMessage = 'Falha ao capturar imagem';
+      if (error.message.includes('storage')) {
+        errorMessage = 'Espaço insuficiente no dispositivo';
+      } else if (error.message.includes('permission')) {
+        errorMessage = 'Permissão negada para acessar a câmera';
+      }
+
+      Alert.alert('Erro', errorMessage);
     }
-    
-    Alert.alert('Erro', errorMessage);
-  }
   };
 
   return (
@@ -46,14 +52,16 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
         style={StyleSheet.absoluteFill}
         facing="back"
       />
-      
+
       <View style={styles.overlay}>
         <GridDetectionOverlay onAlignmentStatusChange={setIsAligned} />
-        
+
         {/* Botão de voltar */}
         <TouchableOpacity
           style={styles.backButton}
           onPress={() => setCurrentScreen('home')}
+          accessible={true}
+          accessibilityLabel="Voltar para tela inicial"
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
@@ -61,6 +69,9 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
         {/* Controles da câmera */}
         <View style={styles.controlsContainer}>
           <TouchableOpacity
+            accessible={true}
+            accessibilityLabel="Capturar foto da prova"
+            accessibilityHint={isAligned ? 'Captura a imagem da prova' : 'Ajuste o alinhamento antes de capturar'}
             onPress={handleCapture}
             disabled={!isAligned}
             style={[
@@ -70,12 +81,20 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
           >
             <MaterialIcons name="camera" size={32} color="white" />
           </TouchableOpacity>
-          
+
           <Text style={styles.statusText}>
             {isAligned ? 'Pronto para capturar' : 'Ajuste o alinhamento'}
           </Text>
         </View>
       </View>
+      {erro && (
+        <View style={styles.overlay}>
+          <Text style={styles.statusText}>{erro}</Text>
+          <TouchableOpacity onPress={limparErro} style={styles.backButton}>
+            <MaterialIcons name="close" size={24} color="white" />
+          </TouchableOpacity>
+        </View>
+        )}
     </View>
   );
 };

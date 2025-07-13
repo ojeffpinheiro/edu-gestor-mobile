@@ -1,7 +1,9 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'jpeg-js';
+import { useCallback, useEffect, useState } from 'react';
 
 export async function getTensorFromURI(uri: string): Promise<tf.Tensor3D> {
   try {
@@ -49,4 +51,41 @@ function base64ToUint8Array(base64: string): Uint8Array {
     bytes[i] = binaryString.charCodeAt(i);
   }
   return bytes;
+}
+
+export const usePersistedImages = () => {
+  const [images, setImages] = useState([]);
+  
+  useEffect(() => {
+    const loadImages = async () => {
+      try {
+        const stored = await AsyncStorage.getItem('capturedImages');
+        if (stored) {
+          setImages(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Failed to load images:', error);
+      }
+    };
+    
+    loadImages();
+  }, []);
+  
+  const saveImages = useCallback(async (newImages) => {
+    try {
+      await AsyncStorage.setItem('capturedImages', JSON.stringify(newImages));
+      setImages(newImages);
+    } catch (error) {
+      console.error('Failed to save images:', error);
+    }
+  }, []);
+  
+  return { images, saveImages };
+};
+
+export async function convertImageToGrayscale(uri: string): Promise<tf.Tensor3D> {
+  const tensor = await getTensorFromURI(uri);
+  const grayscale = tf.mean(tensor, 2).expandDims(2) as tf.Tensor3D;
+  tf.dispose(tensor);
+  return grayscale;
 }

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { BarChart3 } from 'lucide-react-native';
 import CorrectionResultCard from './CorrectionResultCard';

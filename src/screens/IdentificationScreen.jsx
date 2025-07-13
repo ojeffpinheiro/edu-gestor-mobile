@@ -11,7 +11,7 @@ import {
   Dimensions,
   ActivityIndicator,
 } from 'react-native';
-import { Camera } from 'expo-camera';
+import { Camera, CameraView } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
 
@@ -76,31 +76,31 @@ export default function IdentificationScreen() {
   const processarImagem = async (uri) => {
     setProcessando(true);
     setEtapa('resultado');
-    
+
     // Simulação do processamento de imagem
     // Em uma implementação real, aqui você usaria bibliotecas como OpenCV
     // ou serviços de OCR/ML para detectar as marcações
-    
+
     try {
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const num = parseInt(numQuestoes);
       const respostasSimuladas = [];
-      
+
       for (let i = 1; i <= num; i++) {
         // Simula detecção aleatória de alternativas (A, B, C, D, E)
         const alternativas = ['A', 'B', 'C', 'D', 'E'];
-        const alternativaMarcada = Math.random() > 0.1 ? 
-          alternativas[Math.floor(Math.random() * alternativas.length)] : 
+        const alternativaMarcada = Math.random() > 0.1 ?
+          alternativas[Math.floor(Math.random() * alternativas.length)] :
           null;
-        
+
         respostasSimuladas.push({
           questao: i,
           resposta: alternativaMarcada,
           confianca: alternativaMarcada ? Math.random() * 0.3 + 0.7 : 0
         });
       }
-      
+
       setRespostas(respostasSimuladas);
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível processar a imagem');
@@ -117,19 +117,21 @@ export default function IdentificationScreen() {
   };
 
   const exportarResultado = () => {
-    const gabarito = respostas.map(r => 
+    const gabarito = respostas.map(r =>
       `${r.questao}: ${r.resposta || 'Não identificada'}`
     ).join('\n');
-    
+
     Alert.alert(
       'Gabarito Identificado',
       gabarito,
       [
         { text: 'Fechar', style: 'cancel' },
-        { text: 'Compartilhar', onPress: () => {
-          // Implementar compartilhamento
-          console.log('Compartilhar resultado');
-        }}
+        {
+          text: 'Compartilhar', onPress: () => {
+            // Implementar compartilhamento
+            console.log('Compartilhar resultado');
+          }
+        }
       ]
     );
   };
@@ -154,7 +156,7 @@ export default function IdentificationScreen() {
           placeholder="Ex: 20"
           maxLength={2}
         />
-        
+
         <TouchableOpacity style={styles.botaoPrimario} onPress={iniciarCaptura}>
           <MaterialIcons name="camera-alt" size={24} color="white" />
           <Text style={styles.textoBotaoPrimario}>Iniciar Captura</Text>
@@ -184,7 +186,7 @@ export default function IdentificationScreen() {
         </View>
       );
     }
-    
+
     if (permissaoCamera === false) {
       return (
         <View style={styles.container}>
@@ -198,12 +200,11 @@ export default function IdentificationScreen() {
 
     return (
       <View style={styles.containerCamera}>
-        <Camera
+        <CameraView
           ref={cameraRef}
           style={styles.camera}
-          type={Camera.Constants.Type.back}
-          autoFocus={Camera.Constants.AutoFocus.on}
-        >
+          facing="back" />
+
           <View style={styles.overlayCamera}>
             <View style={styles.headerCamera}>
               <TouchableOpacity onPress={() => setEtapa('config')}>
@@ -213,27 +214,26 @@ export default function IdentificationScreen() {
                 Posicione o gabarito na tela
               </Text>
             </View>
-            
+
             <View style={styles.guiaCaptura}>
               <View style={styles.bordaGuia} />
             </View>
-            
+
             <View style={styles.controlesCamera}>
-              <TouchableOpacity 
+              <TouchableOpacity
                 style={styles.botaoGaleria}
                 onPress={escolherDaGaleria}
               >
                 <MaterialIcons name="photo-library" size={24} color="white" />
               </TouchableOpacity>
-              
+
               <TouchableOpacity style={styles.botaoCaptura} onPress={tirarFoto}>
                 <View style={styles.botaoCapturaInner} />
               </TouchableOpacity>
-              
+
               <View style={styles.espaco} />
             </View>
           </View>
-        </Camera>
       </View>
     );
   };
@@ -266,7 +266,7 @@ export default function IdentificationScreen() {
           <Text style={styles.tituloRespostas}>
             Respostas Identificadas ({respostas.length})
           </Text>
-          
+
           <View style={styles.gridRespostas}>
             {respostas.map((resposta, index) => (
               <View key={index} style={styles.itemResposta}>
@@ -279,18 +279,18 @@ export default function IdentificationScreen() {
                 </Text>
                 {resposta.confianca > 0 && (
                   <View style={styles.barraConfianca}>
-                    <View 
+                    <View
                       style={[
                         styles.preenchimentoConfianca,
                         { width: `${resposta.confianca * 100}%` }
-                      ]} 
+                      ]}
                     />
                   </View>
                 )}
               </View>
             ))}
           </View>
-          
+
           <View style={styles.resumo}>
             <Text style={styles.textoResumo}>
               Identificadas: {respostas.filter(r => r.resposta).length} de {respostas.length}
@@ -421,8 +421,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   overlayCamera: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.3)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'transparent',
     justifyContent: 'space-between',
   },
   headerCamera: {

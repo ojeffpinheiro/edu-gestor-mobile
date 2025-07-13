@@ -1,17 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
-import { Exam } from '../../types/examTypes';
 import ExamItem from './ExamItem';
 
-interface CorrectionTabProps {
-  exams: Exam[];
-  answerKey: string[];
-  onExamPress: (exam: Exam) => void;
-  onProcessAll: () => void;
-}
 
-const CorrectionTab: React.FC<CorrectionTabProps> = ({ exams, answerKey, onExamPress, onProcessAll }) => {
+const CorrectionTab = ({ exams, answerKey, onExamPress, onProcessAll }) => {
   return (
     <View style={styles.tabContent}>
       <View style={styles.actionButtons}>
@@ -67,4 +60,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CorrectionTab;
+export default CorrectionTab

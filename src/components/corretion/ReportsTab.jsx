@@ -4,11 +4,7 @@ import { Download, FileText, Target, Trophy, TrendingUp } from 'lucide-react-nat
 import StatsCard from './StatsCard';
 import { ExamReport } from '../../types/examTypes';
 
-interface ReportsTabProps {
-  report: ExamReport;
-}
-
-const ReportsTab: React.FC<ReportsTabProps> = ({ report }) => {
+const ReportsTab= ({ report }) => {
   return (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Relatório de Desempenho</Text>

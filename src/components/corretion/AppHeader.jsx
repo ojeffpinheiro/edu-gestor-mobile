@@ -1,8 +1,7 @@
-import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { User } from 'lucide-react-native';
 
-const AppHeader: React.FC = () => {
+const AppHeader = () => {
   return (
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Correção de Provas</Text>

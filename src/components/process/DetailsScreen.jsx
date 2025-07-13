@@ -1,6 +1,4 @@
-import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { CheckCircle, AlertCircle } from 'lucide-react-native';
 import QuestionItem from './QuestionItem';
 
 const DetailsScreen = ({ correctionResults, onBack }) => {

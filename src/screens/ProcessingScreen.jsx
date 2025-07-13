@@ -1,5 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { View } from 'react-native';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+
+import { getTensorFromURI } from '../utils/imageUtils';
+
 import HomeScreen from '../components/process/HomeScreen';
 import DetailsScreen from '../components/process/DetailsScreen';
 import ResultsScreen from '../components/process/ResultsScreen';
@@ -38,12 +43,15 @@ const ProcessingScreen = () => {
 
   const processImage = async (imageUri) => {
   try {
+    // Inicializar o TensorFlow
     await tf.ready();
+    
     const tensor = await getTensorFromURI(imageUri);
     console.log('Tensor criado com sucesso:', tensor.shape);
     
     setProcessingStatus('processing');
     await new Promise(resolve => setTimeout(resolve, 3000));
+
     const detectedAnswers = generateRandomAnswers(examTemplate.questions);
     const results = calculateResults(detectedAnswers, examTemplate.answerKey);
     setCorrectionResults(results);
@@ -53,6 +61,7 @@ const ProcessingScreen = () => {
     tf.dispose(tensor);
   } catch (error) {
     console.error('Falha ao processar imagem:', error);
+    setProcessingStatus('failed');
   }
 };
 

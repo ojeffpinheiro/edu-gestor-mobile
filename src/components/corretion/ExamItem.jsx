@@ -3,12 +3,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { CheckCircle, XCircle } from 'lucide-react-native';
 import { Exam } from '../../types/examTypes';
 
-interface ExamItemProps {
-  exam: Exam;
-  onPress: () => void;
-}
-
-const ExamItem: React.FC<ExamItemProps> = ({ exam, onPress }) => (
+const ExamItem = ({ exam, onPress }) => (
   <TouchableOpacity style={styles.examItem} onPress={onPress}>
     <View style={styles.examHeader}>
       <View>

@@ -2,16 +2,8 @@ import React from 'react';
 import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
-import { Exam } from '../../types/examTypes';
 
-interface ExamDetailModalProps {
-  visible: boolean;
-  exam: Exam | null;
-  answerKey: string[];
-  onClose: () => void;
-}
-
-const ExamDetailModal: React.FC<ExamDetailModalProps> = ({ visible, exam, answerKey, onClose }) => {
+const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
   if (!exam) return null;
 
   const { corrections } = correctExam(exam.answers, answerKey);

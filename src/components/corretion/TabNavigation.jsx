@@ -2,12 +2,7 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { CheckCircle, BarChart3, Settings } from 'lucide-react-native';
 
-interface TabNavigationProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
-}
-
-const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => (
+const TabNavigation = ({ activeTab, setActiveTab }) => (
   <View style={styles.bottomNav}>
     <TouchableOpacity 
       style={[styles.navItem, activeTab === 'correction' && styles.navItemActive]}

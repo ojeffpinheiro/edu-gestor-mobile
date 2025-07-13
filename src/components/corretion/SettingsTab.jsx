@@ -2,11 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Settings, Plus } from 'lucide-react-native';
 
-interface SettingsTabProps {
-  answerKey: string[];
-}
-
-const SettingsTab: React.FC<SettingsTabProps> = ({ answerKey }) => {
+const SettingsTab = ({ answerKey }) => {
   return (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Configurações</Text>

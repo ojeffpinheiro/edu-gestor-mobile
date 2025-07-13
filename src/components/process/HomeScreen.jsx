@@ -1,5 +1,4 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ActivityIndicator, StyleSheet, Alert } from 'react-native';
 import { Camera, Upload, CheckCircle, FileText, Save, Eye } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 
@@ -13,15 +12,31 @@ const HomeScreen = ({
   onViewDetails,
 }) => {
   const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
-    });
+    // Verificar permissões
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(
+        'Permissão necessária',
+        'Precisamos da permissão para acessar sua galeria de fotos.',
+        [{ text: 'OK' }]
+      );
+      return;
+    }
 
-    if (!result.canceled) {
-      onImageCapture(result.assets[0].uri);
+    try {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 1,
+      });
+
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        onImageCapture(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error('Erro ao selecionar imagem:', error);
+      Alert.alert('Erro', 'Não foi possível selecionar a imagem.');
     }
   };
 

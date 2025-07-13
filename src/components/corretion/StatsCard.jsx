@@ -1,15 +1,6 @@
-import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { Icon } from 'lucide-react-native';
 
-interface StatsCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ComponentType<{ size: number; color: string }>;
-  color: string;
-}
-
-const StatsCard: React.FC<StatsCardProps> = ({ title, value, icon: IconComponent, color }) => (
+const StatsCard = ({ title, value, icon: IconComponent, color }) => (
   <View style={[styles.statsCard, { borderLeftColor: color }]}>
     <View style={styles.statsCardContent}>
       <View>

@@ -4,31 +4,35 @@ import { Download, FileText, Target, Trophy, TrendingUp } from 'lucide-react-nat
 import StatsCard from './StatsCard';
 import { ExamReport } from '../../types/examTypes';
 
-const ReportsTab= ({ report }) => {
+const ReportsTab = ({ report }) => {
+  if (!report) {
+    return <Text>Carregando relatório...</Text>;
+  }
+
   return (
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Relatório de Desempenho</Text>
-      
+
       <View style={styles.statsGrid}>
-        <StatsCard 
+        <StatsCard
           title="Total de Provas"
           value={report.totalExams}
           icon={FileText}
           color="#3B82F6"
         />
-        <StatsCard 
+        <StatsCard
           title="Média Geral"
           value={report.averageScore}
           icon={Target}
           color="#10B981"
         />
-        <StatsCard 
+        <StatsCard
           title="Aprovados"
           value={report.passedStudents}
           icon={Trophy}
           color="#F59E0B"
         />
-        <StatsCard 
+        <StatsCard
           title="Taxa de Aprovação"
           value={`${report.passRate}%`}
           icon={TrendingUp}

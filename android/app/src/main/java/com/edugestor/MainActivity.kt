@@ -1,4 +1,4 @@
-package com.anonymous.edugestor
+package com.edugestor
 
 import android.os.Build
 import android.os.Bundle

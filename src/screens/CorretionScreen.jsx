@@ -7,6 +7,7 @@ import SettingsTab from '../components/corretion/SettingsTab';
 import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
+import { Exam } from '../types/examTypes';
 
 const CorretionScreen = () => {
   const [activeTab, setActiveTab] = useState('correction');

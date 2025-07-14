@@ -4,7 +4,10 @@ import { CheckCircle } from 'lucide-react-native';
 import ExamItem from './ExamItem';
 
 
-const CorrectionTab = ({ exams, answerKey, onExamPress, onProcessAll }) => {
+const CorrectionTab = (props) => {
+  if (!props) return null;
+  const { exams, answerKey, onExamPress, onProcessAll } = props;
+  
   return (
     <View style={styles.tabContent}>
       <View style={styles.actionButtons}>

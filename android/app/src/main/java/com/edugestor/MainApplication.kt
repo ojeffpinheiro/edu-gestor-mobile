@@ -1,4 +1,4 @@
-package com.anonymous.edugestor
+package com.edugestor
 
 import android.app.Application
 import android.content.res.Configuration

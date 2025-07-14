@@ -1,23 +1,35 @@
 import { Correction, Exam, ExamReport } from "../types/examTypes";
 
-export const correctExam = (studentAnswers: string[], answerKey: string[]) => {
+export const correctExam = (studentAnswers: string[] = [], answerKey: string[] = []) => {
+  // Use arrays vazios como padrão, caso não sejam fornecidos
+  const safeStudentAnswers = Array.isArray(studentAnswers) ? studentAnswers : [];
+  const safeAnswerKey = Array.isArray(answerKey) ? answerKey : [];
+
   let correctCount = 0;
   const corrections: Correction[] = [];
 
-  for (let i = 0; i < answerKey.length; i++) {
-    const isCorrect = studentAnswers[i] === answerKey[i];
+  const length = Math.min(safeStudentAnswers.length, safeAnswerKey.length);
+
+  for (let i = 0; i < length; i++) {
+    const isCorrect = safeStudentAnswers[i] === safeAnswerKey[i];
     if (isCorrect) correctCount++;
     
     corrections.push({
       question: i + 1,
-      studentAnswer: studentAnswers[i],
-      correctAnswer: answerKey[i],
+      studentAnswer: safeStudentAnswers[i],
+      correctAnswer: safeAnswerKey[i],
       isCorrect
     });
   }
 
-  const score = (correctCount / answerKey.length) * 10;
-  return { score, corrections, correctCount };
+  const score = length > 0 ? (correctCount / length) * 10 : 0;
+  
+  // Sempre retorne um objeto com todas as propriedades esperadas
+  return {
+    score: parseFloat(score.toFixed(1)),
+    corrections,
+    correctCount
+  };
 };
 
 export const generateReport = (exams: Exam[]): ExamReport => {

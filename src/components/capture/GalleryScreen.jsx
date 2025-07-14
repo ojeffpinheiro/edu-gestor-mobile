@@ -7,9 +7,9 @@ import styles from './styles';
  * Componente que exibe a galeria de imagens capturadas
  * @param {Array} capturedImages - Lista de imagens capturadas
  * @param {function} setCapturedImages - Função para atualizar a lista de imagens
- * @param {function} setCurrentScreen - Função para navegar entre telas
+ * @param {function} setCurrentView - Função para navegar entre telas
  */
-const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentScreen }) => {
+const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentView }) => {
   const [selectedImages, setSelectedImages] = useState([]);
 
   /**
@@ -55,7 +55,7 @@ const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentScreen }) 
       <View style={styles.maxWidthContainer}>
         <View style={styles.screenHeader}>
           <TouchableOpacity
-            onPress={() => setCurrentScreen('home')}
+            onPress={() => setCurrentView('welcome')} 
             style={styles.headerButton}
           >
             <X size={24} color="#374151" />

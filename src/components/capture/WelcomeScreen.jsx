@@ -3,7 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { Camera, BookOpen, Scan, CheckCircle, FileText } from 'lucide-react-native';
 import styles from './styles';
 
-const WelcomeScreen = ({ setCurrentScreen, capturedImages, processImages, results, clearData }) => (
+const WelcomeScreen = ({ setCurrentView, capturedImages, processImages, results, clearData }) => (
   <View style={styles.homeContainer}>
     <View style={styles.maxWidthContainer}>
       <View style={styles.headerContainer}>
@@ -16,7 +16,7 @@ const WelcomeScreen = ({ setCurrentScreen, capturedImages, processImages, result
 
       <View style={styles.buttonContainer}>
         <TouchableOpacity
-          onPress={() => setCurrentScreen('capture')}
+          onPress={() => setCurrentView('camera')}
           style={[styles.button, styles.primaryButton]}
         >
           <Camera size={24} color="white" />
@@ -24,7 +24,7 @@ const WelcomeScreen = ({ setCurrentScreen, capturedImages, processImages, result
         </TouchableOpacity>
 
         <TouchableOpacity
-          onPress={() => setCurrentScreen('gallery')}
+          onPress={() => setCurrentView('gallery')}
           style={[styles.button, styles.secondaryButton]}
         >
           <BookOpen size={24} color="#374151" />
@@ -54,7 +54,7 @@ const WelcomeScreen = ({ setCurrentScreen, capturedImages, processImages, result
 
         {results && (
           <TouchableOpacity
-            onPress={() => setCurrentScreen('results')}
+            onPress={() => setCurrentView('results')}
             style={[styles.button, styles.purpleButton]}
           >
             <CheckCircle size={24} color="white" />

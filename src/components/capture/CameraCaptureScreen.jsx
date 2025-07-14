@@ -8,7 +8,7 @@ import { useErrorHandler } from '../ErrorBoundary';
 const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
   const cameraRef = useRef(null);
   const [isAligned, setIsAligned] = useState(false);
-  const { erro, limparErro, tratarErro } = useErrorHandler();
+  const { erro, limparErro } = useErrorHandler();
 
   const handleCapture = async () => {
     if (!isAligned) {
@@ -59,9 +59,7 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
         {/* Botão de voltar */}
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => setCurrentScreen('home')}
-          accessible={true}
-          accessibilityLabel="Voltar para tela inicial"
+          onPress={() => setCurrentScreen('welcome')}
         >
           <MaterialIcons name="arrow-back" size={24} color="white" />
         </TouchableOpacity>
@@ -94,7 +92,7 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
             <MaterialIcons name="close" size={24} color="white" />
           </TouchableOpacity>
         </View>
-        )}
+      )}
     </View>
   );
 };

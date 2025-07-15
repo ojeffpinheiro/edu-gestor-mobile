@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, Text, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, Image, Text, ActivityIndicator } from 'react-native';
 import { processAnswerSheet } from '../../utils/answerSheetProcessor';
+import styles from './styles';
 
 const MarkerDetector = ({ imageUri, onDetectionComplete }) => {
   const [processing, setProcessing] = useState(true);
@@ -54,27 +55,5 @@ const MarkerDetector = ({ imageUri, onDetectionComplete }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f3f4f6'
-  },
-  processingContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20
-  },
-  processingText: {
-    marginTop: 10,
-    color: '#64748b'
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain'
-  }
-});
 
 export default MarkerDetector;

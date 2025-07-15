@@ -4,6 +4,7 @@ import { CameraView, useCameraPermissions } from 'expo-camera';
 import GridDetectionOverlay from './GridDetectionOverlay';
 import { processAnswerSheet } from '../../utils/answerSheetProcessor';
 import { usePersistedImages } from '../../utils/imageUtils';
+import styles from './styles';
 
 const CameraScreen = ({ navigation }) => {
   const [facing, setFacing] = useState('back');
@@ -107,49 +108,5 @@ const CameraScreen = ({ navigation }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#000',
-  },
-  text: {
-    fontSize: 16,
-    color: 'white',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-  button: {
-    backgroundColor: '#3b82f6',
-    padding: 15,
-    borderRadius: 5,
-    alignSelf: 'center',
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
-  controlsContainer: {
-    position: 'absolute',
-    bottom: 40,
-    left: 0,
-    right: 0,
-    alignItems: 'center',
-  },
-  captureButton: {
-    backgroundColor: 'white',
-    borderRadius: 50,
-    width: 70,
-    height: 70,
-    justifyContent: 'center',
-    alignItems: 'center',
-    elevation: 5,
-  },
-  disabledButton: {
-    backgroundColor: 'gray',
-    opacity: 0.6,
-  },
-});
 
 export default CameraScreen;

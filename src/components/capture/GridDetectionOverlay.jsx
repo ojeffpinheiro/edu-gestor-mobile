@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Text, Dimensions } from 'react-native';
+import { View, Animated, Text, Dimensions } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { manipulateAsync } from 'expo-image-manipulator';
 import { detectAndExtractGrid, validateGridDetection } from '../../utils/gridDetection';
+import styles from './styles';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -11,7 +11,7 @@ const GRID_CONFIG = {
   optionsPerQuestion: 5,
   gridPosition: {
     left: 0.15,
-    top: 0.3,
+    top: 0.2,
     width: 0.7,
     height: 0.5
   }
@@ -21,7 +21,8 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
   const [alignment, setAlignment] = useState({
     isAligned: false,
     quality: 0,
-    message: "Posicione a prova corretamente"
+    message: "Posicione a prova corretamente",
+    corners: null
   });
   const [isProcessing, setIsProcessing] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -63,13 +64,13 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
     }
   }, [alignment.isAligned]);
 
-
   useEffect(() => {
     if (!imageUri) return;
 
     let isMounted = true;
     const processFrame = async () => {
       try {
+        setIsProcessing(true);
         const { success, gridDetection } = await detectAndExtractGrid(imageUri);
         
         if (!isMounted) return;
@@ -78,7 +79,8 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
           setAlignment({
             isAligned: false,
             quality: 0,
-            message: "Não foi possível detectar a grade"
+            message: "Não foi possível detectar a grade",
+            corners: null
           });
           onAlignmentStatusChange(false);
           return;
@@ -92,7 +94,8 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
           quality,
           message: validation.valid 
             ? "Alinhamento correto!" 
-            : validation.reason || "Ajuste a posição"
+            : validation.reason || "Ajuste a posição",
+          corners: gridDetection.corners
         };
 
         if (isMounted) {
@@ -104,9 +107,14 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
           setAlignment({
             isAligned: false,
             quality: 0,
-            message: "Erro no processamento"
+            message: "Erro no processamento",
+            corners: null
           });
           onAlignmentStatusChange(false);
+        }
+      } finally {
+        if (isMounted) {
+          setIsProcessing(false);
         }
       }
     };
@@ -115,30 +123,36 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
     return () => { isMounted = false; };
   }, [imageUri]);
 
-  // Calculate quality based on detection results
-  const calculateDetectionQuality = (detection) => {
-    if (!detection?.success) return 0;
+  // Calcula a qualidade baseada nos resultados da detecção
+  const calculateQuality = (detection) => {
+    if (!detection?.success || !detection.corners) return 0;
 
     const { corners } = detection;
     const markers = Object.values(corners);
 
-    // 1. Size consistency (30% weight)
+    // 1. Consistência de tamanho (30% peso)
     const avgSize = markers.reduce((sum, m) => sum + m.width + m.height, 0) / (markers.length * 2);
     const sizeVariance = markers.reduce((sum, m) => {
       return sum + Math.pow(m.width - avgSize, 2) + Math.pow(m.height - avgSize, 2);
     }, 0) / markers.length;
     const sizeScore = Math.max(0, 100 - sizeVariance * 10);
 
-    // 2. Position symmetry (40% weight)
+    // 2. Simetria de posição (40% peso)
     const centerX = (corners.topLeft.center.x + corners.topRight.center.x +
       corners.bottomLeft.center.x + corners.bottomRight.center.x) / 4;
     const centerY = (corners.topLeft.center.y + corners.topRight.center.y +
       corners.bottomLeft.center.y + corners.bottomRight.center.y) / 4;
-    const positionScore = 100 - (Math.abs(centerX - imageWidth / 2) + Math.abs(centerY - imageHeight / 2)) * 2;
+    const positionScore = 100 - (Math.abs(centerX - screenWidth / 2) + Math.abs(centerY - screenHeight / 2)) * 2;
 
-    // 3. Perspective score (30% weight)
-    const diag1 = distance(corners.topLeft.center, corners.bottomRight.center);
-    const diag2 = distance(corners.topRight.center, corners.bottomLeft.center);
+    // 3. Proporção da perspectiva (30% peso)
+    const diag1 = Math.sqrt(
+      Math.pow(corners.bottomRight.center.x - corners.topLeft.center.x, 2) +
+      Math.pow(corners.bottomRight.center.y - corners.topLeft.center.y, 2)
+    );
+    const diag2 = Math.sqrt(
+      Math.pow(corners.topRight.center.x - corners.bottomLeft.center.x, 2) +
+      Math.pow(corners.topRight.center.y - corners.bottomLeft.center.y, 2)
+    );
     const perspectiveScore = 100 - Math.abs(diag1 - diag2) * 5;
 
     return (sizeScore * 0.3 + positionScore * 0.4 + perspectiveScore * 0.3);
@@ -146,9 +160,9 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
 
   // Cor baseada na qualidade do alinhamento
   const getQualityColor = (quality) => {
-    if (quality > 80) return "#10B981"; // green
-    if (quality > 60) return "#F59E0B"; // yellow
-    return "#EF4444"; // red
+    if (quality > 80) return "#10B981"; // verde
+    if (quality > 60) return "#F59E0B"; // amarelo
+    return "#EF4444"; // vermelho
   };
 
   const getAlignmentTips = (quality) => {
@@ -157,6 +171,7 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
     if (quality < 70) return "Ajuste o ângulo para ficar paralelo";
     return "Pequenos ajustes para melhorar";
   };
+
   // Renderiza o ícone de status
   const renderStatusIcon = () => {
     if (isProcessing) {
@@ -182,60 +197,105 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
     );
   };
 
+  // Renderiza os marcadores de canto detectados
+  const renderDetectedCorners = () => {
+    if (!alignment.corners) return null;
+
+    return (
+      <>
+        {Object.entries(alignment.corners).map(([position, corner]) => (
+          <View
+            key={position}
+            style={[
+              styles.cornerMarker,
+              {
+                left: corner.center.x - 50,
+                top: corner.center.y + 20,
+                backgroundColor: getQualityColor(alignment.quality)
+              }
+            ]}
+          />
+        ))}
+      </>
+    );
+  };
+
   return (
     <View style={styles.container} pointerEvents="none">
       {/* Grade de referência */}
       <View style={[
         styles.gridContainer,
-        { borderColor: getQualityColor(alignment.quality) }
+        { 
+          borderColor: getQualityColor(alignment.quality),
+          left: screenWidth * GRID_CONFIG.gridPosition.left,
+          top: screenHeight * GRID_CONFIG.gridPosition.top,
+          width: screenWidth * GRID_CONFIG.gridPosition.width,
+          height: screenHeight * GRID_CONFIG.gridPosition.height
+        }
       ]}>
         {/* Linhas horizontais */}
-        {[...Array(11)].map((_, i) => (
+        {[...Array(GRID_CONFIG.questionCount + 1)].map((_, i) => (
           <View
             key={`h-line-${i}`}
             style={[
               styles.gridLine,
-              { top: `${(i / 10) * 100}%`, borderColor: getQualityColor() }
+              { 
+                top: `${(i / GRID_CONFIG.questionCount) * 100}%`,
+                borderColor: getQualityColor(alignment.quality)
+              }
             ]}
           />
         ))}
 
-        {[...Array(6)].map((_, i) => (
+        {/* Linhas verticais */}
+        {[...Array(GRID_CONFIG.optionsPerQuestion + 1)].map((_, i) => (
           <View
             key={`v-line-${i}`}
             style={[
               styles.gridLineVertical,
-              { left: `${(i / 5) * 100}%`, borderColor: getQualityColor() }
+              { 
+                left: `${(i / GRID_CONFIG.optionsPerQuestion) * 100}%`,
+                borderColor: getQualityColor(alignment.quality)
+              }
             ]}
           />
         ))}
+
+        {/* Marcadores de canto detectados */}
+        {renderDetectedCorners()}
       </View>
 
       {/* Feedback de alinhamento */}
-
-      <View style={styles.feedbackTextContainer}>
-        <Text style={styles.feedbackText}>
-          {alignment.message}
-        </Text>
-        {!alignment.isAligned && (
-          <Text style={styles.helpText}>
-            {getAlignmentTips(alignment.quality)}
+      <View style={[
+        styles.feedbackContainer,
+        { backgroundColor: `rgba(0, 0, 0, ${alignment.isAligned ? 0.7 : 0.8})` }
+      ]}>
+        {renderStatusIcon()}
+        
+        <View style={styles.feedbackTextContainer}>
+          <Text style={styles.feedbackText}>
+            {alignment.message}
           </Text>
-        )}
+          {!alignment.isAligned && (
+            <Text style={styles.helpText}>
+              {getAlignmentTips(alignment.quality)}
+            </Text>
+          )}
 
-        {/* Quality meter with percentage */}
-        <View style={styles.qualityMeterContainer}>
-          <Text style={styles.qualityText}>
-            Qualidade: {Math.round(alignment.quality)}%
-          </Text>
-          <View style={styles.qualityMeter}>
-            <View style={[
-              styles.qualityBar,
-              {
-                width: `${alignment.quality}%`,
-                backgroundColor: getQualityColor(alignment.quality)
-              }
-            ]} />
+          {/* Medidor de qualidade com porcentagem */}
+          <View style={styles.qualityMeterContainer}>
+            <Text style={styles.qualityText}>
+              Qualidade: {Math.round(alignment.quality)}%
+            </Text>
+            <View style={styles.qualityMeter}>
+              <View style={[
+                styles.qualityBar,
+                {
+                  width: `${alignment.quality}%`,
+                  backgroundColor: getQualityColor(alignment.quality)
+                }
+              ]} />
+            </View>
           </View>
         </View>
       </View>
@@ -243,70 +303,5 @@ const GridDetectionOverlay = ({ onAlignmentStatusChange, imageUri }) => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  gridContainer: {
-    borderWidth: 2,
-    borderRadius: 4,
-    borderColor: '#3B82F6',
-    backgroundColor: 'rgba(59, 130, 246, 0.1)'
-  },
-  gridLine: {
-    position: 'absolute',
-    width: '100%',
-    borderTopWidth: 1,
-    borderStyle: 'dashed'
-  },
-  gridLineVertical: {
-    position: 'absolute',
-    height: '100%',
-    borderLeftWidth: 1,
-    borderStyle: 'dashed'
-  },
-  feedbackContainer: {
-    position: 'absolute',
-    bottom: 130,
-    left: '10%',
-    right: '10%',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-    borderRadius: 12,
-    padding: 12,
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  feedbackText: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 8
-  },
-  qualityMeter: {
-    width: '100%',
-    height: 6,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    borderRadius: 3,
-    overflow: 'hidden'
-  },
-  qualityBar: {
-    height: '100%'
-  },
-  feedbackTextContainer: {
-    flex: 1,
-    marginLeft: 12,
-  },
-  helpText: {
-    color: 'white',
-    fontSize: 14,
-    opacity: 0.8,
-    marginTop: 4,
-  },
-  qualityMeterContainer: {
-    marginTop: 8,
-  },
-  statusIndicator: {
-    padding: 8,
-  },
-});
 
 export default GridDetectionOverlay;

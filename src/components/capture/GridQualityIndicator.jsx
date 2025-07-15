@@ -1,5 +1,6 @@
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
+import styles from './styles';
 
 /**
  * Componente que mostra um indicador visual da qualidade do alinhamento
@@ -29,22 +30,5 @@ const GridQualityIndicator = ({ quality }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  qualityContainer: {
-    width: '100%',
-    marginTop: 8,
-  },
-  qualityBar: {
-    height: 8,
-    borderRadius: 4,
-    marginBottom: 4,
-  },
-  qualityText: {
-    color: 'white',
-    fontSize: 12,
-    textAlign: 'center'
-  }
-});
 
 export default GridQualityIndicator;

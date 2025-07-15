@@ -1,5 +1,6 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { User } from 'lucide-react-native';
+import styles from './AppHeader';
 
 const AppHeader = () => {
   return (
@@ -13,28 +14,5 @@ const AppHeader = () => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
-    borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#1F2937',
-  },
-  headerRight: {
-    flexDirection: 'row',
-  },
-  headerButton: {
-    padding: 8,
-  },
-});
 
 export default AppHeader;

@@ -1,5 +1,9 @@
-// utils/gridDetection.js
-import { manipulateAsync, FlipType, SaveFormat } from 'expo-image-manipulator';
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
+import * as FileSystem from 'expo-file-system';
+import { decode } from 'jpeg-js';
+import { Buffer } from 'buffer';
 
 interface Region {
   pixels: [number, number][];
@@ -30,62 +34,57 @@ interface GridInfo {
 }
 
 export class GridDetector {
-  private canvas: HTMLCanvasElement | null = null;
-  private ctx: CanvasRenderingContext2D | null = null;
-  private imageData: ImageData | null = null;
+  private imageTensor: tf.Tensor3D | null = null;
   private width: number = 0;
   private height: number = 0;
+  private imageData: Uint8Array | null = null;
 
   constructor() {
-    this.canvas = null;
-    this.ctx = null;
-    this.imageData = null;
+    this.imageTensor = null;
     this.width = 0;
     this.height = 0;
+    this.imageData = null;
   }
 
   // Converte imagem para canvas e obtém dados dos pixels
   async loadImage(imageUri: string): Promise<void> {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      img.onload = () => {
-        this.width = img.width;
-        this.height = img.height;
+    try {
+      // Read image file
+      const base64 = await FileSystem.readAsStringAsync(imageUri, {
+        encoding: FileSystem.EncodingType.Base64,
+      });
 
-        // Cria canvas para processamento
-        this.canvas = document.createElement('canvas');
-        this.canvas.width = this.width;
-        this.canvas.height = this.height;
-        this.ctx = this.canvas.getContext('2d');
+      // Decode JPEG using jpeg-js
+      const raw = Buffer.from(base64, 'base64');
+      const { width, height, data } = decode(raw, { useTArray: true });
 
-        if (!this.ctx) {
-          reject(new Error('Could not get canvas context'));
-          return;
-        }
+      // Store image data and create tensor
+      this.imageData = new Uint8Array(data);
+      this.imageTensor = tf.tensor3d(this.imageData, [height, width, 4]); // 4 channels (RGBA)
+      this.width = width;
+      this.height = height;
 
-        // Desenha imagem no canvas
-        this.ctx.drawImage(img, 0, 0);
-        this.imageData = this.ctx.getImageData(0, 0, this.width, this.height);
-
-        resolve();
-      };
-      img.onerror = reject;
-      img.src = imageUri;
-    });
+      // Convert to RGB if needed
+      if (this.imageTensor.shape[2] === 4) {
+        const rgbTensor = this.imageTensor.slice([0, 0, 0], [height, width, 3]);
+        tf.dispose(this.imageTensor);
+        this.imageTensor = rgbTensor;
+      }
+    } catch (error) {
+      console.error('Error loading image:', error);
+      throw error;
+    }
   }
 
-  // Converte pixel para escala de cinza
   getGrayscale(x: number, y: number): number {
-    if (!this.imageData) return 0;
+    if (!this.imageTensor || x < 0 || x >= this.width || y < 0 || y >= this.height) {
+      return 0;
+    }
 
-    const index = (y * this.width + x) * 4;
-    const r = this.imageData.data[index];
-    const g = this.imageData.data[index + 1];
-    const b = this.imageData.data[index + 2];
-    return 0.299 * r + 0.587 * g + 0.114 * b;
+    const pixel = this.imageTensor.slice([y, x, 0], [1, 1, 3]).dataSync();
+    return 0.299 * pixel[0] + 0.587 * pixel[1] + 0.114 * pixel[2];
   }
 
-  // Detecta se um pixel é preto (marcador)
   isBlackPixel(x: number, y: number, threshold = 80): boolean {
     const gray = this.getGrayscale(x, y);
     return gray < threshold;
@@ -306,6 +305,14 @@ export class GridDetector {
       throw error;
     }
   }
+
+  dispose() {
+    if (this.imageTensor) {
+      tf.dispose(this.imageTensor);
+      this.imageTensor = null;
+    }
+    this.imageData = null;
+  }
 }
 
 // Função principal para detectar e extrair grade
@@ -316,16 +323,13 @@ export async function detectAndExtractGrid(imageUri: string): Promise<{
     corners?: Corners;
     grid?: GridInfo;
     error?: string;
-    debug?: {
-      totalRegions: number;
-      imageSize: { width: number; height: number };
-    };
   };
   extractedGridUri?: string;
   error?: string;
 }> {
+  const detector = new GridDetector();
   try {
-    const detector = new GridDetector(); // Instanciando corretamente
+    await detector.loadImage(imageUri);
     const detection = await detector.detectGrid(imageUri);
 
     if (!detection.success) {
@@ -345,8 +349,10 @@ export async function detectAndExtractGrid(imageUri: string): Promise<{
     console.error('Error in detectAndExtractGrid:', error);
     return {
       success: false,
-      error: error instanceof Error ? error.message : 'Erro desconhecido'
+      error: error instanceof Error ? error.message : 'Unknown error'
     };
+  } finally {
+    detector.dispose();
   }
 }
 
@@ -384,11 +390,17 @@ export function validateGridDetection(detection: {
 
   const quality = Math.max(0, 100 - sizeVariance * 10);
 
-  if (!detection || !detection.success) {
-    return { valid: false, reason: 'Detecção falhou' };
+  if (!detection || !detection.success || !detection.corners) {
+    return { valid: false, reason: 'Invalid detection data' };
   }
 
   const { corners, grid } = detection;
+
+
+  const requiredCorners = ['topLeft', 'topRight', 'bottomLeft', 'bottomRight'];
+  if (!requiredCorners.every(key => corners[key])) {
+    return { valid: false, reason: 'Missing corner markers' };
+  }
 
   // Verifica se todos os cantos foram encontrados
   if (!corners?.topLeft || !corners?.topRight || !corners?.bottomLeft || !corners?.bottomRight) {

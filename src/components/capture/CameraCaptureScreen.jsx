@@ -1,47 +1,79 @@
-import React, { useRef, useState } from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Alert } from 'react-native';
-import { CameraView } from 'expo-camera';
-import { MaterialIcons } from '@expo/vector-icons';
+import React, { useState, useRef, useEffect } from 'react';
+import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
+import { CameraView, useCameraPermissions } from 'expo-camera';
 import GridDetectionOverlay from './GridDetectionOverlay';
-import { useErrorHandler } from '../ErrorBoundary';
+import { processAnswerSheet } from '../../utils/answerSheetProcessor';
+import { usePersistedImages } from '../../utils/imageUtils';
 
-const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
-  const cameraRef = useRef(null);
+const CameraScreen = ({ navigation }) => {
+  const [facing, setFacing] = useState('back');
+  const [permission, requestPermission] = useCameraPermissions();
+  const [isProcessing, setIsProcessing] = useState(false);
+  
   const [isAligned, setIsAligned] = useState(false);
-  const { erro, limparErro } = useErrorHandler();
+  const [lastFrameUri, setLastFrameUri] = useState(null);
+  const cameraRef = useRef(null);
 
-  const handleCapture = async () => {
-    if (!isAligned) {
-      Alert.alert(
-        'Alinhamento Necessário',
-        'Por favor, alinhe a prova corretamente antes de capturar.',
-        [{ text: 'OK' }]
-      );
-      return;
+  const { images, saveImages } = usePersistedImages();
+
+  const captureFrame = async () => {
+    if (cameraRef.current) {
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.7,
+        skipProcessing: true,
+        base64: true
+      });
+      setLastFrameUri(photo.uri);
     }
+  };
+
+  useEffect(() => {
+    const interval = setInterval(captureFrame, 1000);
+    return () => clearInterval(interval);
+  }, []);
+
+  // Verifica permissões da câmera
+  if (!permission) {
+    return <View />;
+  }
+  
+  if (!permission.granted) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.text}>Precisamos de permissão para acessar a câmera</Text>
+        <TouchableOpacity style={styles.button} onPress={requestPermission}>
+          <Text style={styles.buttonText}>Conceder permissão</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  // Função para capturar e processar a imagem
+  const handleCapture = async () => {
+    if (!cameraRef.current || !isAligned) return;
 
     try {
+      setIsProcessing(true);
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
-        skipProcessing: true
+        skipProcessing: true,
       });
 
-      if (onPhotoCaptured) {
-        onPhotoCaptured(photo.uri);
+      // Processa a folha de respostas
+      const result = await processAnswerSheet(photo.uri);
+      
+      if (result.success) {
+        // Salva a imagem e navega para os resultados
+        saveImages([...images, { uri: photo.uri, processedAt: new Date().toISOString() }]);
+        navigation.navigate('Results', { result });
       } else {
-        Alert.alert('Erro', 'Função de captura não disponível');
+        Alert.alert('Erro', 'Não foi possível processar a folha de respostas');
       }
     } catch (error) {
-      console.error('Erro na captura:', error);
-
-      let errorMessage = 'Falha ao capturar imagem';
-      if (error.message.includes('storage')) {
-        errorMessage = 'Espaço insuficiente no dispositivo';
-      } else if (error.message.includes('permission')) {
-        errorMessage = 'Permissão negada para acessar a câmera';
-      }
-
-      Alert.alert('Erro', errorMessage);
+      console.error('Erro ao processar imagem:', error);
+      Alert.alert('Erro', 'Ocorreu um erro ao processar a imagem');
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -50,49 +82,27 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
       <CameraView
         ref={cameraRef}
         style={StyleSheet.absoluteFill}
-        facing="back"
+        facing={facing}
       />
 
-      <View style={styles.overlay}>
-        <GridDetectionOverlay onAlignmentStatusChange={setIsAligned} />
+      {/* Overlay de detecção de grade */}
+      <GridDetectionOverlay 
+        imageUri={lastFrameUri}
+        onAlignmentStatusChange={setIsAligned}
+      />
 
-        {/* Botão de voltar */}
+      {/* Botões */}
+      <View style={styles.controlsContainer}>
         <TouchableOpacity
-          style={styles.backButton}
-          onPress={() => setCurrentScreen('welcome')}
+          style={[styles.captureButton, (!isAligned || isProcessing) && styles.disabledButton]}
+          onPress={() => onPhotoCaptured(lastFrameUri)}
+          disabled={!isAligned || isProcessing}
         >
-          <MaterialIcons name="arrow-back" size={24} color="white" />
-        </TouchableOpacity>
-
-        {/* Controles da câmera */}
-        <View style={styles.controlsContainer}>
-          <TouchableOpacity
-            accessible={true}
-            accessibilityLabel="Capturar foto da prova"
-            accessibilityHint={isAligned ? 'Captura a imagem da prova' : 'Ajuste o alinhamento antes de capturar'}
-            onPress={handleCapture}
-            disabled={!isAligned}
-            style={[
-              styles.captureButton,
-              isAligned && styles.captureButtonActive
-            ]}
-          >
-            <MaterialIcons name="camera" size={32} color="white" />
-          </TouchableOpacity>
-
-          <Text style={styles.statusText}>
-            {isAligned ? 'Pronto para capturar' : 'Ajuste o alinhamento'}
+          <Text style={styles.buttonText}>
+            {isProcessing ? 'Processando...' : 'Capturar'}
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
-      {erro && (
-        <View style={styles.overlay}>
-          <Text style={styles.statusText}>{erro}</Text>
-          <TouchableOpacity onPress={limparErro} style={styles.backButton}>
-            <MaterialIcons name="close" size={24} color="white" />
-          </TouchableOpacity>
-        </View>
-      )}
     </View>
   );
 };
@@ -100,47 +110,46 @@ const CameraScreen = ({ onPhotoCaptured, setCurrentScreen }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'black'
+    justifyContent: 'center',
+    backgroundColor: '#000',
   },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'transparent'
+  text: {
+    fontSize: 16,
+    color: 'white',
+    textAlign: 'center',
+    marginBottom: 20,
   },
-  backButton: {
-    position: 'absolute',
-    top: 40,
-    left: 20,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 10,
-    borderRadius: 20
+  button: {
+    backgroundColor: '#3b82f6',
+    padding: 15,
+    borderRadius: 5,
+    alignSelf: 'center',
+  },
+  buttonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    textAlign: 'center',
   },
   controlsContainer: {
     position: 'absolute',
     bottom: 40,
-    width: '100%',
+    left: 0,
+    right: 0,
     alignItems: 'center',
-    backgroundColor: 'transparent'
   },
   captureButton: {
+    backgroundColor: 'white',
+    borderRadius: 50,
     width: 70,
     height: 70,
-    borderRadius: 35,
-    backgroundColor: '#9CA3AF',
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 10
+    elevation: 5,
   },
-  captureButtonActive: {
-    backgroundColor: '#3B82F6'
+  disabledButton: {
+    backgroundColor: 'gray',
+    opacity: 0.6,
   },
-  statusText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: '500',
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    padding: 8,
-    borderRadius: 8
-  }
 });
 
 export default CameraScreen;

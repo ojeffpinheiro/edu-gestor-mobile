@@ -4,23 +4,40 @@ import { processAnswerSheet } from '../../utils/answerSheetProcessor';
 
 const MarkerDetector = ({ imageUri, onDetectionComplete }) => {
   const [processing, setProcessing] = useState(true);
+  const [status, setStatus] = useState("Analisando imagem...");
 
   useEffect(() => {
-    const analyzeSheet = async () => {
+    const processImage = async () => {
       try {
-        const results = await processAnswerSheet(imageUri);
-        onDetectionComplete(results);
+        setStatus("Detectando marcadores...");
+        const detector = new GridDetector();
+        await detector.loadImage(imageUri);
+        setProgress(20);
+        
+        setStatus("Identificando grade...");
+        const detection = await detector.detectGrid(imageUri);
+        setProgress(60);
+        
+        if (detection.success) {
+          setStatus("Processando respostas...");
+          const results = await processAnswerSheet(imageUri);
+          setProgress(100);
+          onDetectionComplete(results);
+        } else {
+          onDetectionComplete({
+            success: false,
+            error: detection.error || "Falha na detecção"
+          });
+        }
       } catch (error) {
         onDetectionComplete({
           success: false,
           error: error.message
         });
-      } finally {
-        setProcessing(false);
       }
     };
-
-    analyzeSheet();
+    
+    processImage();
   }, [imageUri]);
 
   return (
@@ -28,7 +45,7 @@ const MarkerDetector = ({ imageUri, onDetectionComplete }) => {
       {processing ? (
         <View style={styles.processingContainer}>
           <ActivityIndicator size="large" color="#3b82f6" />
-          <Text style={styles.processingText}>Processando imagem...</Text>
+          <Text style={styles.processingText}>{status}</Text>
         </View>
       ) : (
         <Image source={{ uri: imageUri }} style={styles.image} />

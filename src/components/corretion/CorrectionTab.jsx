@@ -2,8 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import ExamItem from './ExamItem';
-import styles from './CorrectionTab';
-
+import styles from './CorrectionTabStyles';
 
 const CorrectionTab = (props) => {
   if (!props) return null;

@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, Alert, StyleSheet } from 'react-native';
 import { correctExam, generateReport } from '../utils/examUtils';
-import CorrectionTab from '../components/corretion/CorrectionTab';
 import ReportsTab from '../components/corretion/ReportsTab';
 import SettingsTab from '../components/corretion/SettingsTab';
 import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import { Exam } from '../types/examTypes';
+import CorrectionTab from '../components/corretion/CorrectionTab';
 
 const CorretionScreen = () => {
   const [activeTab, setActiveTab] = useState('correction');
@@ -74,7 +74,7 @@ const CorretionScreen = () => {
     switch (activeTab) {
       case 'correction':
         return (
-          <CorrectionTab 
+          <CorrectionTab
             exams={exams}
             answerKey={answerKey}
             onExamPress={(exam) => {

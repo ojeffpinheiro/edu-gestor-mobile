@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { User } from 'lucide-react-native';
-import styles from './AppHeader';
+import styles from './AppHeaderStyles';
 
 const AppHeader = () => {
   return (

@@ -1,5 +1,6 @@
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text } from 'react-native';
 import { CheckCircle, AlertCircle } from 'lucide-react-native';
+import styles from './QuestionItemStyles';
 
 const QuestionItem = ({ result }) => {
   return (
@@ -24,35 +25,5 @@ const QuestionItem = ({ result }) => {
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-  },
-  correct: {
-    backgroundColor: '#dcfce7',
-  },
-  incorrect: {
-    backgroundColor: '#fee2e2',
-  },
-  questionNumber: {
-    fontWeight: '500',
-  },
-  answers: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  answerText: {
-    fontSize: 12,
-  },
-  answerValue: {
-    fontWeight: 'bold',
-  },
-});
 
 export default QuestionItem;

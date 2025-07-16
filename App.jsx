@@ -1,9 +1,13 @@
 import { useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
+
+import { ThemeProvider, useTheme } from './src/context/ThemeContext';
 
 import HomeScreen from './src/screens/HomeScreen';
 import AuthScreen from './src/screens/AuthScreen';
@@ -12,46 +16,14 @@ import CaptureScreen from './src/screens/CaptureScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import CorretionScreen from './src/screens/CorretionScreen';
-import { Text, View } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 const Stack = createStackNavigator();
 
-export default function App() {
-  const [tfReady, setTfReady] = useState(false);
-
-  useEffect(() => {
-    const initializeTensorFlow = async () => {
-      try {
-        // 1. Importar o polyfill específico primeiro
-        await import('@tensorflow/tfjs-react-native/dist/platform_react_native');
-
-        await tf.setBackend('rn-webgl');
-
-        // 2. Aguardar a inicialização do backend
-        await tf.ready();
-
-        // 3. Verificar o backend
-        console.log('Backend atual:', tf.getBackend());
-
-        setTfReady(true);
-      } catch (error) {
-        console.error('Falha na inicialização:', error);
-      }
-    };
-
-    initializeTensorFlow();
-  }, []);
-
-  if (!tfReady) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Inicializando TensorFlow...</Text>
-      </View>
-    );
-  }
+const AppContent = () => {
+  const { colors, isDarkMode } = useTheme();
 
   return (
+    
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -105,5 +77,47 @@ export default function App() {
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
+  );
+};
+
+export default function App() {
+  const { colors, isDarkMode } = useTheme();
+  const [tfReady, setTfReady] = useState(false);
+
+  useEffect(() => {
+    const initializeTensorFlow = async () => {
+      try {
+        // 1. Importar o polyfill específico primeiro
+        await import('@tensorflow/tfjs-react-native/dist/platform_react_native');
+
+        await tf.setBackend('rn-webgl');
+
+        // 2. Aguardar a inicialização do backend
+        await tf.ready();
+
+        // 3. Verificar o backend
+        console.log('Backend atual:', tf.getBackend());
+
+        setTfReady(true);
+      } catch (error) {
+        console.error('Falha na inicialização:', error);
+      }
+    };
+
+    initializeTensorFlow();
+  }, []);
+
+  if (!tfReady) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Inicializando TensorFlow...</Text>
+      </View>
+    );
+  }
+
+  return (
+    <ThemeProvider>
+      <AppContent />
+    </ThemeProvider>
   );
 }

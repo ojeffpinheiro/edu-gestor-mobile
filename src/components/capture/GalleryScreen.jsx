@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { BookOpen, X, Trash2 } from 'lucide-react-native';
 import styles from './styles';
@@ -12,6 +12,7 @@ import additionalStyles from './GalleryScreenStyles';
  */
 const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentView }) => {
   const [selectedImages, setSelectedImages] = useState([]);
+const [sortOption, setSortOption] = useState('date');
 
   /**
    * Alterna a seleção de uma imagem
@@ -34,6 +35,17 @@ const GalleryScreen = ({ capturedImages, setCapturedImages, setCurrentView }) =>
     );
     setSelectedImages([]);
   };
+
+  
+const sortedImages = useMemo(() => {
+  return [...capturedImages].sort((a, b) => {
+    if (sortOption === 'date') {
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    } else {
+      return b.gridQuality - a.gridQuality;
+    }
+  });
+}, [capturedImages, sortOption]);
 
   return (
     <View style={styles.galleryContainer}>

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import GridDetectionOverlay from './GridDetectionOverlay';
@@ -10,23 +10,27 @@ const CameraScreen = ({ navigation }) => {
   const [facing, setFacing] = useState('back');
   const [permission, requestPermission] = useCameraPermissions();
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   const [isAligned, setIsAligned] = useState(false);
   const [lastFrameUri, setLastFrameUri] = useState(null);
   const cameraRef = useRef(null);
 
   const { images, saveImages } = usePersistedImages();
 
-  const captureFrame = async () => {
-    if (cameraRef.current) {
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.7,
-        skipProcessing: true,
-        base64: true
-      });
-      setLastFrameUri(photo.uri);
+  const captureFrame = useCallback(async () => {
+    if (cameraRef.current && !isProcessing) {
+      try {
+        const photo = await cameraRef.current.takePictureAsync({
+          quality: 0.7,
+          skipProcessing: true,
+          base64: true
+        });
+        setLastFrameUri(photo.uri);
+      } catch (error) {
+        console.warn('Frame capture error:', error);
+      }
     }
-  };
+  }, [isProcessing]);
 
   useEffect(() => {
     const interval = setInterval(captureFrame, 1000);
@@ -37,7 +41,7 @@ const CameraScreen = ({ navigation }) => {
   if (!permission) {
     return <View />;
   }
-  
+
   if (!permission.granted) {
     return (
       <View style={styles.container}>
@@ -62,7 +66,7 @@ const CameraScreen = ({ navigation }) => {
 
       // Processa a folha de respostas
       const result = await processAnswerSheet(photo.uri);
-      
+
       if (result.success) {
         // Salva a imagem e navega para os resultados
         saveImages([...images, { uri: photo.uri, processedAt: new Date().toISOString() }]);
@@ -87,7 +91,7 @@ const CameraScreen = ({ navigation }) => {
       />
 
       {/* Overlay de detecção de grade */}
-      <GridDetectionOverlay 
+      <GridDetectionOverlay
         imageUri={lastFrameUri}
         onAlignmentStatusChange={setIsAligned}
       />

@@ -119,7 +119,8 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
 
             <View style={styles.demoBox}>
               <Text style={styles.demoText}>
-                <Text style={{ fontWeight: 'bold' }}>Demo:</Text> Use a senha "admin123" para testar
+                <Text style={{ fontWeight: 'bold' }}>Demo:</Text>
+                Use a senha "admin123" para testar
               </Text>
             </View>
           </View>

@@ -1,40 +1,51 @@
-import { useEffect, useRef } from "react";
-import { Animated } from "react-native";
-import styles from "./GridDetectionOverlayStyles";
+import React from 'react';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
-const ScanLine = ({ GRID_CONFIG, screenHeight }) => {
-  const translateY = useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(translateY, {
+const ScanLine = ({ active }) => {
+  const { colors } = useTheme();
+  const [position] = useState(new Animated.Value(0));
+  
+  React.useEffect(() => {
+    if (active) {
+      Animated.loop(
+        Animated.timing(position, {
           toValue: 1,
           duration: 2000,
-          useNativeDriver: true
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 0,
+          easing: Easing.linear,
           useNativeDriver: true
         })
-      ])
-    ).start();
-  }, []);
+      ).start();
+    } else {
+      position.setValue(0);
+    }
+  }, [active]);
 
   return (
-    <Animated.View style={[
-      styles.scanLine,
-      {
-        transform: [{
-          translateY: translateY.interpolate({
-            inputRange: [0, 1],
-            outputRange: [0, screenHeight * GRID_CONFIG.gridPosition.height]
-          })
-        }]
-      }
-    ]} />
+    <Animated.View 
+      style={[
+        localStyles.line,
+        { 
+          backgroundColor: colors.primary,
+          transform: [{
+            translateY: position.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0%', '100%']
+            })
+          }]
+        }
+      ]} 
+    />
   );
 };
+
+const localStyles = StyleSheet.create({
+  line: {
+    position: 'absolute',
+    width: '100%',
+    height: 2,
+    opacity: 0.8
+  }
+});
 
 export default ScanLine;

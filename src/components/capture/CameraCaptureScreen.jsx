@@ -1,84 +1,22 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
-import { CameraView, useCameraPermissions } from 'expo-camera';
-import GridDetectionOverlay from './GridDetectionOverlay';
-import { processAnswerSheet } from '../../utils/answerSheetProcessor';
-import { usePersistedImages } from '../../utils/imageUtils';
-import styles from './styles';
+import React, { useState, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { CameraView } from 'expo-camera';
+import { Flashlight, Scan } from 'lucide-react-native';
+import { createMainStyles } from '../../styles/mainStyles';
+import { useTheme } from '../../context/ThemeContext';
+import { Spacing, BorderRadius } from '../../styles/designTokens';
 
 const CameraScreen = ({ navigation }) => {
-  const [facing, setFacing] = useState('back');
-  const [permission, requestPermission] = useCameraPermissions();
-  const [isProcessing, setIsProcessing] = useState(false);
-
-  const [isAligned, setIsAligned] = useState(false);
-  const [lastFrameUri, setLastFrameUri] = useState(null);
+  const { colors } = useTheme();
+  const styles = createMainStyles(colors);
+  const [hasPermission, setHasPermission] = useState(null);
+  const [torchOn, setTorchOn] = useState(false);
   const cameraRef = useRef(null);
 
-  const { images, saveImages } = usePersistedImages();
-
-  const captureFrame = useCallback(async () => {
-    if (cameraRef.current && !isProcessing) {
-      try {
-        const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.7,
-          skipProcessing: true,
-          base64: true
-        });
-        setLastFrameUri(photo.uri);
-      } catch (error) {
-        console.warn('Frame capture error:', error);
-      }
-    }
-  }, [isProcessing]);
-
-  useEffect(() => {
-    const interval = setInterval(captureFrame, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Verifica permissões da câmera
-  if (!permission) {
-    return <View />;
-  }
-
-  if (!permission.granted) {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.text}>Precisamos de permissão para acessar a câmera</Text>
-        <TouchableOpacity style={styles.button} onPress={requestPermission}>
-          <Text style={styles.buttonText}>Conceder permissão</Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  // Função para capturar e processar a imagem
-  const handleCapture = async () => {
-    if (!cameraRef.current || !isAligned) return;
-
-    try {
-      setIsProcessing(true);
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-        skipProcessing: true,
-      });
-
-      // Processa a folha de respostas
-      const result = await processAnswerSheet(photo.uri);
-
-      if (result.success) {
-        // Salva a imagem e navega para os resultados
-        saveImages([...images, { uri: photo.uri, processedAt: new Date().toISOString() }]);
-        navigation.navigate('Results', { result });
-      } else {
-        Alert.alert('Erro', 'Não foi possível processar a folha de respostas');
-      }
-    } catch (error) {
-      console.error('Erro ao processar imagem:', error);
-      Alert.alert('Erro', 'Ocorreu um erro ao processar a imagem');
-    } finally {
-      setIsProcessing(false);
+  const toggleTorch = () => {
+    if (cameraRef.current) {
+      cameraRef.current.toggleTorch();
+      setTorchOn(!torchOn);
     }
   };
 
@@ -86,31 +24,119 @@ const CameraScreen = ({ navigation }) => {
     <View style={styles.container}>
       <CameraView
         ref={cameraRef}
-        style={StyleSheet.absoluteFill}
-        facing={facing}
-      />
-
-      {/* Overlay de detecção de grade */}
-      <GridDetectionOverlay
-        imageUri={lastFrameUri}
-        onAlignmentStatusChange={setIsAligned}
-      />
-
-      {/* Botões */}
-      <View style={styles.controlsContainer}>
-        <TouchableOpacity
-          style={[styles.captureButton, (!isAligned || isProcessing) && styles.disabledButton]}
-          onPress={() => onPhotoCaptured(lastFrameUri)}
-          disabled={!isAligned || isProcessing}
-        >
-          <Text style={styles.buttonText}>
-            {isProcessing ? 'Processando...' : 'Capturar'}
+        style={StyleSheet.absoluteFillObject}
+      >
+        {/* Scanner overlay */}
+        <View style={localStyles.overlay}>
+          <View style={[localStyles.scanFrame, { borderColor: colors.primary }]}>
+            {/* Scanner corners */}
+            <View style={[localStyles.corner, localStyles.topLeft]} />
+            <View style={[localStyles.corner, localStyles.topRight]} />
+            <View style={[localStyles.corner, localStyles.bottomLeft]} />
+            <View style={[localStyles.corner, localStyles.bottomRight]} />
+          </View>
+          
+          <Text style={[localStyles.instructionText, { color: colors.card }]}>
+            Posicione a folha de resposta dentro do quadro
           </Text>
-        </TouchableOpacity>
-      </View>
+        </View>
+
+        {/* Bottom controls */}
+        <View style={localStyles.controls}>
+          <TouchableOpacity
+            style={[localStyles.button, { backgroundColor: colors.primary }]}
+            onPress={() => navigation.navigate('Processing')}
+          >
+            <Scan size={24} color={colors.card} />
+            <Text style={[localStyles.buttonText, { color: colors.card }]}>Capturar</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[localStyles.torchButton, { backgroundColor: colors.card }]}
+            onPress={toggleTorch}
+          >
+            <Flashlight size={24} color={torchOn ? colors.warning : colors.textPrimary} />
+          </TouchableOpacity>
+        </View>
+      </CameraView>
     </View>
   );
 };
 
+const localStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)'
+  },
+  scanFrame: {
+    width: '80%',
+    aspectRatio: 1,
+    borderWidth: 2,
+    position: 'relative'
+  },
+  corner: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderColor: '#ffffff',
+    borderWidth: 2
+  },
+  topLeft: {
+    top: -2,
+    left: -2,
+    borderRightWidth: 0,
+    borderBottomWidth: 0
+  },
+  topRight: {
+    top: -2,
+    right: -2,
+    borderLeftWidth: 0,
+    borderBottomWidth: 0
+  },
+  bottomLeft: {
+    bottom: -2,
+    left: -2,
+    borderRightWidth: 0,
+    borderTopWidth: 0
+  },
+  bottomRight: {
+    bottom: -2,
+    right: -2,
+    borderLeftWidth: 0,
+    borderTopWidth: 0
+  },
+  instructionText: {
+    marginTop: Spacing.lg,
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  controls: {
+    position: 'absolute',
+    bottom: Spacing.xl,
+    left: 0,
+    right: 0,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    marginHorizontal: Spacing.sm
+  },
+  buttonText: {
+    marginLeft: Spacing.sm,
+    fontSize: 16,
+    fontWeight: 'bold'
+  },
+  torchButton: {
+    padding: Spacing.md,
+    borderRadius: BorderRadius.round
+  }
+});
 
 export default CameraScreen;

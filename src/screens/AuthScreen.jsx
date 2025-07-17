@@ -18,6 +18,10 @@ const AuthScreen = ({ navigation }) => {
           <AuthForm 
             setCurrentView={setCurrentView}
             setIsAuthenticated={setIsAuthenticated}
+            selectedStudent={selectedStudent}
+            setSelectedStudent={setSelectedStudent}
+            navigation={navigation}
+            isAuthenticated={isAuthenticated}
           />
         );
       case 'scanner':
@@ -26,6 +30,9 @@ const AuthScreen = ({ navigation }) => {
             setCurrentView={setCurrentView}
             scannedCode={scannedCode}
             setScannedCode={setScannedCode}
+            setIsAuthenticated={setIsAuthenticated}
+            navigation={navigation}
+            isAuthenticated={isAuthenticated}
           />
         );
       case 'students':
@@ -36,6 +43,7 @@ const AuthScreen = ({ navigation }) => {
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
             navigation={navigation}
+            isAuthenticated={isAuthenticated}
           />
         );
       default:

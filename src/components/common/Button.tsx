@@ -54,7 +54,7 @@ const Button = ({
       backgroundColor: colors.primary,
     },
     secondary: {
-      backgroundColor: colors.cardBackground,
+      backgroundColor: colors.card,
       borderColor: colors.border,
       borderWidth: 1,
     },
@@ -81,19 +81,19 @@ const Button = ({
       textAlign: 'center',
     },
     textPrimary: {
-      color: colors.cardBackground, // Texto branco/claro para botões coloridos
+      color: colors.card, // Texto branco/claro para botões coloridos
     },
     textSecondary: {
       color: colors.textSecondary, // Texto escuro/neutro para botões secundários
     },
     textSuccess: {
-      color: colors.cardBackground,
+      color: colors.card,
     },
     textDanger: {
-      color: colors.cardBackground,
+      color: colors.card,
     },
     textInfo: {
-      color: colors.cardBackground,
+      color: colors.card,
     },
     iconContainer: {
       marginRight: Spacing.xs,

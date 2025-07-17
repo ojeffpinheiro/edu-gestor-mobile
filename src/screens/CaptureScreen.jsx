@@ -52,6 +52,7 @@ const CaptureScreen = () => {
         <CameraScreen
           onPhotoCaptured={handlePhotoCaptured}
           setCurrentScreen={setCurrentView}
+          navigation={navigation}
         />
       );
       
@@ -60,11 +61,16 @@ const CaptureScreen = () => {
         <MarkerDetector 
           imageUri={imageUri}
           onDetectionComplete={handleDetectionComplete}
+          setIsProcessing={setIsProcessing}
+          setCurrentView={setCurrentView}
+          capturedImages={capturedImages}
+          setCapturedImages={setCapturedImages}
+          clearData={clearData}
         />
       );
       
     case 'results':
-      return <ResultsScreen results={results} />;
+      return <ResultsScreen results={results} navigation={navigator} route={route} />;
       
     case 'welcome':
       return (

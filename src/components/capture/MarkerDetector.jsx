@@ -1,59 +1,33 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, Text, ActivityIndicator } from 'react-native';
-import { processAnswerSheet } from '../../utils/answerSheetProcessor';
-import styles from './styles';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
 
-const MarkerDetector = ({ imageUri, onDetectionComplete }) => {
-  const [processing, setProcessing] = useState(true);
-  const [status, setStatus] = useState("Analisando imagem...");
-
-  useEffect(() => {
-    const processImage = async () => {
-      try {
-        setStatus("Detectando marcadores...");
-        const detector = new GridDetector();
-        await detector.loadImage(imageUri);
-        setProgress(20);
-        
-        setStatus("Identificando grade...");
-        const detection = await detector.detectGrid(imageUri);
-        setProgress(60);
-        
-        if (detection.success) {
-          setStatus("Processando respostas...");
-          const results = await processAnswerSheet(imageUri);
-          setProgress(100);
-          onDetectionComplete(results);
-        } else {
-          onDetectionComplete({
-            success: false,
-            error: detection.error || "Falha na detecção"
-          });
-        }
-      } catch (error) {
-        onDetectionComplete({
-          success: false,
-          error: error.message
-        });
-      }
-    };
-    
-    processImage();
-  }, [imageUri]);
+const MarkerDetector = ({ position }) => {
+  const { colors } = useTheme();
+  
+  if (!position) return null;
 
   return (
-    <View style={styles.container}>
-      {processing ? (
-        <View style={styles.processingContainer}>
-          <ActivityIndicator size="large" color="#3b82f6" />
-          <Text style={styles.processingText}>{status}</Text>
-        </View>
-      ) : (
-        <Image source={{ uri: imageUri }} style={styles.image} />
-      )}
-    </View>
+    <View style={[
+      localStyles.marker, 
+      { 
+        left: position.x, 
+        top: position.y,
+        borderColor: colors.primary
+      }
+    ]} />
   );
 };
 
+const localStyles = StyleSheet.create({
+  marker: {
+    position: 'absolute',
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 3,
+    backgroundColor: 'rgba(59, 130, 246, 0.2)'
+  }
+});
 
 export default MarkerDetector;

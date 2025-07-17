@@ -1,3 +1,4 @@
+// src/context/ThemeContext.tsx
 import React, {
   createContext,
   useContext,
@@ -9,6 +10,7 @@ import React, {
 import { useColorScheme, Appearance } from 'react-native';
 import { ColorScheme, darkColors, lightColors } from '../styles/colors';
 
+// 1. Defina os tipos
 type ThemePreference = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
@@ -19,8 +21,19 @@ interface ThemeContextType {
   setAppTheme: (theme: ThemePreference) => void;
 }
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+// 2. Crie o contexto SEM valor padrão (null assertion)
+const ThemeContext = createContext<ThemeContextType | null>(null);
 
+// 3. Hook customizado
+export const useTheme = () => {
+  const context = useContext(ThemeContext);
+  if (!context) {
+    throw new Error('useTheme deve ser usado dentro de um ThemeProvider');
+  }
+  return context;
+};
+
+// 4. Provider com toda a lógica
 interface ThemeProviderProps {
   children: ReactNode;
   initialTheme?: ThemePreference;
@@ -43,7 +56,6 @@ export const ThemeProvider = ({
   useEffect(() => {
     const subscription = Appearance.addChangeListener(({ colorScheme }) => {
       if (theme === 'system') {
-        // Force re-render when system theme changes and we're in system mode
         setTheme('system');
       }
     });
@@ -79,12 +91,4 @@ export const ThemeProvider = ({
       {children}
     </ThemeContext.Provider>
   );
-};
-
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (context === undefined) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
 };

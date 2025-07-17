@@ -20,10 +20,7 @@ import CorretionScreen from './src/screens/CorretionScreen';
 const Stack = createStackNavigator();
 
 const AppContent = () => {
-  const { colors, isDarkMode } = useTheme();
-
   return (
-    
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
@@ -81,9 +78,8 @@ const AppContent = () => {
 };
 
 export default function App() {
-  const { colors, isDarkMode } = useTheme();
   const [tfReady, setTfReady] = useState(false);
-
+  
   useEffect(() => {
     const initializeTensorFlow = async () => {
       try {

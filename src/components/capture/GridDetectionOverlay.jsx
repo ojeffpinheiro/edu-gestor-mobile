@@ -2,60 +2,57 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 
-const GridDetectionOverlay = ({ detected }) => {
+const GridDetectionOverlay = ({ detected, edges }) => {
   const { colors } = useTheme();
   
   return (
     <View style={StyleSheet.absoluteFillObject} pointerEvents="none">
-      <View style={[localStyles.grid, { borderColor: detected ? colors.success : colors.warning }]}>
-        {/* Vertical lines */}
-        <View style={[localStyles.line, localStyles.lineVertical1]} />
-        <View style={[localStyles.line, localStyles.lineVertical2]} />
-        
-        {/* Horizontal lines */}
-        <View style={[localStyles.line, localStyles.lineHorizontal1]} />
-        <View style={[localStyles.line, localStyles.lineHorizontal2]} />
-      </View>
+      {edges && (
+        <View style={[
+          localStyles.detectedFrame, 
+          { 
+            borderColor: detected ? colors.success : colors.warning,
+            borderWidth: detected ? 3 : 2
+          }
+        ]}>
+          {/* Linhas conectando os pontos detectados */}
+          <View style={[
+            localStyles.detectedLine,
+            {
+              left: edges.topLeft.x,
+              top: edges.topLeft.y,
+              width: Math.sqrt(
+                Math.pow(edges.topRight.x - edges.topLeft.x, 2) + 
+                Math.pow(edges.topRight.y - edges.topLeft.y, 2)
+              ),
+              transform: [
+                { 
+                  rotate: Math.atan2(
+                    edges.topRight.y - edges.topLeft.y,
+                    edges.topRight.x - edges.topLeft.x
+                  ) + 'rad' 
+                }
+              ]
+            }
+          ]} />
+          
+          {/* Repetir para outras linhas */}
+        </View>
+      )}
     </View>
   );
 };
 
 const localStyles = StyleSheet.create({
-  grid: {
+  detectedFrame: {
     position: 'absolute',
-    top: '20%',
-    left: '10%',
-    right: '10%',
-    bottom: '20%',
-    borderWidth: 2
+    borderStyle: 'dashed',
+    borderRadius: 5
   },
-  line: {
+  detectedLine: {
     position: 'absolute',
-    backgroundColor: 'rgba(255,255,255,0.3)'
-  },
-  lineVertical1: {
-    width: 1,
-    left: '33%',
-    top: 0,
-    bottom: 0
-  },
-  lineVertical2: {
-    width: 1,
-    left: '66%',
-    top: 0,
-    bottom: 0
-  },
-  lineHorizontal1: {
-    height: 1,
-    top: '33%',
-    left: 0,
-    right: 0
-  },
-  lineHorizontal2: {
-    height: 1,
-    top: '66%',
-    left: 0,
-    right: 0
+    height: 2,
+    backgroundColor: 'rgba(0,255,0,0.7)'
   }
 });
 

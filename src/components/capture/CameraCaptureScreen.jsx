@@ -1,64 +1,172 @@
 import React, { useState, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { CameraView } from 'expo-camera';
-import { Flashlight, Scan } from 'lucide-react-native';
-import { createMainStyles } from '../../styles/mainStyles';
+import { Flashlight, Scan, ArrowLeft } from 'lucide-react-native';
+import * as tf from '@tensorflow/tfjs';
+import { cameraWithTensors } from '@tensorflow/tfjs-react-native';
+
+import GridDetectionOverlay from './GridDetectionOverlay';
+import ScanLine from './ScanLine';
+import GridQualityIndicator from './GridQualityIndicator';
+
 import { useTheme } from '../../context/ThemeContext';
+import { detectEdges, calculateAlignmentQuality } from '../../utils/imageProcessor';
+
+import { createMainStyles } from '../../styles/mainStyles'
 import { Spacing, BorderRadius } from '../../styles/designTokens';
 
-const CameraScreen = ({ navigation }) => {
-  const { colors } = useTheme();
-  const styles = createMainStyles(colors);
-  const [hasPermission, setHasPermission] = useState(null);
-  const [torchOn, setTorchOn] = useState(false);
-  const cameraRef = useRef(null);
+// Componente de câmera com suporte a tensores
+const TensorCamera = cameraWithTensors(CameraView);
 
-  const toggleTorch = () => {
+const CameraScreen = ({ onPhotoCaptured, onBack }) => {
+  const { colors } = useTheme();
+  const [torchEnabled, setTorchEnabled] = useState(false);
+  const [gridDetected, setGridDetected] = useState(false);
+  const [alignmentQuality, setAlignmentQuality] = useState(0);
+  const [edgePositions, setEdgePositions] = useState(null);
+  const cameraRef = useRef(null);
+  const styles = createMainStyles(colors);
+  const textureDims = { width: 1080, height: 1920 }; // Dimensões para processamento
+
+  const toggleTorch = () => setTorchEnabled(current => !current);
+
+  // Função para processar frames da câmera
+  const handleCameraStream = async (images) => {
+    const nextImageTensor = images.next().value;
+
+    try {
+      // Detectar bordas e calcular qualidade
+      const { edges, quality } = await detectEdges(nextImageTensor);
+      const { topLeft, topRight, bottomLeft, bottomRight } = edges;
+
+      setAlignmentQuality(quality);
+      setGridDetected(quality > 60); // Considera detectado se qualidade > 60%
+      setEdgePositions(edges);
+
+      tf.dispose(nextImageTensor);
+    } catch (error) {
+      console.error('Erro no processamento:', error);
+    }
+  };
+
+  const handleCapture = async () => {
+    if (!gridDetected) {
+      Alert.alert('Atenção', 'Posicione melhor a folha dentro do quadro para melhor detecção');
+      return;
+    }
+
     if (cameraRef.current) {
-      cameraRef.current.toggleTorch();
-      setTorchOn(!torchOn);
+      try {
+        const photo = await cameraRef.current.takePictureAsync({
+          quality: 0.8,
+          base64: true,
+          skipProcessing: true // Para capturar imagem mais rápido
+        });
+        onPhotoCaptured(photo.uri);
+      } catch (error) {
+        Alert.alert('Erro', 'Não foi possível capturar a foto');
+      }
     }
   };
 
   return (
-    <View style={styles.container}>
-      <CameraView
+    <View style={StyleSheet.absoluteFill}>
+      <TensorCamera
         ref={cameraRef}
-        style={StyleSheet.absoluteFillObject}
+        style={StyleSheet.absoluteFill}
+        facing={'back'}
+        torchEnabled={torchEnabled}
+        onReady={handleCameraStream}
+        cameraTextureWidth={textureDims.width}
+        cameraTextureHeight={textureDims.height}
+        resizeWidth={textureDims.width}
+        resizeHeight={textureDims.height}
+        resizeDepth={3}
+        autorender={true}
       >
-        {/* Scanner overlay */}
+        <GridDetectionOverlay detected={gridDetected} edges={edgePositions} />
+        <ScanLine active={true} />
+        <GridQualityIndicator quality={alignmentQuality} />
+
+        <View style={[
+          localStyles.header,
+          { borderBottomColor: colors.border, backgroundColor: colors.background }
+        ]}>
+          <TouchableOpacity onPress={onBack}>
+            <ArrowLeft size={24} color={colors.card} />
+          </TouchableOpacity>
+        </View>
+
         <View style={localStyles.overlay}>
-          <View style={[localStyles.scanFrame, { borderColor: colors.primary }]}>
-            {/* Scanner corners */}
-            <View style={[localStyles.corner, localStyles.topLeft]} />
-            <View style={[localStyles.corner, localStyles.topRight]} />
-            <View style={[localStyles.corner, localStyles.bottomLeft]} />
-            <View style={[localStyles.corner, localStyles.bottomRight]} />
+          <View style={[localStyles.scanFrame, {
+            borderColor: gridDetected ? colors.success : colors.warning
+          }]}>
+            {['topLeft', 'topRight', 'bottomLeft', 'bottomRight'].map((position) => (
+              <View
+                key={position}
+                style={[
+                  localStyles.corner,
+                  localStyles[position],
+                  { borderColor: colors.card }
+                ]}
+              />
+            ))}
+            {edgePositions && (
+              <>
+                <View style={[
+                  localStyles.cornerMarker,
+                  {
+                    left: edgePositions.topLeft.x,
+                    top: edgePositions.topLeft.y,
+                    borderColor: colors.success
+                  }
+                ]} />
+                {/* Repetir para outros cantos */}
+              </>
+            )}
           </View>
-          
           <Text style={[localStyles.instructionText, { color: colors.card }]}>
-            Posicione a folha de resposta dentro do quadro
+            {gridDetected
+              ? `Posição ideal! (${alignmentQuality}%) Toque para capturar`
+              : `Ajuste o alinhamento (${alignmentQuality}%)`}
           </Text>
         </View>
 
-        {/* Bottom controls */}
         <View style={localStyles.controls}>
           <TouchableOpacity
-            style={[localStyles.button, { backgroundColor: colors.primary }]}
-            onPress={() => navigation.navigate('Processing')}
+            style={[
+              localStyles.button,
+              {
+                backgroundColor: gridDetected ? colors.success : colors.primary,
+                opacity: gridDetected ? 1 : 0.7
+              }
+            ]}
+            onPress={handleCapture}
           >
             <Scan size={24} color={colors.card} />
-            <Text style={[localStyles.buttonText, { color: colors.card }]}>Capturar</Text>
+            <Text style={[localStyles.buttonText, { color: colors.card }]}>
+              Capturar
+            </Text>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
-            style={[localStyles.torchButton, { backgroundColor: colors.card }]}
+            style={[
+              localStyles.torchButton,
+              {
+                backgroundColor: colors.card,
+                borderColor: torchEnabled ? colors.warning : colors.border
+              }
+            ]}
             onPress={toggleTorch}
           >
-            <Flashlight size={24} color={torchOn ? colors.warning : colors.textPrimary} />
+            <Flashlight
+              size={24}
+              fill={torchEnabled ? colors.warning : 'transparent'}
+              color={torchEnabled ? colors.warning : colors.textPrimary}
+            />
           </TouchableOpacity>
         </View>
-      </CameraView>
+      </TensorCamera>
     </View>
   );
 };
@@ -70,11 +178,27 @@ const localStyles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0.5)'
   },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.md,
+    borderBottomWidth: 1
+  },
   scanFrame: {
     width: '80%',
     aspectRatio: 1,
     borderWidth: 2,
     position: 'relative'
+  },
+  cornerMarker: {
+    position: 'absolute',
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    borderWidth: 3,
+    backgroundColor: 'rgba(0,255,0,0.3)'
   },
   corner: {
     position: 'absolute',

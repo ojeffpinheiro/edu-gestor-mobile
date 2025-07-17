@@ -1,20 +1,19 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, TouchableOpacity } from 'react-native';
 import { ChevronLeft, Download, Share2 } from 'lucide-react-native';
 import { createMainStyles } from '../../styles/mainStyles';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius } from '../../styles/designTokens';
 
-const ResultsScreen = ({ route, navigation }) => {
+const ResultsScreen = ({ results, imageUri, onBack }) => {
   const { colors } = useTheme();
   const styles = createMainStyles(colors);
-  const { image } = route.params;
 
   return (
     <View style={styles.container}>
       <View style={styles.card}>
         <View style={localStyles.header}>
-          <TouchableOpacity onPress={() => navigation.goBack()}>
+          <TouchableOpacity onPress={onBack}>
             <ChevronLeft size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={[styles.title, { flex: 1, textAlign: 'center' }]}>Resultados</Text>
@@ -22,7 +21,9 @@ const ResultsScreen = ({ route, navigation }) => {
         </View>
 
         <ScrollView contentContainerStyle={localStyles.content}>
-          <Image source={{ uri: image.uri }} style={localStyles.resultImage} />
+          {imageUri && (
+            <Image source={{ uri: imageUri }} style={localStyles.resultImage} />
+          )}
 
           <View style={localStyles.resultMeta}>
             <Text style={styles.subtitle}>Detalhes da Análise</Text>
@@ -31,46 +32,60 @@ const ResultsScreen = ({ route, navigation }) => {
               <Text style={[localStyles.metaLabel, { color: colors.textSecondary }]}>
                 Total de Questões:
               </Text>
-              <Text style={[localStyles.metaValue, { color: colors.textPrimary }]}>20</Text>
+              <Text style={[localStyles.metaValue, { color: colors.textPrimary }]}>
+                {results?.totalQuestions || 'N/A'}
+              </Text>
             </View>
             
             <View style={[localStyles.metaItem, { borderColor: colors.border }]}>
               <Text style={[localStyles.metaLabel, { color: colors.textSecondary }]}>
                 Acertos:
               </Text>
-              <Text style={[localStyles.metaValue, { color: colors.success }]}>16</Text>
+              <Text style={[localStyles.metaValue, { color: colors.success }]}>
+                {results?.correctAnswers || 'N/A'}
+              </Text>
             </View>
             
             <View style={[localStyles.metaItem, { borderColor: colors.border }]}>
               <Text style={[localStyles.metaLabel, { color: colors.textSecondary }]}>
                 Erros:
               </Text>
-              <Text style={[localStyles.metaValue, { color: colors.error }]}>4</Text>
+              <Text style={[localStyles.metaValue, { color: colors.error }]}>
+                {results?.wrongAnswers || 'N/A'}
+              </Text>
             </View>
             
             <View style={[localStyles.metaItem, { borderColor: colors.border }]}>
               <Text style={[localStyles.metaLabel, { color: colors.textSecondary }]}>
                 Nota Final:
               </Text>
-              <Text style={[localStyles.metaValue, { color: colors.primary }]}>8.0</Text>
+              <Text style={[localStyles.metaValue, { color: colors.primary }]}>
+                {results?.score ? `${results.score.toFixed(1)}` : 'N/A'}
+              </Text>
             </View>
           </View>
 
           <View style={localStyles.actionButtons}>
-            <TouchableOpacity style={[
-              localStyles.actionButton, 
-              { backgroundColor: colors.card, borderColor: colors.border }
-            ]}>
+            <TouchableOpacity 
+              style={[
+                localStyles.actionButton, 
+                { backgroundColor: colors.card, borderColor: colors.border }
+              ]}
+              onPress={() => {/* Implement PDF export */}}
+            >
               <Download size={20} color={colors.textPrimary} />
               <Text style={[localStyles.actionButtonText, { color: colors.textPrimary }]}>
                 Exportar PDF
               </Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={[
-              localStyles.actionButton, 
-              { backgroundColor: colors.primary }
-            ]}>
+            <TouchableOpacity 
+              style={[
+                localStyles.actionButton, 
+                { backgroundColor: colors.primary }
+              ]}
+              onPress={() => {/* Implement share */}}
+            >
               <Share2 size={20} color={colors.card} />
               <Text style={[localStyles.actionButtonText, { color: colors.card }]}>
                 Compartilhar

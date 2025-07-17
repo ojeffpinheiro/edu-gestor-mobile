@@ -1,8 +1,8 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
-import { createMainStyles } from '../styles/mainStyles';
-import { useTheme } from '../context/ThemeContext';
-import { Spacing, BorderRadius } from '../styles/designTokens';
+import { createMainStyles } from '../../styles/mainStyles'
+import { useTheme } from '../../context/ThemeContext';
+import { Spacing, BorderRadius } from '../../styles/designTokens';
 
 const GridQualityIndicator = ({ quality }) => {
   const { colors } = useTheme();

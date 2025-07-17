@@ -1,0 +1,29 @@
+{
+  "format": "graph-model",
+  "generatedBy": "tfjs-converter",
+  "modelTopology": {
+    "node": [
+      {
+        "name": "input",
+        "op": "Placeholder",
+        "attr": {
+          "dtype": { "type": "DT_FLOAT" },
+          "shape": { "shape": { "dim": [ { "size": "1" }, { "size": "256" }, { "size": "256" }, { "size": "3" } ] } }
+        }
+      },
+      {
+        "name": "output",
+        "op": "Identity",
+        "input": [ "input" ],
+        "attr": { "T": { "type": "DT_FLOAT" } }
+      }
+    ],
+    "versions": { "producer": 1.0 }
+  },
+  "weightsManifest": [
+    {
+      "paths": ["weights.bin"],
+      "weights": []
+    }
+  ]
+}

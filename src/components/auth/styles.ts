@@ -3,140 +3,236 @@ import { StyleSheet } from 'react-native';
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: 'rgba(239, 246, 255, 0.5)',
+    padding: 20,
+    backgroundColor: '#f8fafc',
     justifyContent: 'center',
   },
+
   card: {
     backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 24,
+    borderRadius: 24,
+    padding: 32,
+    margin: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
-      height: 2,
+      height: 8,
     },
-    shadowOpacity: 0.1,
-    shadowRadius: 10,
-    elevation: 5,
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 12,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
   },
+
   header: {
     alignItems: 'center',
-    marginBottom: 24,
+    marginBottom: 32,
   },
+
   iconContainer: {
-    backgroundColor: '#dbeafe',
-    borderRadius: 999,
-    width: 64,
-    height: 64,
+    marginBottom: 20,
+  },
+
+  iconGradient: {
+    backgroundColor: '#3b82f6',
+    borderRadius: 20,
+    width: 80,
+    height: 80,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
+    shadowColor: '#3b82f6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
   },
+
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#1e293b',
     marginBottom: 8,
     textAlign: 'center',
+    letterSpacing: -0.5,
   },
+
   subtitle: {
     fontSize: 16,
-    color: '#6b7280',
+    color: '#64748b',
     textAlign: 'center',
+    lineHeight: 24,
+    fontWeight: '400',
   },
-  infoBox: {
-    backgroundColor: '#eff6ff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
+
+  inputSection: {
+    marginBottom: 32,
   },
-  infoTitle: {
+
+  inputLabel: {
+    fontSize: 14,
     fontWeight: '600',
-    color: '#1e40af',
+    color: '#374151',
     marginBottom: 8,
+    marginLeft: 4,
   },
-  infoText: {
-    color: '#1e40af',
-    fontSize: 14,
-  },
-  infoList: {
-    marginTop: 8,
-  },
-  infoItem: {
-    color: '#1e40af',
-    fontSize: 14,
-    marginBottom: 4,
-  },
+
   inputContainer: {
     position: 'relative',
+  },
+
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderRadius: 16,
+    backgroundColor: '#f8fafc',
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+  },
+
+  inputIcon: {
+    marginRight: 12,
+  },
+
+  input: {
+    flex: 1,
+    fontSize: 16,
+    color: '#1e293b',
+    paddingVertical: 16,
+    paddingHorizontal: 0,
+    fontWeight: '500',
+  },
+
+  inputFocused: {
+    borderColor: '#3b82f6',
+    backgroundColor: '#ffffff',
+    shadowColor: '#3b82f6',
+    shadowOffset: {
+      width: 0,
+      height: 0,
+    },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+
+  inputActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+
+  actionButton: {
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: 'transparent',
+  },
+
+  buttonSection: {
     marginBottom: 24,
   },
-  input: {
-    borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 12,
-    padding: 16,
-    paddingRight: 48,
+
+  primaryButton: {
+    backgroundColor: '#3b82f6',
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#3b82f6',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+
+  disabledButton: {
+    backgroundColor: '#94a3b8',
+    opacity: 0.6,
+    shadowOpacity: 0.1,
+  },
+
+  secondaryButton: {
+    backgroundColor: 'transparent',
+    borderColor: '#e2e8f0',
+    borderWidth: 2,
+    paddingVertical: 16,
+    paddingHorizontal: 24,
+    borderRadius: 16,
+    alignItems: 'center',
+  },
+
+  buttonText: {
+    color: '#ffffff',
     fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
-  eyeIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
+
+  secondaryButtonText: {
+    color: '#64748b',
+    fontSize: 16,
+    fontWeight: '600',
+    letterSpacing: 0.5,
   },
+
   demoBox: {
     backgroundColor: '#fef3c7',
-    borderRadius: 12,
-    padding: 16,
-    marginTop: 16,
+    borderRadius: 16,
+    padding: 20,
+    borderWidth: 1,
+    borderColor: '#f59e0b',
+    marginTop: 8,
   },
+
+  demoHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  demoBadge: {
+    backgroundColor: '#f59e0b',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    marginRight: 8,
+  },
+
+  demoBadgeText: {
+    color: '#ffffff',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 0.5,
+  },
+
   demoText: {
     color: '#92400e',
     fontSize: 14,
+    lineHeight: 20,
+    fontWeight: '500',
   },
-  scannerActive: {
-    alignItems: 'center',
+
+  demoPassword: {
+    fontWeight: '700',
+    backgroundColor: '#f59e0b',
+    color: '#ffffff',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 6,
+    fontSize: 13,
+    letterSpacing: 0.5,
   },
-  successText: {
-    color: '#166534',
-  },
-  studentsList: {
-    maxHeight: 300,
-    marginBottom: 24,
-  },
-  studentItem: {
-    borderWidth: 2,
-    borderColor: '#e5e7eb',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-  },
-  selectedStudent: {
-    borderColor: '#2563eb',
-    backgroundColor: '#eff6ff',
-  },
-  studentInfo: {
-    marginBottom: 8,
-  },
-  studentName: {
-    fontWeight: '600',
-    color: '#1f2937',
-    fontSize: 16,
-  },
-  studentClass: {
-    color: '#6b7280',
-    fontSize: 14,
-  },
-  studentIdContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  studentId: {
-    color: '#9ca3af',
-    fontSize: 14,
-  },
+
+  // Estilos existentes do scanner (mantidos para compatibilidade)
   scannerContainer: {
     width: '100%',
     height: 250,
@@ -145,21 +241,18 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f3f4f6',
     marginBottom: 20,
   },
-  
-  // Container da câmera
+
   cameraContainer: {
     flex: 1,
     position: 'relative',
   },
-  
-  // Estilo da câmera
+
   camera: {
     flex: 1,
     width: '100%',
     height: '100%',
   },
-  
-  // Overlay do scanner
+
   scannerOverlay: {
     position: 'absolute',
     top: 0,
@@ -170,8 +263,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  
-  // Frame do scanner
+
   scannerFrame: {
     width: 200,
     height: 200,
@@ -179,13 +271,12 @@ export const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: 'transparent',
   },
-  
-  // Cantos do frame
+
   scannerCorner: {
     position: 'absolute',
     width: 20,
     height: 20,
-    borderColor: '#2563eb',
+    borderColor: '#3b82f6',
     borderWidth: 3,
     borderTopWidth: 3,
     borderLeftWidth: 3,
@@ -194,21 +285,21 @@ export const styles = StyleSheet.create({
     top: -2,
     left: -2,
   },
-  
+
   topRight: {
     top: -2,
     right: -2,
     left: 'auto',
     transform: [{ rotate: '90deg' }],
   },
-  
+
   bottomLeft: {
     bottom: -2,
     left: -2,
     top: 'auto',
     transform: [{ rotate: '270deg' }],
   },
-  
+
   bottomRight: {
     bottom: -2,
     right: -2,
@@ -216,8 +307,7 @@ export const styles = StyleSheet.create({
     left: 'auto',
     transform: [{ rotate: '180deg' }],
   },
-  
-  // Instruções do scanner
+
   scannerInstructions: {
     color: '#ffffff',
     fontSize: 14,
@@ -226,8 +316,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: 20,
     fontWeight: '500',
   },
-  
-  // Botão de fechar
+
   closeButton: {
     position: 'absolute',
     top: 10,
@@ -240,20 +329,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 10,
   },
-  
-  // Container dos botões
-  buttonContainer: {
-    width: '100%',
-    marginBottom: 10,
-  },
-  
-  // Botão desabilitado
-  disabledButton: {
-    backgroundColor: '#9ca3af',
-    opacity: 0.6,
-  },
-  
-  // Ajustes no placeholder do scanner
+
   scannerPlaceholder: {
     flex: 1,
     justifyContent: 'center',
@@ -261,86 +337,159 @@ export const styles = StyleSheet.create({
     backgroundColor: '#f9fafb',
     minHeight: 200,
   },
-  
+
   scannerInactive: {
     alignItems: 'center',
   },
-  
+
   scannerText: {
     fontSize: 14,
-    color: '#6b7280',
+    color: '#64748b',
     marginTop: 10,
     textAlign: 'center',
   },
-  
-  // Caixa de sucesso
+
   successBox: {
     backgroundColor: '#f0fdf4',
-    borderColor: '#16a34a',
+    borderColor: '#22c55e',
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
+    borderRadius: 12,
+    padding: 16,
     marginBottom: 20,
   },
-  
+
   successHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 4,
   },
-  
+
   successTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#16a34a',
+    color: '#22c55e',
     marginLeft: 8,
   },
+
   successCode: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#15803d',
+    color: '#16a34a',
     marginLeft: 28,
   },
-  
-  // Botão de sucesso
+
   successButton: {
-    backgroundColor: '#16a34a',
+    backgroundColor: '#22c55e',
     paddingVertical: 14,
     paddingHorizontal: 20,
-    borderRadius: 8,
+    borderRadius: 12,
     alignItems: 'center',
     marginBottom: 12,
+    shadowColor: '#22c55e',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 6,
   },
-  
-  // Botões primário e secundário
-  primaryButton: {
-    backgroundColor: '#2563eb',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
+
+  // Estilos para lista de estudantes
+  studentsList: {
+    maxHeight: 300,
+    marginBottom: 24,
+  },
+
+  studentItem: {
+    borderWidth: 2,
+    borderColor: '#e2e8f0',
+    borderRadius: 16,
+    padding: 16,
     marginBottom: 12,
+    backgroundColor: '#ffffff',
   },
-  
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#d1d5db',
+
+  selectedStudent: {
+    borderColor: '#3b82f6',
+    backgroundColor: '#eff6ff',
+  },
+
+  studentInfo: {
+    marginBottom: 8,
+  },
+
+  studentName: {
+    fontWeight: '600',
+    color: '#1e293b',
+    fontSize: 16,
+  },
+
+  studentClass: {
+    color: '#64748b',
+    fontSize: 14,
+  },
+
+  studentIdContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  studentId: {
+    color: '#9ca3af',
+    fontSize: 14,
+  },
+
+  scannerActive: {
+    alignItems: 'center',
+  },
+
+  successText: {
+    color: '#16a34a',
+  },
+
+  buttonContainer: {
+    width: '100%',
+    marginBottom: 10,
+  },
+
+  infoBox: {
+    backgroundColor: '#eff6ff',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
     borderWidth: 1,
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginBottom: 12,
+    borderColor: '#3b82f6',
   },
-  
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
+
+  infoTitle: {
     fontWeight: '600',
+    color: '#1e40af',
+    marginBottom: 8,
+    fontSize: 16,
   },
-  secondaryButtonText: {
-    color: '#6b7280',
-    fontSize: 16,
-    fontWeight: '600',
+
+  infoText: {
+    color: '#1e40af',
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  infoList: {
+    marginTop: 8,
+  },
+
+  infoItem: {
+    color: '#1e40af',
+    fontSize: 14,
+    marginBottom: 4,
+    lineHeight: 20,
+  },
+
+  eyeIcon: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
   },
 });

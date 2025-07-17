@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
+import 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
-import { ThemeProvider, useTheme } from './src/context/ThemeContext';
+import { ThemeProvider } from './src/context/ThemeContext';
 
 import HomeScreen from './src/screens/HomeScreen';
 import AuthScreen from './src/screens/AuthScreen';
@@ -16,10 +16,20 @@ import CaptureScreen from './src/screens/CaptureScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import CorretionScreen from './src/screens/CorretionScreen';
+import { loadModels } from './src/utils/imageProcessor';
 
 const Stack = createStackNavigator();
 
 const AppContent = () => {
+  useEffect(() => {
+    const prepare = async () => {
+      await tf.ready();
+      await loadModels();
+    };
+
+    prepare();
+  }, []);
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
@@ -79,7 +89,7 @@ const AppContent = () => {
 
 export default function App() {
   const [tfReady, setTfReady] = useState(false);
-  
+
   useEffect(() => {
     const initializeTensorFlow = async () => {
       try {

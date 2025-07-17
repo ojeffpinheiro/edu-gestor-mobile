@@ -1,81 +1,101 @@
-import React from 'react';
-import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet } from 'react-native';
-import { GalleryVertical, CheckCircle } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import { createMainStyles } from '../../styles/mainStyles';
-import { Spacing, BorderRadius,  } from '../../styles/designTokens';
+import React, { useMemo, useState } from 'react';
+import { View, Text, TouchableOpacity, Image, ScrollView } from 'react-native';
+import { BookOpen, X, Trash2 } from 'lucide-react-native';
+import styles from './styles';
+import additionalStyles from './GalleryScreenStyles';
 
-const GalleryScreen = ({ navigation }) => {
-  const { colors } = useTheme();
-  const styles = createMainStyles(colors);
-  
-  // Mock data - replace with actual images
-  const images = Array.from({ length: 10 }, (_, i) => ({
-    id: `img-${i}`,
-    uri: `https://placehold.co/300x400/333/FFF?text=Scan+${i+1}`
-  }));
+const GalleryScreen = ({ capturedImages = [], setCapturedImages, onBack }) => {
+  const [selectedImages, setSelectedImages] = useState([]);
+  const [sortOption, setSortOption] = useState('date');
+
+  const toggleSelectImage = (imageId) => {
+    setSelectedImages(prev => 
+      prev.includes(imageId) 
+        ? prev.filter(id => id !== imageId) 
+        : [...prev, imageId]
+    );
+  };
+
+  const deleteSelected = () => {
+    setCapturedImages(prev => 
+      prev.filter(img => !selectedImages.includes(img.id))
+    );
+    setSelectedImages([]);
+  };
+
+  const sortedImages = useMemo(() => {
+    return [...capturedImages].sort((a, b) => {
+      if (sortOption === 'date') {
+        return new Date(b.timestamp) - new Date(a.timestamp);
+      } else {
+        return b.gridQuality - a.gridQuality;
+      }
+    });
+  }, [capturedImages, sortOption]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={localStyles.header}>
-          <GalleryVertical size={24} color={colors.primary} />
-          <Text style={[styles.title, { marginLeft: Spacing.sm }]}>Galeria de Scans</Text>
+    <View style={styles.galleryContainer}>
+      {selectedImages.length > 0 && (
+        <View style={additionalStyles.actionBar}>
+          <Text style={additionalStyles.actionBarText}>
+            {selectedImages.length} selecionada(s)
+          </Text>
+          <TouchableOpacity 
+            onPress={deleteSelected}
+            style={additionalStyles.deleteButton}
+          >
+            <Trash2 size={20} color="#EF4444" />
+            <Text style={additionalStyles.deleteButtonText}>Remover</Text>
+          </TouchableOpacity>
         </View>
-        
-        <FlatList
-          data={images}
-          numColumns={2}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity 
-              style={localStyles.imageContainer}
-              onPress={() => navigation.navigate('Results', { image: item })}
-            >
-              <Image 
-                source={{ uri: item.uri }} 
-                style={localStyles.image}
-              />
-              <View style={localStyles.checkBadge}>
-                <CheckCircle size={16} color={colors.success} />
-              </View>
-            </TouchableOpacity>
-          )}
-          columnWrapperStyle={localStyles.columnWrapper}
-        />
+      )}
+
+      <View style={styles.maxWidthContainer}>
+        <View style={styles.screenHeader}>
+          <TouchableOpacity
+            onPress={onBack} 
+            style={styles.headerButton}
+          >
+            <X size={24} color="#374151" />
+          </TouchableOpacity>
+          <Text style={styles.screenTitle}>Provas Capturadas</Text>
+          <View style={{ width: 32 }} />
+        </View>
+
+        {sortedImages.length === 0 ? (
+          <View style={styles.emptyGallery}>
+            <BookOpen size={64} color="#9ca3af" />
+            <Text style={styles.emptyText}>Nenhuma prova capturada</Text>
+          </View>
+        ) : (
+          <ScrollView contentContainerStyle={styles.galleryGrid}>
+            {sortedImages.map((image) => (
+              <TouchableOpacity
+                key={image.id}
+                style={[
+                  styles.imageCard,
+                  selectedImages.includes(image.id) && additionalStyles.selectedImageCard
+                ]}
+                onPress={() => toggleSelectImage(image.id)}
+                onLongPress={() => toggleSelectImage(image.id)}
+              >
+                <Image
+                  source={{ uri: image.uri }}
+                  style={styles.galleryImage}
+                />
+                <View style={styles.imageInfo}>
+                  <Text style={styles.imageTimestamp}>{image.timestamp}</Text>
+                  <Text style={additionalStyles.gridQualityText}>
+                    Qualidade: {image.gridQuality}%
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        )}
       </View>
     </View>
   );
 };
-
-const localStyles = StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: Spacing.lg
-  },
-  imageContainer: {
-    flex: 1,
-    margin: Spacing.sm,
-    borderRadius: BorderRadius.md,
-    overflow: 'hidden'
-  },
-  image: {
-    width: '100%',
-    aspectRatio: 1,
-    backgroundColor: '#f0f0f0'
-  },
-  checkBadge: {
-    position: 'absolute',
-    top: Spacing.sm,
-    right: Spacing.sm,
-    backgroundColor: 'rgba(255,255,255,0.7)',
-    borderRadius: BorderRadius.round,
-    padding: Spacing.xxs
-  },
-  columnWrapper: {
-    justifyContent: 'space-between'
-  }
-});
 
 export default GalleryScreen;

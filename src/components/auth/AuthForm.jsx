@@ -8,15 +8,18 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableWithoutFeedback,
-  Keyboard
+  Keyboard,
+  Animated
 } from 'react-native';
-import { Lock, Eye, EyeOff, X } from 'lucide-react-native';
+import { Lock, Eye, EyeOff, X, Shield } from 'lucide-react-native';
 import { styles } from './styles';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [isTyping, setIsTyping] = useState(false);
+  const [fadeAnim] = useState(new Animated.Value(0));
+  const [slideAnim] = useState(new Animated.Value(30));
   const passwordInputRef = useRef(null);
 
   const validatePassword = () => {
@@ -26,104 +29,152 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
     } else {
       Alert.alert('Erro', 'Senha incorreta!');
     }
-    Keyboard.dismiss(); // Esconde o teclado após validação
+    Keyboard.dismiss();
   };
 
   useEffect(() => {
+    // Animação de entrada
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 600,
+        useNativeDriver: true,
+      })
+    ]).start();
+
     if (passwordInputRef.current) {
       passwordInputRef.current.focus();
     }
-  }, [password]);
+  }, []);
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <View style={styles.container}>
-          <View style={styles.card}>
-            <View style={styles.header}>
-              <View style={styles.iconContainer}>
-                <Lock size={24} color="#2563eb" />
+          <TouchableOpacity
+            activeOpacity={1}
+            onPress={() => passwordInputRef.current?.focus()}
+          >
+            <Animated.View
+              style={[
+                styles.card,
+                {
+                  opacity: fadeAnim,
+                  transform: [{ translateY: slideAnim }]
+                }
+              ]}
+            >
+              {/* Header com gradiente visual */}
+              <View style={styles.header}>
+                <View style={styles.iconContainer}>
+                  <View style={styles.iconGradient}>
+                    <Shield size={28} color="#ffffff" />
+                  </View>
+                </View>
+                <Text style={styles.title}>Bem-vindo de volta</Text>
+                <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
               </View>
-              <Text style={styles.title}>Autenticação</Text>
-              <Text style={styles.subtitle}>Digite sua senha para acessar o sistem</Text>
-            </View>
 
-            <View style={styles.inputContainer}>
-              <TextInput
-                placeholder="Digite sua senha"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={(text) => {
-                  setPassword(text);
-                  // Força o foco a permanecer no input após cada alteração
-                  if (passwordInputRef.current) {
-                    passwordInputRef.current.focus();
-                  }
-                }}
-                ref={passwordInputRef}
-                autoFocus={true}
+              {/* Container do input com animação */}
+              <View style={styles.inputSection}>
+                <Text style={styles.inputLabel}>Senha</Text>
+                <View style={styles.inputContainer}>
+                  <View style={styles.inputWrapper}>
+                    <Lock size={20} color="#6b7280" style={styles.inputIcon} />
+                    <TextInput
+                      placeholder="Digite sua senha"
+                      placeholderTextColor="#9ca3af"
+                      secureTextEntry={!showPassword}
+                      value={password}
+                      onChangeText={(text) => {
+                        setPassword(text);
+                        if (passwordInputRef.current) {
+                          passwordInputRef.current.focus();
+                        }
+                      }}
+                      ref={passwordInputRef}
+                      onFocus={() => setIsTyping(true)}
+                      onBlur={() => setIsTyping(false)}
+                      style={[
+                        styles.input,
+                        isTyping && styles.inputFocused
+                      ]}
+                    />
+                    <View style={styles.inputActions}>
+                      {password.length > 0 && (
+                        <TouchableOpacity
+                          style={styles.actionButton}
+                          onPress={() => {
+                            setPassword('');
+                            passwordInputRef.current.focus();
+                          }}
+                        >
+                          <X size={18} color="#9ca3af" />
+                        </TouchableOpacity>
+                      )}
+                      <TouchableOpacity
+                        style={styles.actionButton}
+                        onPress={() => {
+                          setShowPassword(!showPassword);
+                          passwordInputRef.current.focus();
+                        }}
+                      >
+                        {showPassword ?
+                          <EyeOff size={18} color="#9ca3af" /> :
+                          <Eye size={18} color="#9ca3af" />
+                        }
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+              </View>
 
-                onFocus={() => setIsTyping(true)}
-                onBlur={() => {
-                  setIsTyping(false);
-                  if (passwordInputRef.current) {
-                    passwordInputRef.current.focus();
-                  }
-                }}
-                style={[
-                  styles.input,
-                  isTyping && { borderColor: '#2563eb' }
-                ]}
-              />
-              <TouchableOpacity
-                style={styles.eyeIcon}
-                onPress={() => {
-                  setShowPassword(!showPassword);
-                  passwordInputRef.current.focus();
-                }}
-              >
-                {showPassword ? <EyeOff size={20} color="#6b7280" /> : <Eye size={20} color="#6b7280" />}
-              </TouchableOpacity>
-              {password.length > 0 && (
+              {/* Botões com novo design */}
+              <View style={styles.buttonSection}>
                 <TouchableOpacity
-                  style={[styles.eyeIcon, { right: 48 }]}
+                  style={[
+                    styles.primaryButton,
+                    password.length === 0 && styles.disabledButton
+                  ]}
+                  onPress={validatePassword}
+                  disabled={password.length === 0}
+                >
+                  <Text style={styles.buttonText}>Entrar</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.secondaryButton}
                   onPress={() => {
-                    setPassword('');
-                    passwordInputRef.current.focus();
+                    setCurrentView('home');
+                    Keyboard.dismiss();
                   }}
                 >
-                  <X size={20} color="#6b7280" />
+                  <Text style={styles.secondaryButtonText}>Voltar ao início</Text>
                 </TouchableOpacity>
-              )}
-            </View>
+              </View>
 
-            <TouchableOpacity
-              style={styles.primaryButton}
-              onPress={validatePassword}
-            >
-              <Text style={styles.buttonText}>Entrar</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={styles.secondaryButton}
-              onPress={() => {
-                setCurrentView('home');
-                Keyboard.dismiss();
-              }}
-            >
-              <Text style={styles.secondaryButtonText}>Voltar</Text>
-            </TouchableOpacity>
-
-            <View style={styles.demoBox}>
-              <Text style={styles.demoText}>
-                <Text style={{ fontWeight: 'bold' }}>Demo:</Text>
-                Use a senha "admin123" para testar
-              </Text>
-            </View>
-          </View>
+              {/* Demo box redesenhada */}
+              <View style={styles.demoBox}>
+                <View style={styles.demoHeader}>
+                  <View style={styles.demoBadge}>
+                    <Text style={styles.demoBadgeText}>DEMO</Text>
+                  </View>
+                </View>
+                <Text style={styles.demoText}>
+                  Use a senha <Text style={styles.demoPassword}>'admin123'</Text> para testar o sistema
+                </Text>
+              </View>
+            </Animated.View>
+          </TouchableOpacity>
         </View>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>

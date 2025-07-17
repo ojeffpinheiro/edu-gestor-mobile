@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
-import { Users, CheckCircle } from 'lucide-react-native';
+import { View, Text, TouchableOpacity, ScrollView, Animated, Easing } from 'react-native';
+import { Users, CheckCircle, ChevronLeft } from 'lucide-react-native';
 import { createMainStyles } from '../../styles/mainStyles';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
+import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
+import { useNavigation } from '@react-navigation/native';
 
 const students = [
   { id: '001', name: 'Ana Silva', class: '3A' },
@@ -12,98 +13,191 @@ const students = [
   { id: '004', name: 'João Pereira', class: '3B' }
 ];
 
-const StudentsScreen = ({ navigation, scannedCode, selectedStudent, setSelectedStudent, setCurrentView }) => {
+const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createMainStyles(colors);
+  const navigation = useNavigation()
+  const scaleValue = new Animated.Value(1);
+
+  const animatePress = () => {
+    Animated.sequence([
+      Animated.timing(scaleValue, {
+        toValue: 0.95,
+        duration: 100,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      }),
+      Animated.timing(scaleValue, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      })
+    ]).start();
+  };
+
+  const handleStudentSelect = (id) => {
+    animatePress();
+    setSelectedStudent(id);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={localStyles.header}>
-          <View style={[localStyles.iconContainer, { backgroundColor: colors.primary + '20' }]}>
-            <Users size={24} color={colors.primary} />
+      <View style={[styles.card, { padding: 0 }]}>
+        {/* Modern Header */}
+        <View style={[localStyles.headerContainer, { backgroundColor: colors.primary }]}>
+          <TouchableOpacity 
+            style={localStyles.backButton}
+            onPress={() => setCurrentView('scanner')}
+          >
+            <ChevronLeft size={24} color={colors.card} />
+          </TouchableOpacity>
+          <View style={localStyles.headerContent}>
+            <Text style={[localStyles.headerTitle, { color: colors.card }]}>Identificação de Aluno</Text>
+            <Text style={[localStyles.headerSubtitle, { color: colors.card + 'CC' }]}>
+              Selecione o aluno para esta prova
+            </Text>
           </View>
-          <Text style={styles.title}>Identificação de Aluno</Text>
-          <Text style={styles.subtitle}>Selecione o aluno para esta prova</Text>
         </View>
 
-        {scannedCode && (
-          <View style={[localStyles.infoBox, { backgroundColor: colors.primary + '10' }]}>
-            <Text style={[localStyles.infoText, { color: colors.primary }]}>
-              <Text style={{ fontWeight: Typography.fontWeight.bold }}>Código: </Text>
-              <Text>{scannedCode?.toString() || ''}</Text>
-            </Text>
-          </View>
-        )}
-
-        <ScrollView style={localStyles.studentsList}>
-          {students.map((student) => (
-            <TouchableOpacity
-              key={student.id}
-              style={[
-                localStyles.studentItem,
-                { borderColor: colors.border },
-                selectedStudent === student.id && { borderColor: colors.primary, backgroundColor: colors.primary + '10' }
-              ]}
-              onPress={() => setSelectedStudent(student.id)}
-            >
-              <View style={localStyles.studentInfo}>
-                <Text style={[localStyles.studentName, { color: colors.textPrimary }]}>{student.name}</Text>
-                <Text style={[localStyles.studentClass, { color: colors.textSecondary }]}>Turma: {student.class}</Text>
-              </View>
-              <View style={localStyles.studentIdContainer}>
-                <Text style={[localStyles.studentId, { color: colors.textSecondary }]}>ID: {student.id}</Text>
-                {selectedStudent === student.id && (
-                  <CheckCircle size={20} color={colors.primary} />
-                )}
-              </View>
-            </TouchableOpacity>
-          ))}
-        </ScrollView>
-
-        {selectedStudent && (
-          <View style={[localStyles.successBox, { borderColor: colors.success, backgroundColor: colors.success + '10' }]}>
-            <View style={localStyles.successHeader}>
-              <CheckCircle size={20} color={colors.success} />
-              <Text style={[localStyles.successTitle, { color: colors.success }]}>Aluno Selecionado</Text>
+        <View style={{ padding: Spacing.lg }}>
+          {scannedCode && (
+            <View style={[localStyles.infoBox, { backgroundColor: colors.primary + '10' }]}>
+              <Text style={[localStyles.infoText, { color: colors.primary }]}>
+                <Text style={{ fontWeight: Typography.fontWeight.bold }}>Código: </Text>
+                <Text>{scannedCode?.toString() || ''}</Text>
+              </Text>
             </View>
-            <Text style={[localStyles.successText, { color: colors.success }]}>
-              {students.find(s => s.id === selectedStudent)?.name}
-            </Text>
+          )}
+
+          <Text style={[localStyles.sectionTitle, { color: colors.textSecondary, marginBottom: Spacing.sm }]}>
+            Lista de Alunos
+          </Text>
+
+          <ScrollView 
+            style={localStyles.studentsList}
+            showsVerticalScrollIndicator={false}
+          >
+            {students.map((student) => (
+              <Animated.View
+                key={student.id}
+                style={{
+                  transform: [{ scale: selectedStudent === student.id ? scaleValue : 1 }]
+                }}
+              >
+                <TouchableOpacity
+                  style={[
+                    localStyles.studentItem,
+                    { 
+                      borderColor: colors.border,
+                      backgroundColor: colors.card,
+                      ...Shadow(colors).button
+                    },
+                    selectedStudent === student.id && { 
+                      borderColor: colors.primary, 
+                      backgroundColor: colors.primary + '10',
+                    }
+                  ]}
+                  onPress={() => handleStudentSelect(student.id)}
+                  activeOpacity={0.7}
+                >
+                  <View style={localStyles.studentInfo}>
+                    <Text style={[localStyles.studentName, { color: colors.textPrimary }]}>
+                      {student.name}
+                    </Text>
+                    <View style={localStyles.studentMeta}>
+                      <Text style={[localStyles.studentClass, { color: colors.textSecondary }]}>
+                        Turma: {student.class}
+                      </Text>
+                      <Text style={[localStyles.studentId, { color: colors.textSecondary }]}>
+                        ID: {student.id}
+                      </Text>
+                    </View>
+                  </View>
+                  {selectedStudent === student.id && (
+                    <View style={localStyles.checkIcon}>
+                      <CheckCircle size={24} color={colors.primary} fill={colors.primary} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              </Animated.View>
+            ))}
+          </ScrollView>
+
+          {selectedStudent && (
+            <View style={[
+              localStyles.successBox, 
+              { 
+                borderColor: colors.success, 
+                backgroundColor: colors.success + '10',
+                ...Shadow(colors).button
+              }
+            ]}>
+              <View style={localStyles.successHeader}>
+                <CheckCircle size={20} color={colors.success} />
+                <Text style={[localStyles.successTitle, { color: colors.success }]}>
+                  Aluno Selecionado
+                </Text>
+              </View>
+              <Text style={[localStyles.successText, { color: colors.success }]}>
+                {students.find(s => s.id === selectedStudent)?.name}
+              </Text>
+            </View>
+          )}
+
+          <View style={localStyles.buttonsContainer}>
+            <TouchableOpacity
+              style={[
+                styles.primaryButton, 
+                !selectedStudent && styles.disabledButton,
+                { marginBottom: Spacing.sm }
+              ]}
+              onPress={() => navigation.navigate('Capture')}
+              disabled={!selectedStudent}
+              activeOpacity={0.8}
+            >
+              <Text style={styles.buttonText}>Continuar para Captura</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.secondaryButton, { borderColor: colors.border }]}
+              onPress={() => setCurrentView('scanner')}
+              activeOpacity={0.8}
+            >
+              <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>
+                Voltar
+              </Text>
+            </TouchableOpacity>
           </View>
-        )}
-
-        <TouchableOpacity
-          style={[styles.primaryButton, !selectedStudent && styles.disabledButton]}
-          onPress={() => navigation.navigate('Capture')}
-          disabled={!selectedStudent}
-        >
-          <Text style={styles.buttonText}>Continuar para Captura</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.secondaryButton, { borderColor: colors.border }]}
-          onPress={() => setCurrentView('scanner')}
-        >
-          <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>Voltar</Text>
-        </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
 };
 
 const localStyles = {
-  header: {
-    alignItems: 'center',
+  headerContainer: {
+    padding: Spacing.lg,
+    paddingTop: Spacing.xl,
+    borderTopLeftRadius: BorderRadius.xxl,
+    borderTopRightRadius: BorderRadius.xxl,
     marginBottom: Spacing.lg,
-  },
-  iconContainer: {
-    borderRadius: BorderRadius.round,
-    width: Spacing.xxxl + Spacing.xs, // 64
-    height: Spacing.xxxl + Spacing.xs, // 64
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+  },
+  backButton: {
+    marginRight: Spacing.md,
+  },
+  headerContent: {
+    flex: 1,
+  },
+  headerTitle: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    marginBottom: Spacing.xxs,
+  },
+  headerSubtitle: {
+    fontSize: Typography.fontSize.sm,
   },
   infoBox: {
     borderRadius: BorderRadius.lg,
@@ -113,33 +207,45 @@ const localStyles = {
   infoText: {
     fontSize: Typography.fontSize.sm,
   },
+  sectionTitle: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
   studentsList: {
     maxHeight: 300,
     marginBottom: Spacing.lg,
   },
   studentItem: {
-    borderWidth: 2,
+    borderWidth: 1,
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
     marginBottom: Spacing.sm,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   studentInfo: {
-    marginBottom: Spacing.xs,
+    flex: 1,
   },
   studentName: {
     fontWeight: Typography.fontWeight.semibold,
     fontSize: Typography.fontSize.md,
+    marginBottom: Spacing.xxs,
+  },
+  studentMeta: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   studentClass: {
     fontSize: Typography.fontSize.sm,
   },
-  studentIdContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
   studentId: {
     fontSize: Typography.fontSize.sm,
+  },
+  checkIcon: {
+    marginLeft: Spacing.sm,
   },
   successBox: {
     borderWidth: 1,
@@ -161,6 +267,9 @@ const localStyles = {
     fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.bold,
     marginLeft: Spacing.xxl,
+  },
+  buttonsContainer: {
+    marginTop: Spacing.sm,
   },
 };
 

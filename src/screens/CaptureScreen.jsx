@@ -1,6 +1,9 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
 import { useCameraPermissions } from 'expo-camera';
+
+import { processAnswerSheet } from '../utils/answerSheetProcessor';
+
 import ProcessingScreen from '../components/capture/ProcessingScreen';
 import CameraScreen from '../components/capture/CameraCaptureScreen';
 import GalleryScreen from '../components/capture/GalleryScreen';
@@ -16,30 +19,38 @@ const CaptureScreen = () => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [permission, requestPermission] = useCameraPermissions();
 
-  // Solicitar permissão da câmera
   useEffect(() => {
     (async () => {
       const { status } = await requestPermission();
       if (status !== 'granted') {
-        Alert.alert('Permissão necessária', 'Precisamos da permissão da câmera para funcionar.');
+        Alert.alert('Permissão necessária', 'Precisamos da permissão da câmera para capturar a imagem.');
       }
     })();
   }, []);
 
-  const handlePhotoCaptured = (uri) => {
+  const handlePhotoCaptured = async (uri) => {
     setImageUri(uri);
     setCurrentView('processing');
-  };
+    setIsProcessing(true);
 
-  const handleDetectionComplete = (detectionResults) => {
-    setResults(detectionResults);
-    setCurrentView('results');
+    try {
+      const detectionResults = await processAnswerSheet(uri);
+      setResults(detectionResults);
+      setCurrentView('results');
+      setCapturedImages(prev => [...prev, { uri, results: detectionResults }]);
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível processar a imagem');
+      setCurrentView('camera');
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const clearData = () => {
     setCapturedImages([]);
     setResults(null);
     setImageUri(null);
+    setCurrentView('welcome');
   };
 
   if (isProcessing) {
@@ -48,51 +59,42 @@ const CaptureScreen = () => {
 
   switch (currentView) {
     case 'camera':
-      return (
-        <CameraScreen
-          onPhotoCaptured={handlePhotoCaptured}
-          setCurrentScreen={setCurrentView}
-          navigation={navigation}
-        />
-      );
-      
+      return <CameraScreen
+        onPhotoCaptured={handlePhotoCaptured}
+        onBack={() => setCurrentView('welcome')}
+      />;
     case 'processing':
-      return (
-        <MarkerDetector 
-          imageUri={imageUri}
-          onDetectionComplete={handleDetectionComplete}
-          setIsProcessing={setIsProcessing}
-          setCurrentView={setCurrentView}
-          capturedImages={capturedImages}
-          setCapturedImages={setCapturedImages}
-          clearData={clearData}
-        />
-      );
-      
+      return <ProcessingScreen />;
     case 'results':
-      return <ResultsScreen results={results} navigation={navigator} route={route} />;
-      
-    case 'welcome':
-      return (
-        <WelcomeScreen
-          setCurrentView={setCurrentView}
-          capturedImages={capturedImages}
-          clearData={clearData}
-          results={results}
-        />
-      );
-      
+      return <ResultsScreen
+        results={results}
+        imageUri={imageUri}
+        onBack={() => setCurrentView('welcome')}
+      />;
     case 'gallery':
-      return (
-        <GalleryScreen
-          capturedImages={capturedImages}
-          setCapturedImages={setCapturedImages}
-          setCurrentView={setCurrentView}
-        />
-      );
-      
+      return <GalleryScreen
+        capturedImages={capturedImages}
+        setCapturedImages={setCapturedImages}
+        onSelect={(item) => {
+          setImageUri(item.uri);
+          setResults(item.results);
+          setCurrentView('results');
+        }}
+        onBack={() => setCurrentView('welcome')}
+      />;
     default:
-      return <WelcomeScreen setCurrentView={setCurrentView} />;
+      return <WelcomeScreen
+        capturedImages={capturedImages}
+        clearData={clearData}
+        processImages={() => {
+          if (capturedImages.length > 0) {
+            setCurrentView('processing');
+            setIsProcessing(true);
+          }
+        }}
+        results={results}
+        setCurrentView={setCurrentView}
+      />;
   }
 };
 

@@ -5,7 +5,7 @@ import ScannerScreen from '../components/auth/ScannerScreen';
 import StudentsScreen from '../components/auth/StudentsScreen';
 import HomeScreen from '../components/auth/HomeScreen';
 
-const AuthScreen = ({ navigation }) => {
+const AuthScreen = () => {
   const [currentView, setCurrentView] = useState('home');
   const [scannedCode, setScannedCode] = useState('');
   const [selectedStudent, setSelectedStudent] = useState('');
@@ -15,34 +15,31 @@ const AuthScreen = ({ navigation }) => {
     switch (currentView) {
       case 'auth':
         return (
-          <AuthForm 
+          <AuthForm
             setCurrentView={setCurrentView}
             setIsAuthenticated={setIsAuthenticated}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
-            navigation={navigation}
             isAuthenticated={isAuthenticated}
           />
         );
       case 'scanner':
         return (
-          <ScannerScreen 
+          <ScannerScreen
             setCurrentView={setCurrentView}
             scannedCode={scannedCode}
             setScannedCode={setScannedCode}
             setIsAuthenticated={setIsAuthenticated}
-            navigation={navigation}
             isAuthenticated={isAuthenticated}
           />
         );
       case 'students':
         return (
-          <StudentsScreen 
+          <StudentsScreen
             setCurrentView={setCurrentView}
             scannedCode={scannedCode}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
-            navigation={navigation}
             isAuthenticated={isAuthenticated}
           />
         );

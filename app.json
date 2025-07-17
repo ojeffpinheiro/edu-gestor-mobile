@@ -4,6 +4,9 @@
   "android": {
     "package": "com.anonymous.edugestor"
   },
+  "packagerOpts": {
+    "assetExts": ["bin","json"]
+  },
   "plugins": [
     [
       "expo-barcode-scanner",

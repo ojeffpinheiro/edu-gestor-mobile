@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Text, View } from 'react-native';
 import 'react-native-gesture-handler';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
@@ -15,35 +15,68 @@ import IdentificationScreen from './src/screens/IdentificationScreen';
 import CaptureScreen from './src/screens/CaptureScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
-import CorretionScreen from './src/screens/CorretionScreen';
+import CorrectionScreen from './src/screens/CorretionScreen';
 import { loadModels } from './src/utils/imageProcessor';
 
 const Stack = createStackNavigator();
 
 const AppContent = () => {
+  const [tfReady, setTfReady] = useState(false);
+  const [initialized, setInitialized] = useState(false);
+
   useEffect(() => {
-    const prepare = async () => {
-      await tf.ready();
-      await loadModels();
+    let isMounted = true;
+
+    const initialize = async () => {
+      try {
+        // 1. Carrega o polyfill primeiro
+        await import('@tensorflow/tfjs-react-native/dist/platform_react_native');
+
+        // 2. Inicializa o TensorFlow
+        await tf.ready();
+
+        // 3. Configura o backend
+        await tf.setBackend('rn-webgl');
+
+        // 4. Carrega os modelos
+        await loadModels();
+
+        if (isMounted) {
+          setTfReady(true);
+        }
+      } catch (error) {
+        console.error('Initialization error:', error);
+      } finally {
+        if (isMounted) {
+          setInitialized(true);
+        }
+      }
     };
 
-    prepare();
+    initialize();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
+  if (!initialized) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text>Inicializando...</Text>
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
-          id={undefined}
           initialRouteName="Home"
           screenOptions={{
-            headerStyle: {
-              backgroundColor: '#2196F3',
-            },
+            headerStyle: { backgroundColor: '#2196F3' },
             headerTintColor: '#fff',
-            headerTitleStyle: {
-              fontWeight: 'bold',
-            },
+            headerTitleStyle: { fontWeight: 'bold' },
           }}
         >
           <Stack.Screen
@@ -78,7 +111,7 @@ const AppContent = () => {
           />
           <Stack.Screen
             name="Correction"
-            component={CorretionScreen}
+            component={CorrectionScreen}
             options={{ title: 'Correção' }}
           />
         </Stack.Navigator>
@@ -88,42 +121,11 @@ const AppContent = () => {
 };
 
 export default function App() {
-  const [tfReady, setTfReady] = useState(false);
-
-  useEffect(() => {
-    const initializeTensorFlow = async () => {
-      try {
-        // 1. Importar o polyfill específico primeiro
-        await import('@tensorflow/tfjs-react-native/dist/platform_react_native');
-
-        await tf.setBackend('rn-webgl');
-
-        // 2. Aguardar a inicialização do backend
-        await tf.ready();
-
-        // 3. Verificar o backend
-        console.log('Backend atual:', tf.getBackend());
-
-        setTfReady(true);
-      } catch (error) {
-        console.error('Falha na inicialização:', error);
-      }
-    };
-
-    initializeTensorFlow();
-  }, []);
-
-  if (!tfReady) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Inicializando TensorFlow...</Text>
-      </View>
-    );
-  }
-
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <SafeAreaProvider>
+      <ThemeProvider>
+        <AppContent />
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

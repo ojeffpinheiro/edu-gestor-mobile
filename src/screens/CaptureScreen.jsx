@@ -17,11 +17,11 @@ const CaptureScreen = () => {
   const [results, setResults] = useState(null);
   const [capturedImages, setCapturedImages] = useState([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [permission, requestPermission] = useCameraPermissions();
+  const cameraPermission = useCameraPermissions();
 
   useEffect(() => {
     (async () => {
-      const { status } = await requestPermission();
+      const { status } = await cameraPermission.requestPermission();
       if (status !== 'granted') {
         Alert.alert('Permissão necessária', 'Precisamos da permissão da câmera para capturar a imagem.');
       }

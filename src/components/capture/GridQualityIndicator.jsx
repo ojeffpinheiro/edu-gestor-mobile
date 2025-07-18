@@ -4,10 +4,10 @@ import { createMainStyles } from '../../styles/mainStyles'
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius } from '../../styles/designTokens';
 
-const GridQualityIndicator = ({ quality }) => {
+const GridQualityIndicator = ({ quality, brightness, alignment }) => {
   const { colors } = useTheme();
   const styles = createMainStyles(colors);
-  
+
   const getQualityColor = () => {
     if (quality > 75) return colors.success;
     if (quality > 50) return colors.warning;
@@ -16,16 +16,26 @@ const GridQualityIndicator = ({ quality }) => {
 
   return (
     <View style={[localStyles.container, { backgroundColor: colors.card }]}>
-      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>Qualidade do Alinhamento</Text>
+      <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+        Qualidade do Alinhamento
+      </Text>
       <View style={localStyles.progressContainer}>
-        <View style={[localStyles.progressBar, { 
-          width: `${quality}%`, 
-          backgroundColor: getQualityColor() 
+        <View style={[localStyles.progressBar, {
+          width: `${quality}%`,
+          backgroundColor: getQualityColor()
         }]} />
       </View>
       <Text style={[localStyles.qualityText, { color: getQualityColor() }]}>
         {quality}%
       </Text>
+      <View style={localStyles.metricsRow}>
+        <Text style={[localStyles.metricText, { color: colors.textPrimary }]}>
+          Brilho: {brightness}%
+        </Text>
+        <Text style={[localStyles.metricText, { color: colors.textPrimary }]}>
+          Ângulo: {alignment}°
+        </Text>
+      </View>
     </View>
   );
 };
@@ -55,6 +65,16 @@ const localStyles = StyleSheet.create({
   qualityText: {
     fontWeight: 'bold',
     fontSize: 16
+  },
+  metricsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginTop: Spacing.sm
+  },
+  metricText: {
+    fontSize: 12,
+    opacity: 0.8
   }
 });
 

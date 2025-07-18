@@ -9,7 +9,7 @@ import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import { Exam } from '../types/examTypes';
 import CorrectionTab from '../components/corretion/CorrectionTab';
 
-const CorretionScreen = () => {
+const CorrectionScreen = () => {
   const [activeTab, setActiveTab] = useState('correction');
   const [exams, setExams] = useState([
     {
@@ -49,7 +49,7 @@ const CorretionScreen = () => {
 
   const [answerKey, setAnswerKey] = useState(['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B']);
   const [modalVisible, setModalVisible] = useState(false);
-  const [selectedExam, setSelectedExam] = useState<Exam | null>(null);
+  const [selectedExam, setSelectedExam] = useState(null);
 
   const processAllPendingExams = () => {
     const updatedExams = exams.map(exam => {
@@ -63,7 +63,7 @@ const CorretionScreen = () => {
       }
       return exam;
     });
-    
+
     setExams(updatedExams);
     Alert.alert('Sucesso', 'Todas as provas foram corrigidas!');
   };
@@ -93,12 +93,17 @@ const CorretionScreen = () => {
     }
   };
 
+  const handleExamPress = (exam) => {
+    setSelectedExam(exam);
+    setModalVisible(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      
+
       <AppHeader />
-      
+
       <ScrollView style={styles.content}>
         {renderTabContent()}
       </ScrollView>
@@ -125,4 +130,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CorretionScreen;
+export default CorrectionScreen;

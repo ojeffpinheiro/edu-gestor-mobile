@@ -10,7 +10,7 @@ import ScanLine from './ScanLine';
 import GridQualityIndicator from './GridQualityIndicator';
 
 import { useTheme } from '../../context/ThemeContext';
-import { detectEdges, calculateAlignmentQuality } from '../../utils/imageProcessor';
+import { detectEdges, calculateAlignmentQuality, analyzeImage } from '../../utils/imageProcessor';
 
 import { createMainStyles } from '../../styles/mainStyles'
 import { Spacing, BorderRadius } from '../../styles/designTokens';
@@ -24,9 +24,17 @@ const CameraScreen = ({ onPhotoCaptured, onBack }) => {
   const [gridDetected, setGridDetected] = useState(false);
   const [alignmentQuality, setAlignmentQuality] = useState(0);
   const [edgePositions, setEdgePositions] = useState(null);
+  const [analysis, setAnalysis] = useState({
+    contrast: 0,
+    sharpness: 0,
+    quality: 0,
+    brightness: 0,
+    alignment: 0,
+    edges: null
+  });
   const cameraRef = useRef(null);
   const styles = createMainStyles(colors);
-  const textureDims = { width: 1080, height: 1920 }; // Dimensões para processamento
+  const textureDims = { width: 1080, height: 1920 };
 
   const toggleTorch = () => setTorchEnabled(current => !current);
 
@@ -35,13 +43,11 @@ const CameraScreen = ({ onPhotoCaptured, onBack }) => {
     const nextImageTensor = images.next().value;
 
     try {
-      // Detectar bordas e calcular qualidade
-      const { edges, quality } = await detectEdges(nextImageTensor);
-      const { topLeft, topRight, bottomLeft, bottomRight } = edges;
-
-      setAlignmentQuality(quality);
-      setGridDetected(quality > 60); // Considera detectado se qualidade > 60%
-      setEdgePositions(edges);
+      const result = await analyzeImage(nextImageTensor);
+      setAnalysis(result);
+      setAlignmentQuality(result.quality);
+      setGridDetected(result.quality > 60);
+      setEdgePositions(result.edges);
 
       tf.dispose(nextImageTensor);
     } catch (error) {
@@ -84,9 +90,18 @@ const CameraScreen = ({ onPhotoCaptured, onBack }) => {
         resizeDepth={3}
         autorender={true}
       >
-        <GridDetectionOverlay detected={gridDetected} edges={edgePositions} />
+        <GridDetectionOverlay
+          detected={gridDetected}
+          edges={analysis.edges}
+          contrast={analysis.contrast}
+          sharpness={analysis.sharpness} />
+
         <ScanLine active={true} />
-        <GridQualityIndicator quality={alignmentQuality} />
+
+        <GridQualityIndicator
+          quality={analysis.quality}
+          brightness={analysis.brightness}
+          alignment={analysis.alignment} />
 
         <View style={[
           localStyles.header,

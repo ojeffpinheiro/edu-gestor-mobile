@@ -1,32 +1,36 @@
-import { View, Text, Modal, ScrollView, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
 import styles from './ExamDetailModalStyles';
 
 const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
-  if (!visible) return null;
+  // Retorno early se não estiver visível ou dados faltando
+  if (!visible || !exam || !answerKey) return null;
 
-  if (!exam || !answerKey) {
-    console.warn("ExamDetailModal: Dados essenciais faltando");
-    return null;
-  }
+  // Validação robusta dos dados de entrada
+  const safeExam = {
+    ...exam,
+    answers: Array.isArray(exam.answers) ? exam.answers : [],
+    score: typeof exam.score === 'number' ? exam.score : null
+  };
 
-  const isValidArrays = Array.isArray(exam.answers) && Array.isArray(answerKey);
-  if (!isValidArrays) {
-    console.warn("ExamDetailModal: answers ou answerKey não são arrays");
-    return null;
-  }
+  const safeAnswerKey = Array.isArray(answerKey) ? answerKey : [];
 
-  let corrections = [];
+  // Calcula correções de forma segura
+  const calculateCorrections = () => {
+    try {
+      const result = correctExam(safeExam.answers, safeAnswerKey);
+      return {
+        score: safeExam.score !== null ? safeExam.score : result.score, // Mantém o score existente se disponível
+        corrections: result.corrections || []
+      };
+    } catch (error) {
+      console.error("Erro ao calcular correções:", error);
+      return { score: 0, corrections: [] };
+    }
+  };
 
-  try {
-    const correctionResult = correctExam(exam.answers, answerKey);
-    corrections = Array.isArray(correctionResult?.corrections)
-      ? correctionResult.corrections
-      : [];
-  } catch (e) {
-    console.error("Erro ao corrigir exame:", e);
-  }
+  const { score, corrections } = calculateCorrections();
 
   return (
     <Modal
@@ -37,6 +41,7 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
+          {/* Cabeçalho */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Detalhes da Prova</Text>
             <TouchableOpacity onPress={onClose}>
@@ -44,42 +49,31 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
             </TouchableOpacity>
           </View>
 
+          {/* Corpo */}
           <ScrollView style={styles.modalBody}>
             <View style={styles.studentInfo}>
-              <Text style={styles.studentNameModal}>{exam.studentName}</Text>
-              <Text style={styles.studentIdModal}>ID: {exam.studentId}</Text>
-              <Text style={styles.examSubjectModal}>{exam.subject}</Text>
-              {exam.score !== null && (
-                <Text style={[styles.scoreModal, { color: exam.score >= 6 ? '#10B981' : '#EF4444' }]}>
-                  Nota Final: {exam.score}
-                </Text>
-              )}
+              <Text style={styles.studentNameModal}>{safeExam.studentName}</Text>
+              <Text style={styles.studentIdModal}>ID: {safeExam.studentId}</Text>
+              <Text style={styles.examSubjectModal}>{safeExam.subject}</Text>
+              <Text style={[styles.scoreModal, { color: score >= 6 ? '#10B981' : '#EF4444' }]}>
+                Nota: {score.toFixed(1)}
+              </Text>
             </View>
 
             <View style={styles.correctionsContainer}>
               <Text style={styles.correctionsTitle}>Correções por Questão</Text>
-              {corrections.length > 0 ? (
-                corrections.map((correction, index) => (
-                  <View key={index} style={styles.correctionItem}>
-                    <View key={index} style={styles.correctionItem}>
-                      <Text style={styles.questionNumber}>Q{correction.question}</Text>
-                      <Text style={styles.studentAnswerText}>
-                        Resposta: {correction.studentAnswer}
-                      </Text>
-                      <Text style={styles.correctAnswerText}>
-                        Gabarito: {correction.correctAnswer}
-                      </Text>
-                      {correction.isCorrect ? (
-                        <CheckCircle size={16} color="#10B981" />
-                      ) : (
-                        <XCircle size={16} color="#EF4444" />
-                      )}
-                    </View>
-                  </View>
-                ))
-              ) : (
-                <Text>Nenhuma correção disponível</Text>
-              )}
+              {corrections.map((item, index) => (
+                <View key={`correction-${index}`} style={styles.correctionItem}>
+                  <Text style={styles.questionNumber}>Q{item.question}</Text>
+                  <Text style={styles.studentAnswerText}>Resposta: {item.studentAnswer}</Text>
+                  <Text style={styles.correctAnswerText}>Gabarito: {item.correctAnswer}</Text>
+                  {item.isCorrect ? (
+                    <CheckCircle size={16} color="#10B981" />
+                  ) : (
+                    <XCircle size={16} color="#EF4444" />
+                  )}
+                </View>
+              ))}
             </View>
           </ScrollView>
         </View>
@@ -87,6 +81,5 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
     </Modal>
   );
 };
-
 
 export default ExamDetailModal;

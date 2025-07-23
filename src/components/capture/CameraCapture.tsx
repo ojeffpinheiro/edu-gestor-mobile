@@ -60,25 +60,15 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
 
   const analyzePoints = async (imageUri: string) => {
     try {
-       const base64String = await FileSystem.readAsStringAsync(imageUri, {
+      const base64String = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
-      // Decodificar manualmente
       const rawImageData = Buffer.from(base64String, 'base64');
       const imageData = jpeg.decode(rawImageData, { useTArray: true });
-      
-      // Carregar a imagem - abordagem alternativa para React Native
-      const response = await fetch(imageUri);
-      const blob = await response.blob();
-      
-      // Restante do código permanece o mesmo...
       const pixelBuffer = new Uint8Array(imageData.data);
       const imageTensor = tf.tensor3d(pixelBuffer, [imageData.height, imageData.width, 4]);
 
-      const arrayBuffer = await blob.arrayBuffer();
-      const buffer = Buffer.from(arrayBuffer);
-      
       const referencePoints = isLandscape
         ? [
           { id: 1, x: 0.26, y: 0.1 },
@@ -100,30 +90,38 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
       const newPointsStatus: PointsStatus = {};
       const newPointsColors: PointsColors = {};
 
-      // Analisar cada ponto de referência
       for (const point of referencePoints) {
         const x = Math.round(point.x * imageData.width);
         const y = Math.round(point.y * imageData.height);
-        
-        // Pegar uma região 10x10 pixels ao redor do ponto
+
+        // Calcular os limites do slice
+        const startX = Math.max(0, x - 5);
+        const startY = Math.max(0, y - 5);
+        const endX = Math.min(imageData.width, startX + 10);
+        const endY = Math.min(imageData.height, startY + 10);
+
+        // Calcular o tamanho do slice
+        const sliceWidth = endX - startX;
+        const sliceHeight = endY - startY;
+
+        // Fazer o slice com os limites ajustados
         const region = imageTensor.slice(
-          [Math.max(0, y - 5), Math.max(0, x - 5), 0],
-          [10, 10, 4]
+          [startY, startX, 0],
+          [sliceHeight, sliceWidth, 4]
         );
-        
+
         // Calcular cor média
         const mean = region.mean(0).mean(0);
-        const meanValues = await mean.array() as number[]; // Adicionando type assertion aqui
+        const meanValues = await mean.array() as number[];
         const [r, g, b] = meanValues;
-        
-        // Verificar se é azul
+
         const color = chroma(r, g, b);
         const blueDistance = chroma.distance(color, '#0000FF');
         const isBlue = blueDistance < BLUE_THRESHOLD;
-        
+
         newPointsStatus[point.id] = isBlue;
         newPointsColors[point.id] = { r, g, b };
-        
+
         tf.dispose([region, mean]);
       }
 
@@ -155,7 +153,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
 
       setPointsStatus(status);
       setPointsColors(colors);
-      
+
       if (shouldCapture) {
         await handleImageCapture(photo.uri);
       }
@@ -207,15 +205,15 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
     );
   }
 
-   return (
+  return (
     <View style={styles.container}>
       <CameraView
         ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
       <View style={styles.overlay}>
-        <ReferencePoints 
-          pointsStatus={pointsStatus} 
+        <ReferencePoints
+          pointsStatus={pointsStatus}
           pointsColors={pointsColors}
-          isLandscape={isLandscape} 
+          isLandscape={isLandscape}
         />
       </View>
       <CaptureControls

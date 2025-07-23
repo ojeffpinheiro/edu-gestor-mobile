@@ -32,6 +32,9 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 5,
   },
+  disabledButton: {
+    opacity: 0.6,
+  },
   secondaryButton: {
     backgroundColor: '#4CAF50',
   },

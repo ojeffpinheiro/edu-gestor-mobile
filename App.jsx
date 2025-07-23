@@ -12,11 +12,11 @@ import { ThemeProvider } from './src/context/ThemeContext';
 import HomeScreen from './src/screens/HomeScreen';
 import AuthScreen from './src/screens/AuthScreen';
 import IdentificationScreen from './src/screens/IdentificationScreen';
-import CaptureScreen from './src/screens/CaptureScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import CorrectionScreen from './src/screens/CorretionScreen';
-import { loadModels } from './src/utils/imageProcessor';
+import { loadModels } from './src/utils/imageProcessor'; // Importe loadModels
+import CaptureScreen from './src/screens/CaptureScreen';
 
 const Stack = createStackNavigator();
 
@@ -39,7 +39,7 @@ const AppContent = () => {
         await tf.setBackend('rn-webgl');
 
         // 4. Carrega os modelos
-        await loadModels();
+        await loadModels(); // Chame loadModels aqui
 
         if (isMounted) {
           setTfReady(true);
@@ -72,13 +72,14 @@ const AppContent = () => {
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Home"
+          initialRouteName="Cam"
           screenOptions={{
             headerStyle: { backgroundColor: '#2196F3' },
             headerTintColor: '#fff',
             headerTitleStyle: { fontWeight: 'bold' },
           }}
         >
+          <Stack.Screen name='Cam' component={CaptureScreen}  />
           <Stack.Screen
             name="Home"
             component={HomeScreen}

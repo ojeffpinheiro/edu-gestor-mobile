@@ -259,7 +259,7 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
+    <View style={{ flex: 1, backgroundColor: colors.card }}>
       <ScrollView style={modernStyles.container}>
         <Animated.View style={[
           modernStyles.card,

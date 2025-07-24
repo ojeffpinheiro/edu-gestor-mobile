@@ -4,6 +4,17 @@ import { Spacing, BorderRadius, Shadow, Typography } from './designTokens';
 
 export const createMainStyles = (colors: ColorScheme) =>
     StyleSheet.create({
+        screenContainer: {
+            flex: 1,
+            padding: Spacing.md,
+            backgroundColor: colors.background,
+        },
+        centeredContainer: {
+            flex: 1,
+            justifyContent: 'center',
+            padding: Spacing.md,
+            backgroundColor: colors.background,
+        },
         container: {
             flex: 1,
             padding: Spacing.md,
@@ -61,4 +72,4 @@ export const createMainStyles = (colors: ColorScheme) =>
             backgroundColor: colors.gray[400],
         },
     }
-);
+    );

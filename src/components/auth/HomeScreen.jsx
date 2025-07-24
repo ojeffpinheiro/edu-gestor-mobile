@@ -1,92 +1,101 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { BookOpen } from 'lucide-react-native';
-import { createMainStyles } from '../../styles/mainStyles';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
+import { Card, PrimaryButton } from '../common/sharedComponents';
 
 const HomeScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
 
-  // Fallback para tema não carregado
   if (!colors) return <Text>Carregando...</Text>;
-
-  const styles = createMainStyles(colors);
 
   return (
     <View style={styles.container}>
-      <View style={styles.card}>
-        <View style={localStyles.header}>
-          <View style={[localStyles.iconContainer, {
-            backgroundColor: `${colors.primary || '#3B82F6'}20` // Correção aqui
-          }]}>
+      <Card>
+        <View style={styles.header}>
+          <View style={[styles.iconContainer, { backgroundColor: `${colors.primary}20` }]}>
             <BookOpen size={32} color={colors.primary} />
           </View>
-          <Text style={styles.title}>Correção Automatizada</Text>
-          <Text style={styles.subtitle}>Sistema para correção de provas via scanner</Text>
-        </View>
-
-        {/* Adicione fallbacks similares em todas as interpolações */}
-        <View style={[localStyles.infoBox, {
-          backgroundColor: `${colors.primary || '#3B82F6'}10`
-        }]}>
-          <Text style={[localStyles.infoTitle, { color: colors.primary }]}>
-            Como funciona:
+          <Text style={[styles.title, { color: colors.textPrimary }]}>Correção Automatizada</Text>
+          <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
+            Sistema para correção de provas via scanner
           </Text>
-          <View style={localStyles.infoList}>
-            <Text style={[localStyles.infoItem, { color: colors.primary }]}>
-              • Autentique-se com sua senha
-            </Text>
-            <Text style={[localStyles.infoItem, { color: colors.primary }]}>
-              • Escaneie o código da prova
-            </Text>
-            <Text style={[localStyles.infoItem, { color: colors.primary }]}>
-              • Identifique o aluno
-            </Text>
-            <Text style={[localStyles.infoItem, { color: colors.primary }]}>
-              • Capture a folha de resposta
-            </Text>
-          </View>
         </View>
 
-        <TouchableOpacity style={styles.primaryButton} onPress={() => setCurrentView('auth')}>
-          <Text style={styles.buttonText}>Iniciar Correção</Text>
-        </TouchableOpacity>
-      </View>
+        <View style={[styles.infoBox, { backgroundColor: `${colors.primary}10` }]}>
+          <Text style={[styles.infoTitle, { color: colors.primary }]}>Como funciona:</Text>
+          {[
+            'Autentique-se com sua senha',
+            'Escaneie o código da prova',
+            'Identifique o aluno',
+            'Capture a folha de resposta'
+          ].map((item, index) => (
+            <Text key={index} style={[styles.infoItem, { color: colors.primary }]}>
+              • {item}
+            </Text>
+          ))}
+        </View>
+
+        <PrimaryButton 
+          title="Iniciar Correção" 
+          onPress={() => setCurrentView('auth')} 
+          style={styles.button}
+        />
+      </Card>
     </View>
   );
 };
 
-// Estilos locais para HomeScreen
-const localStyles = {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    padding: Spacing.lg,
+  },
+  card: {
+    padding: Spacing.xl,
+  },
   header: {
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   iconContainer: {
     borderRadius: BorderRadius.round,
-    width: Spacing.xxxl + Spacing.xs, // 64
-    height: Spacing.xxxl + Spacing.xs, // 64
+    width: Spacing.xxxl + Spacing.xs,
+    height: Spacing.xxxl + Spacing.xs,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.md,
+    marginBottom: Spacing.lg,
+  },
+  title: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    marginBottom: Spacing.sm,
+    textAlign: 'center',
+  },
+  subtitle: {
+    fontSize: Typography.fontSize.md,
+    textAlign: 'center',
+    marginBottom: Spacing.xl,
   },
   infoBox: {
     borderRadius: BorderRadius.lg,
     padding: Spacing.md,
-    marginBottom: Spacing.lg,
+    marginBottom: Spacing.xl,
   },
   infoTitle: {
     fontWeight: Typography.fontWeight.semibold,
-    marginBottom: Spacing.xs,
-  },
-  infoList: {
-    marginTop: Spacing.xs,
+    marginBottom: Spacing.sm,
+    fontSize: Typography.fontSize.md,
   },
   infoItem: {
     fontSize: Typography.fontSize.sm,
-    marginBottom: Spacing.xxs,
+    marginBottom: Spacing.xs,
   },
-};
+  button: {
+    marginTop: Spacing.md,
+  },
+});
 
 export default HomeScreen;

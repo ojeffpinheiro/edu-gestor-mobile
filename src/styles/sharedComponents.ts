@@ -1,34 +1,32 @@
 import { StyleSheet } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
 import { Shadow, Spacing, Typography } from './designTokens';
 
-const { colors } = useTheme();
-
-export const CardStyles = StyleSheet.create({
+// Remove the hook call from the top level and make these style creators
+export const createCardStyles = (colors: any) => StyleSheet.create({
   base: {
     backgroundColor: colors.background,
     borderRadius: Spacing.md,
     padding: Spacing.lg,
     marginBottom: Spacing.md,
-    ...Shadow,
+    ...Shadow(colors).default,
   },
   elevated: {
     borderWidth: 1,
     borderColor: colors.border,
   },
   success: {
-    backgroundColor: colors.success[100],
+    backgroundColor: colors.success + '10',
     borderLeftWidth: 4,
-    borderLeftColor: colors.success[500],
+    borderLeftColor: colors.success,
   },
   error: {
-    backgroundColor: colors.error[100],
+    backgroundColor: colors.error + '10',
     borderLeftWidth: 4,
-    borderLeftColor: colors.error[500],
+    borderLeftColor: colors.error,
   },
 });
 
-export const ButtonStyles = StyleSheet.create({
+export const createButtonStyles = (colors: any) => StyleSheet.create({
   primary: {
     backgroundColor: colors.primary,
     paddingVertical: Spacing.md,
@@ -37,17 +35,28 @@ export const ButtonStyles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    ...Shadow,
+    ...Shadow(colors).button,
   },
   secondary: {
-    backgroundColor: colors.gray[100],
+    backgroundColor: 'transparent',
     borderWidth: 1,
-    borderColor: colors.gray[300],
+    borderColor: colors.border,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: Spacing.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexDirection: 'row',
   },
   text: {
+    color: colors.card,
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  secondaryText: {
     color: colors.textSecondary,
-    ...Typography.button,
-    fontWeight: '600',
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.medium,
   },
   icon: {
     marginRight: Spacing.sm,

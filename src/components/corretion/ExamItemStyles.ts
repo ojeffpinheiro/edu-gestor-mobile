@@ -1,49 +1,49 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from "../../styles/colors";
+import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 
-const styles = StyleSheet.create({
+export const createExamItemStyles = (colors: ColorScheme) => StyleSheet.create({
   examItem: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.card,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    marginBottom: 12,
+    borderColor: colors.border,
+    marginBottom: Spacing.sm,
   },
   examHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginBottom: 8,
+    alignItems: 'center',
+    marginBottom: Spacing.xs,
   },
   studentName: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.textPrimary,
   },
   studentId: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
   },
   examDetails: {
     flexDirection: 'row',
-    gap: 16,
     alignItems: 'center',
+    gap: Spacing.md
   },
   examSubject: {
-    fontSize: 14,
-    color: '#374151',
+    fontSize: Typography.fontSize.sm,
+    color: colors.border,
   },
   examDate: {
-    fontSize: 14,
-    color: '#6B7280',
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
   },
   examScore: {
-    fontSize: 14,
-    fontWeight: '600',
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
   },
   examStatus: {
-    marginLeft: 8,
+    marginLeft: Spacing.xs,
   },
 });
-
-export default styles;

@@ -1,37 +1,39 @@
 import { StyleSheet } from "react-native";
+import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { ColorScheme } from "../../styles/colors";
 
-const styles = StyleSheet.create({
+const createReportsTabStyles = (colors: ColorScheme) => StyleSheet.create({
   tabContent: {
-    padding: 16,
+    padding: Spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.textPrimary,
+    marginBottom: Spacing.md,
   },
   statsGrid: {
-    gap: 12,
-    marginBottom: 24,
+    gap: Spacing.xs,
+    marginBottom: Spacing.xxl,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#3B82F6',
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-    borderRadius: 8,
-    gap: 8,
+    backgroundColor: colors.primary,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: BorderRadius.md,
+    gap: Spacing.xs,
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '600',
+    color: colors.gray[100],
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
   },
   reportActions: {
     alignItems: 'center',
   },
 });
 
-export default styles;
+export default createReportsTabStyles;

@@ -1,10 +1,14 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle, XCircle } from 'lucide-react-native';
-import { Exam } from '../../types/examTypes';
-import styles from './ExamItemStyles';
+import { useTheme } from '../../context/ThemeContext';
+import { createExamItemStyles } from './ExamItemStyles';
 
-const ExamItem = ({ exam, onPress }) => (
+const ExamItem = ({ exam, onPress }) => {
+  const { colors } = useTheme();
+  const styles = createExamItemStyles(colors);
+
+  return(
   <TouchableOpacity style={styles.examItem} onPress={onPress}>
     <View style={styles.examHeader}>
       <View>
@@ -13,9 +17,9 @@ const ExamItem = ({ exam, onPress }) => (
       </View>
       <View style={styles.examStatus}>
         {exam.status === 'corrected' ? (
-          <CheckCircle size={20} color="#10B981" />
+          <CheckCircle size={20} color={colors.secondary} />
         ) : (
-          <XCircle size={20} color="#EF4444" />
+          <XCircle size={20} color={colors.error} />
         )}
       </View>
     </View>
@@ -23,12 +27,13 @@ const ExamItem = ({ exam, onPress }) => (
       <Text style={styles.examSubject}>{exam.subject}</Text>
       <Text style={styles.examDate}>{exam.examDate}</Text>
       {exam.score !== null && (
-        <Text style={[styles.examScore, { color: exam.score >= 6 ? '#10B981' : '#EF4444' }]}>
+        <Text style={[styles.examScore, { color: exam.score >= 6 ? colors.success : colors.error }]}>
           Nota: {exam.score}
         </Text>
       )}
     </View>
   </TouchableOpacity>
 );
+}
 
 export default ExamItem;

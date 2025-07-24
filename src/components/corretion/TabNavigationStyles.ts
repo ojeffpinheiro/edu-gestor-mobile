@@ -1,30 +1,32 @@
 import { StyleSheet } from "react-native";
+import { Spacing, Typography } from "../../styles/designTokens";
+import { ColorScheme } from "../../styles/colors";
 
-const styles = StyleSheet.create({
+const createTabNavigationStyles  = (colors: ColorScheme) => StyleSheet.create({
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     borderTopWidth: 1,
-    borderTopColor: '#E5E7EB',
-    paddingVertical: 8,
+    borderTopColor: colors.border,
+    paddingVertical: Spacing.sm,
   },
   navItem: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 8,
+    paddingVertical: Spacing.sm,
   },
   navItemActive: {
-    backgroundColor: '#EBF4FF',
+    backgroundColor: colors.gray[200],
   },
   navText: {
-    fontSize: 12,
-    color: '#6B7280',
-    marginTop: 4,
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
+    marginTop: Spacing.xs,
   },
   navTextActive: {
-    color: '#3B82F6',
-    fontWeight: '600',
+    color: colors.primary,
+    fontWeight: Typography.fontWeight.semibold,
   },
 });
 
-export default styles;
+export default createTabNavigationStyles;

@@ -1,11 +1,14 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity } from 'react-native';
 import { Download, FileText, Target, Trophy, TrendingUp } from 'lucide-react-native';
 import StatsCard from './StatsCard';
-import { ExamReport } from '../../types/examTypes';
-import styles from './ReportsTabStyles';
+import { useTheme } from '../../context/ThemeContext';
+import createReportsTabStyles from './ReportsTabStyles';
 
 const ReportsTab = ({ report }) => {
+  const { colors } = useTheme();
+  const styles = createReportsTabStyles(colors);
+
   if (!report) {
     return <Text>Carregando relatório...</Text>;
   }
@@ -19,31 +22,31 @@ const ReportsTab = ({ report }) => {
           title="Total de Provas"
           value={report.totalExams}
           icon={FileText}
-          color="#3B82F6"
+          color={colors.primary}
         />
         <StatsCard
           title="Média Geral"
           value={report.averageScore}
           icon={Target}
-          color="#10B981"
+          color={colors.secondary}
         />
         <StatsCard
           title="Aprovados"
           value={report.passedStudents}
           icon={Trophy}
-          color="#F59E0B"
+          color={colors.warning}
         />
         <StatsCard
           title="Taxa de Aprovação"
           value={`${report.passRate}%`}
           icon={TrendingUp}
-          color="#8B5CF6"
+          color={colors.accent}
         />
       </View>
 
       <View style={styles.reportActions}>
         <TouchableOpacity style={styles.primaryButton}>
-          <Download size={20} color="#FFFFFF" />
+          <Download size={20} color={colors.card} />
           <Text style={styles.buttonText}>Exportar Relatório</Text>
         </TouchableOpacity>
       </View>

@@ -1,26 +1,28 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from "../../styles/colors";
+import { Spacing } from "../../styles/designTokens";
 
-const styles = StyleSheet.create({
+const createHeaderstyles = (colors: ColorScheme) => StyleSheet.create({
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: '#FFFFFF',
+    padding: Spacing.md,
+    backgroundColor: colors.card,
     borderBottomWidth: 1,
-    borderBottomColor: '#E5E7EB',
+    borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    color: '#1F2937',
+    color: colors.textPrimary,
   },
   headerRight: {
     flexDirection: 'row',
   },
   headerButton: {
-    padding: 8,
+    padding: Spacing.xs,
   },
 });
 
-export default styles;
+export default createHeaderstyles;

@@ -1,13 +1,15 @@
 import { StyleSheet } from "react-native";
+import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { ColorScheme } from "../../styles/colors";
 
-const styles = StyleSheet.create({
+export const createStatsCardStyles = (colors: ColorScheme) => StyleSheet.create({
   statsCard: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.card,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
     borderLeftWidth: 4,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
+    borderColor: colors.border,
   },
   statsCardContent: {
     flexDirection: 'row',
@@ -15,14 +17,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   statsTitle: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 4,
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
+    marginBottom: Spacing.xs,
   },
   statsValue: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    color: colors.textPrimary,
   },
 });
-
-export default styles;

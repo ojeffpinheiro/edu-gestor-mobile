@@ -1,7 +1,12 @@
 import { View, Text } from 'react-native';
-import styles from './StatsCardStyles';
+import { useTheme } from '../../context/ThemeContext';
+import { createStatsCardStyles } from './StatsCardStyles';
 
-const StatsCard = ({ title, value, icon: IconComponent, color }) => (
+const StatsCard = ({ title, value, icon: IconComponent, color }) => {
+  const { colors } = useTheme();
+  const styles = createStatsCardStyles(colors);
+
+  return (
   <View style={[styles.statsCard, { borderLeftColor: color }]}>
     <View style={styles.statsCardContent}>
       <View>
@@ -12,5 +17,6 @@ const StatsCard = ({ title, value, icon: IconComponent, color }) => (
     </View>
   </View>
 );
+}
 
 export default StatsCard;

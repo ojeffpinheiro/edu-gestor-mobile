@@ -1,42 +1,44 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from "../../styles/colors";
+import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 
-const styles = StyleSheet.create({
+const createSettingsTabStyles  = (colors: ColorScheme) => StyleSheet.create({
   tabContent: {
-    padding: 16,
+    padding: Spacing.md,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 16,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.textPrimary,
+    marginBottom: Spacing.md,
   },
   settingsSection: {
-    backgroundColor: '#FFFFFF',
-    padding: 16,
-    borderRadius: 8,
-    marginBottom: 16,
+    backgroundColor: colors.card,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.md,
   },
   settingsLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
-    marginBottom: 8,
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.textPrimary,
+    marginBottom: Spacing.xs,
   },
   answerKeyText: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 12,
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
+    marginBottom: Spacing.sm,
   },
   settingsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    gap: 8,
+    paddingVertical: Spacing.sm,
+    gap: Spacing.xs,
   },
   settingsButtonText: {
-    fontSize: 16,
-    color: '#6B7280',
+    fontSize: Typography.fontSize.md,
+    color: colors.textSecondary,
   },
 });
 
-export default styles;
+export default createSettingsTabStyles;

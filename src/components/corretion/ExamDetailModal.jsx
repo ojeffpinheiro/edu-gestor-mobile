@@ -1,9 +1,13 @@
 import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
-import styles from './ExamDetailModalStyles';
+import { createExamDetailModalStyles } from './ExamDetailModalStyles';
+import { useTheme } from '../../context/ThemeContext';
 
 const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
+  const { colors } = useTheme();
+  const styles = createExamDetailModalStyles(colors);
+
   // Retorno early se não estiver visível ou dados faltando
   if (!visible || !exam || !answerKey) return null;
 
@@ -45,7 +49,7 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Detalhes da Prova</Text>
             <TouchableOpacity onPress={onClose}>
-              <XCircle size={24} color="#6B7280" />
+              <XCircle size={24} color={colors} />
             </TouchableOpacity>
           </View>
 
@@ -55,7 +59,7 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
               <Text style={styles.studentNameModal}>{safeExam.studentName}</Text>
               <Text style={styles.studentIdModal}>ID: {safeExam.studentId}</Text>
               <Text style={styles.examSubjectModal}>{safeExam.subject}</Text>
-              <Text style={[styles.scoreModal, { color: score >= 6 ? '#10B981' : '#EF4444' }]}>
+              <Text style={[styles.scoreModal, { color: score >= 6 ? colors.secondary : colors.error }]}>
                 Nota: {score.toFixed(1)}
               </Text>
             </View>
@@ -68,9 +72,9 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
                   <Text style={styles.studentAnswerText}>Resposta: {item.studentAnswer}</Text>
                   <Text style={styles.correctAnswerText}>Gabarito: {item.correctAnswer}</Text>
                   {item.isCorrect ? (
-                    <CheckCircle size={16} color="#10B981" />
+                    <CheckCircle size={16} color={colors.secondary} />
                   ) : (
-                    <XCircle size={16} color="#EF4444" />
+                    <XCircle size={16} color={colors.error} />
                   )}
                 </View>
               ))}

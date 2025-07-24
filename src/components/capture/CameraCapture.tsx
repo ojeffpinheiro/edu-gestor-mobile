@@ -14,6 +14,7 @@ import ReferencePoints from './ReferencePoints';
 import CaptureControls from './CaptureControls';
 
 import styles from '../../screens/Camera';
+import MarkAnalysis from './MarkAnalysis';
 
 interface PointsStatus {
   [key: number]: boolean;
@@ -35,13 +36,14 @@ const AUTO_CAPTURE_MODES = {
   FAST: 1500, // 1.5 segundos
   SLOW: 3000  // 3 segundos
 };
-const BLACK_THRESHOLD = 50; // Distância máxima para considerar como preto
+const BLACK_THRESHOLD = 80; // Distância máxima para considerar como preto
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoCapture, setAutoCapture] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
+const [analysisMode, setAnalysisMode] = useState(false);
   const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_MODES>('OFF');
   const [analysisResult, setAnalysisResult] = useState<{
     correctPoints: number;
@@ -339,14 +341,19 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   }, []);
 
   if (capturedImage) {
-    return (
-      <ImagePreview
-        imageUri={capturedImage}
-        onRetry={() => setCapturedImage(null)}
-        onConfirm={() => onPhotoCaptured(capturedImage)}
-      />
-    );
-  }
+  return analysisMode ? (
+    <MarkAnalysis 
+      imageUri={capturedImage} 
+      onBack={() => setAnalysisMode(false)}
+    />
+  ) : (
+    <ImagePreview
+      imageUri={capturedImage}
+      onRetry={() => setCapturedImage(null)}
+      onConfirm={() => setAnalysisMode(true)}
+    />
+  );
+}
 
   return (
     <View style={styles.container}>

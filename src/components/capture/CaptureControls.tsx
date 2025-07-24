@@ -1,6 +1,8 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../../context/ThemeContext';
+import { BorderRadius, Spacing } from '../../styles/designTokens';
 
 interface CaptureControlsProps {
   onCapture: () => void;
@@ -17,10 +19,12 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
   onAutoCaptureToggle,
   isProcessing
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={styles.container}>
       {/* Gallery Button */}
-      <TouchableOpacity onPress={onGalleryOpen} style={styles.button}>
+      <TouchableOpacity onPress={onGalleryOpen} style={[styles.button, { backgroundColor: colors.success + '30' }]}>
         <Ionicons name="images" size={32} color="white" />
       </TouchableOpacity>
 
@@ -38,7 +42,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
         onPress={onAutoCaptureToggle}
         style={[
           styles.button,
-          autoCaptureMode !== 'OFF' && styles.activeButton
+          autoCaptureMode !== 'OFF' && { backgroundColor: colors.primary, borderColor: colors.border }
         ]}
       >
         <View style={styles.autoCaptureContainer}>
@@ -71,21 +75,17 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 30,
+    bottom: Spacing.xl,
     left: 0,
     right: 0,
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: BorderRadius.round
   },
   button: {
     padding: 15,
-    backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 50,
-  },
-  activeButton: {
-    backgroundColor: 'rgba(0,100,0,0.3)',
   },
   autoCaptureContainer: {
     alignItems: 'center',
@@ -105,11 +105,9 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   captureButton: {
-    padding: 20,
-    backgroundColor: 'rgba(255,255,255,0.3)',
-    borderRadius: 50,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.round,
     borderWidth: 2,
-    borderColor: 'white',
   },
   disabledButton: {
     opacity: 0.5,

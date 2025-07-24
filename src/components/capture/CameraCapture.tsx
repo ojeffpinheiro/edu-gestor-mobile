@@ -15,6 +15,8 @@ import CaptureControls from './CaptureControls';
 
 import styles from '../../screens/Camera';
 import MarkAnalysis from './MarkAnalysis';
+import { useTheme } from '../../context/ThemeContext';
+import { createCameraStyles } from './CameraStyles';
 
 interface PointsStatus {
   [key: number]: boolean;
@@ -39,11 +41,13 @@ const AUTO_CAPTURE_MODES = {
 const BLACK_THRESHOLD = 80; // Distância máxima para considerar como preto
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
+  const { colors } = useTheme();
+  const cameraStyles = createCameraStyles(colors);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoCapture, setAutoCapture] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
-const [analysisMode, setAnalysisMode] = useState(false);
+  const [analysisMode, setAnalysisMode] = useState(false);
   const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_MODES>('OFF');
   const [analysisResult, setAnalysisResult] = useState<{
     correctPoints: number;
@@ -113,6 +117,7 @@ const [analysisMode, setAnalysisMode] = useState(false);
       return newMode;
     });
   }, []);
+
   const getAlignmentColor = (percentage: number) => {
     return percentage >= 90 ? '#00FF00' : '#FF0000';
   };
@@ -341,25 +346,25 @@ const [analysisMode, setAnalysisMode] = useState(false);
   }, []);
 
   if (capturedImage) {
-  return analysisMode ? (
-    <MarkAnalysis 
-      imageUri={capturedImage} 
-      onBack={() => setAnalysisMode(false)}
-    />
-  ) : (
-    <ImagePreview
-      imageUri={capturedImage}
-      onRetry={() => setCapturedImage(null)}
-      onConfirm={() => setAnalysisMode(true)}
-    />
-  );
-}
+    return analysisMode ? (
+      <MarkAnalysis
+        imageUri={capturedImage}
+        onBack={() => setAnalysisMode(false)}
+      />
+    ) : (
+      <ImagePreview
+        imageUri={capturedImage}
+        onRetry={() => setCapturedImage(null)}
+        onConfirm={() => setAnalysisMode(true)}
+      />
+    );
+  }
 
   return (
-    <View style={styles.container}>
+    <View style={cameraStyles.container}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
 
-      <View style={styles.overlay}>
+      <View style={cameraStyles.overlay}>
         <ReferencePoints
           pointsStatus={pointsStatus}
           pointsColors={pointsColors}

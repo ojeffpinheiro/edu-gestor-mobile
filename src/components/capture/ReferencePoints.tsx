@@ -1,6 +1,8 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
 import chroma from 'chroma-js';
+import { useTheme } from '../../context/ThemeContext';
+import { BorderRadius } from '../../styles/designTokens';
 
 interface ReferencePointsProps {
   pointsStatus: { [key: number]: boolean };
@@ -24,6 +26,8 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
   correctPoints = 0,
   totalPoints = 6
 }) => {
+  const { colors } = useTheme();
+
   const scanAnim = useRef(new Animated.Value(0)).current;
   const pulseAnims = useRef<{ [key: number]: Animated.Value }>({}).current;
 
@@ -96,12 +100,12 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 
   return (
     <>
-      <View style={styles.guideFrame}>
+      <View style={[styles.guideFrame, { borderColor: colors.border }]}>
         {/* Cantos da moldura */}
-        <View style={[styles.corner, styles.cornerTL]} />
-        <View style={[styles.corner, styles.cornerTR]} />
-        <View style={[styles.corner, styles.cornerBL]} />
-        <View style={[styles.corner, styles.cornerBR]} />
+        <View style={[styles.corner, styles.cornerTL, { backgroundColor: colors.success }]} />
+        <View style={[styles.corner, styles.cornerTR, { backgroundColor: colors.success }]} />
+        <View style={[styles.corner, styles.cornerBL, { backgroundColor: colors.success }]} />
+        <View style={[styles.corner, styles.cornerBR, { backgroundColor: colors.success }]} />
       </View>
 
       {/* Feedback de pontos corretos */}
@@ -124,7 +128,7 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
             left: `${point.x * 100}%`,
             top: `${point.y * 100}%`,
           }]}>
-            <View style={[styles.point, { backgroundColor: color }]}>
+            <View style={[styles.point, { backgroundColor: color, borderColor: colors.border }]}>
               <Text style={styles.pointText}>{point.id}</Text>
             </View>
           </View>
@@ -154,14 +158,12 @@ const styles = StyleSheet.create({
     width: '95%',
     height: '65%',
     borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.5)',
     position: 'relative',
   },
   corner: {
     position: 'absolute',
     width: 25,
     height: 25,
-    borderColor: '#00FF00',
   },
   cornerTL: {
     top: -1,
@@ -191,11 +193,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     width: 30,
     height: 30,
-    borderRadius: 15,
+    borderRadius: BorderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: 'white',
     transform: [{ translateX: -15 }, { translateY: -15 }]
   },
   pointText: {

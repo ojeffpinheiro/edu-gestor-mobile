@@ -3,6 +3,7 @@ import { View, Alert, Dimensions, StyleSheet } from 'react-native';
 import { CameraCapturedPicture, CameraView } from 'expo-camera';
 import chroma from 'chroma-js';
 import { Buffer } from 'buffer';
+import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import * as jpeg from 'jpeg-js';
 import * as tf from '@tensorflow/tfjs';
@@ -25,22 +26,14 @@ interface PointColor {
   percentage?: number;
 }
 
-interface ReferencePointsProps {
-  pointsStatus: PointsStatus;
-  pointsColors: PointsColors;
-  isLandscape: boolean;
-  correctPoints?: number;
-  totalPoints?: number;
-}
-
 interface PointsColors {
   [key: number]: PointColor;
 }
 
-const AUTO_CAPTURE_INTERVALS = {
+const AUTO_CAPTURE_MODES = {
   OFF: null,
-  FAST: 1500, // 1.5 seconds
-  SLOW: 3000  // 3 seconds
+  FAST: 1500, // 1.5 segundos
+  SLOW: 3000  // 3 segundos
 };
 const BLACK_THRESHOLD = 50; // Distância máxima para considerar como preto
 
@@ -49,7 +42,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoCapture, setAutoCapture] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
-  const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_INTERVALS>('OFF');
+  const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_MODES>('OFF');
   const [analysisResult, setAnalysisResult] = useState<{
     correctPoints: number;
     totalPoints: number;
@@ -63,12 +56,28 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   // Auto capture effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
+    let timeout: NodeJS.Timeout;
 
-    if (autoCaptureMode !== 'OFF' && !isProcessing && hasPermission) {
-      interval = setInterval(handleCapture, AUTO_CAPTURE_INTERVALS[autoCaptureMode]);
+    const executeCapture = async () => {
+      if (!isProcessing && hasPermission) {
+        setIsProcessing(true);
+        try {
+          await handleCapture();
+        } finally {
+          // Adiciona um pequeno delay após o processamento
+          timeout = setTimeout(() => setIsProcessing(false), 500);
+        }
+      }
+    };
+
+    if (autoCaptureMode !== 'OFF') {
+      interval = setInterval(executeCapture, AUTO_CAPTURE_MODES[autoCaptureMode]);
     }
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      clearTimeout(timeout);
+    };
   }, [autoCaptureMode, isProcessing, hasPermission]);
 
   useEffect(() => {
@@ -80,15 +89,28 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
 
   const handleAutoCaptureToggle = useCallback(() => {
     setAutoCaptureMode(prevMode => {
+      let newMode: keyof typeof AUTO_CAPTURE_MODES;
+
       switch (prevMode) {
-        case 'OFF': return 'FAST';
-        case 'FAST': return 'SLOW';
-        case 'SLOW': return 'OFF';
-        default: return 'OFF';
+        case 'OFF':
+          newMode = 'FAST';
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+          break;
+        case 'FAST':
+          newMode = 'SLOW';
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+          break;
+        case 'SLOW':
+          newMode = 'OFF';
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+          break;
+        default:
+          newMode = 'OFF';
       }
+
+      return newMode;
     });
   }, []);
-
   const getAlignmentColor = (percentage: number) => {
     return percentage >= 90 ? '#00FF00' : '#FF0000';
   };
@@ -220,7 +242,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
           r: grayValue,
           g: grayValue,
           b: grayValue,
-          percentage
+          percentage: percentage,
         };
 
         if (isCorrect) correctPoints++;
@@ -343,7 +365,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
       <CaptureControls
         onCapture={handleCapture}
         onGalleryOpen={handleGalleryOpen}
-        autoCapture={autoCaptureMode !== 'OFF'}
+        autoCaptureMode={autoCaptureMode}
         onAutoCaptureToggle={handleAutoCaptureToggle}
         isProcessing={isProcessing}
       />

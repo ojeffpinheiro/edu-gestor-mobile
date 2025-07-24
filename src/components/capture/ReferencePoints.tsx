@@ -1,10 +1,17 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
 import chroma from 'chroma-js';
 
 interface ReferencePointsProps {
   pointsStatus: { [key: number]: boolean };
-  pointsColors: { [key: number]: { r: number; g: number; b: number } };
+  pointsColors: {
+    [key: number]: {
+      r: number;
+      g: number;
+      b: number;
+      percentage?: number;
+    }
+  };
   isLandscape: boolean;
   correctPoints?: number;
   totalPoints?: number;
@@ -17,26 +24,8 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
   correctPoints = 0,
   totalPoints = 6
 }) => {
-  const scanAnim = React.useRef(new Animated.Value(0)).current;
-
-  useEffect(() => {
-    startScanAnimation();
-  }, []);
-
-  const startScanAnimation = () => {
-    scanAnim.setValue(0);
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(scanAnim, {
-          toValue: 1,
-          duration: 3000,
-          easing: Easing.linear,
-          useNativeDriver: true
-        }),
-        Animated.delay(500)
-      ])
-    ).start();
-  };
+  const scanAnim = useRef(new Animated.Value(0)).current;
+  const pulseAnims = useRef<{ [key: number]: Animated.Value }>({}).current;
 
   const referencePoints = isLandscape
     ? [
@@ -55,6 +44,55 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
       { id: 5, x: 0.1, y: 0.84 },
       { id: 6, x: 1, y: 0.84 }
     ];
+
+  referencePoints.forEach(point => {
+    if (!pulseAnims[point.id]) {
+      pulseAnims[point.id] = new Animated.Value(1);
+    }
+  });
+
+  useEffect(() => {
+    startScanAnimation();
+
+    // Start pulse animations for points with low alignment
+    referencePoints.forEach(point => {
+      if (pointsColors[point.id]?.percentage !== undefined && pointsColors[point.id].percentage < 60) {
+        startPulseAnimation(point.id);
+      }
+    });
+  }, [pointsColors]);
+
+  const startScanAnimation = () => {
+    scanAnim.setValue(0);
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scanAnim, {
+          toValue: 1,
+          duration: 3000,
+          easing: Easing.linear,
+          useNativeDriver: true
+        }),
+        Animated.delay(500)
+      ])
+    ).start();
+  };
+
+  const startPulseAnimation = (pointId: number) => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulseAnims[pointId], {
+          toValue: 1.2,
+          duration: 500,
+          useNativeDriver: true
+        }),
+        Animated.timing(pulseAnims[pointId], {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true
+        })
+      ])
+    ).start();
+  };
 
   return (
     <>
@@ -75,8 +113,10 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 
       {/* Pontos de referência */}
       {referencePoints.map((point) => {
-        const color = pointsColors[point.id]
-          ? `rgb(${pointsColors[point.id].r}, ${pointsColors[point.id].g}, ${pointsColors[point.id].b})`
+        const pointData = pointsColors[point.id];
+        const percentage = pointData?.percentage ?? 0;
+        const color = pointData
+          ? `rgb(${pointData.r}, ${pointData.g}, ${pointData.b})`
           : pointsStatus[point.id] ? '#00FF00' : '#FF0000';
 
         return (
@@ -152,19 +192,19 @@ const styles = StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    transform: [{ translateX: -15 }, { translateY: -15 }],
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
     borderColor: 'white',
-    },
+    transform: [{ translateX: -15 }, { translateY: -15 }]
+  },
   pointText: {
-  color: 'white',
-  fontWeight: 'bold',
-  fontSize: 12,
-  textShadowColor: 'rgba(0,0,0,0.8)',
-  textShadowOffset: { width: 1, height: 1 },
-  textShadowRadius: 2,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 12,
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
   scanLine: {
     position: 'absolute',

@@ -1,7 +1,22 @@
 import React, { useEffect } from 'react';
 import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
+import chroma from 'chroma-js';
 
-const ReferencePoints = ({ pointsStatus, pointsColors, isLandscape }) => {
+interface ReferencePointsProps {
+  pointsStatus: { [key: number]: boolean };
+  pointsColors: { [key: number]: { r: number; g: number; b: number } };
+  isLandscape: boolean;
+  correctPoints?: number;
+  totalPoints?: number;
+}
+
+const ReferencePoints: React.FC<ReferencePointsProps> = ({
+  pointsStatus,
+  pointsColors,
+  isLandscape,
+  correctPoints = 0,
+  totalPoints = 6
+}) => {
   const scanAnim = React.useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
@@ -51,6 +66,13 @@ const ReferencePoints = ({ pointsStatus, pointsColors, isLandscape }) => {
         <View style={[styles.corner, styles.cornerBR]} />
       </View>
 
+      {/* Feedback de pontos corretos */}
+      <View style={styles.pointsFeedback}>
+        <Text style={styles.pointsText}>
+          Pontos corretos: {correctPoints}/{totalPoints}
+        </Text>
+      </View>
+
       {/* Pontos de referência */}
       {referencePoints.map((point) => {
         const color = pointsColors[point.id]
@@ -58,18 +80,13 @@ const ReferencePoints = ({ pointsStatus, pointsColors, isLandscape }) => {
           : pointsStatus[point.id] ? '#00FF00' : '#FF0000';
 
         return (
-          <View
-            key={point.id}
-            style={[
-              styles.point,
-              {
-                left: `${point.x * 100}%`,
-                top: `${point.y * 100}%`,
-                backgroundColor: color
-              }
-            ]}
-          >
-            <Text style={styles.pointText}>{point.id}</Text>
+          <View key={point.id} style={[styles.pointContainer, {
+            left: `${point.x * 100}%`,
+            top: `${point.y * 100}%`,
+          }]}>
+            <View style={[styles.point, { backgroundColor: color }]}>
+              <Text style={styles.pointText}>{point.id}</Text>
+            </View>
           </View>
         );
       })}
@@ -138,17 +155,48 @@ const styles = StyleSheet.create({
     transform: [{ translateX: -15 }, { translateY: -15 }],
     justifyContent: 'center',
     alignItems: 'center',
-  },
+    borderWidth: 2,
+    borderColor: 'white',
+    },
   pointText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
+  color: 'white',
+  fontWeight: 'bold',
+  fontSize: 12,
+  textShadowColor: 'rgba(0,0,0,0.8)',
+  textShadowOffset: { width: 1, height: 1 },
+  textShadowRadius: 2,
   },
   scanLine: {
     position: 'absolute',
     width: '80%',
     height: 2,
     backgroundColor: 'rgba(0, 255, 0, 0.7)',
+  },
+  pointsFeedback: {
+    position: 'absolute',
+    top: 20,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(0,0,0,0.7)',
+    padding: 10,
+    borderRadius: 20,
+  },
+  pointsText: {
+    color: 'white',
+    fontWeight: 'bold',
+  },
+  pointContainer: {
+    position: 'absolute',
+    alignItems: 'center',
+    transform: [{ translateX: -20 }, { translateY: -25 }],
+  },
+  percentageText: {
+    color: 'white',
+    fontSize: 10,
+    marginTop: 2,
+    fontWeight: 'bold',
+    textShadowColor: 'rgba(0,0,0,0.8)',
+    textShadowOffset: { width: 1, height: 1 },
+    textShadowRadius: 2,
   },
 });
 

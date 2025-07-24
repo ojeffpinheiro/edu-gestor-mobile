@@ -22,20 +22,38 @@ interface PointColor {
   r: number;
   g: number;
   b: number;
+  percentage?: number;
+}
+
+interface ReferencePointsProps {
+  pointsStatus: PointsStatus;
+  pointsColors: PointsColors;
+  isLandscape: boolean;
+  correctPoints?: number;
+  totalPoints?: number;
 }
 
 interface PointsColors {
   [key: number]: PointColor;
 }
 
-const ANALYSIS_INTERVAL = 3000;
-const BLUE_THRESHOLD = 50; // Distância máxima para considerar como azul
+const AUTO_CAPTURE_INTERVALS = {
+  OFF: null,
+  FAST: 1500, // 1.5 seconds
+  SLOW: 3000  // 3 seconds
+};
+const BLACK_THRESHOLD = 50; // Distância máxima para considerar como preto
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [autoCapture, setAutoCapture] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
+  const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_INTERVALS>('OFF');
+  const [analysisResult, setAnalysisResult] = useState<{
+    correctPoints: number;
+    totalPoints: number;
+  } | null>(null);
   const isLandscape = dimensions.width > dimensions.height;
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [pointsStatus, setPointsStatus] = useState<PointsStatus>({});
@@ -45,11 +63,13 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   // Auto capture effect
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (autoCapture && !isProcessing && hasPermission) {
-      interval = setInterval(handleCapture, ANALYSIS_INTERVAL);
+
+    if (autoCaptureMode !== 'OFF' && !isProcessing && hasPermission) {
+      interval = setInterval(handleCapture, AUTO_CAPTURE_INTERVALS[autoCaptureMode]);
     }
+
     return () => clearInterval(interval);
-  }, [autoCapture, isProcessing, hasPermission]);
+  }, [autoCaptureMode, isProcessing, hasPermission]);
 
   useEffect(() => {
     const subscription = Dimensions.addEventListener('change', ({ window }) => {
@@ -58,16 +78,72 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
     return () => subscription?.remove();
   }, []);
 
+  const handleAutoCaptureToggle = useCallback(() => {
+    setAutoCaptureMode(prevMode => {
+      switch (prevMode) {
+        case 'OFF': return 'FAST';
+        case 'FAST': return 'SLOW';
+        case 'SLOW': return 'OFF';
+        default: return 'OFF';
+      }
+    });
+  }, []);
+
+  const getAlignmentColor = (percentage: number) => {
+    return percentage >= 90 ? '#00FF00' : '#FF0000';
+  };
+
+  const analyzeColor = (r: number, g: number, b: number) => {
+    // Convert to grayscale
+    const grayValue = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+
+    // Calculate distance to pure black (#000000)
+    const normalizedR = r / 255;
+    const normalizedG = g / 255;
+    const normalizedB = b / 255;
+    const color = chroma(normalizedR, normalizedG, normalizedB);
+    const blackDistance = chroma.distance(color, '#000000');
+    const MIN_BRIGHTNESS = 10; // Minimum value to consider (0-255)
+    const isBlack = blackDistance < BLACK_THRESHOLD && grayValue < MIN_BRIGHTNESS;
+
+    // Calculate "blackness" percentage (0-100)
+    const percentage = Math.max(0, 100 - (blackDistance / BLACK_THRESHOLD) * 100);
+
+    return {
+      isBlack,
+      grayValue,
+      percentage
+    };
+  };
+
   const analyzePoints = async (imageUri: string) => {
     try {
+      console.log('Iniciando análise da imagem:', imageUri);
       const base64String = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
 
       const rawImageData = Buffer.from(base64String, 'base64');
       const imageData = jpeg.decode(rawImageData, { useTArray: true });
+      console.log('Imagem decodificada:', imageData.width, 'x', imageData.height);
+
       const pixelBuffer = new Uint8Array(imageData.data);
-      const imageTensor = tf.tensor3d(pixelBuffer, [imageData.height, imageData.width, 4]);
+      let imageTensor = tf.tensor3d(pixelBuffer, [imageData.height, imageData.width, 4], 'float32');
+      console.log('Tensor criado:', imageTensor.shape);
+
+      // Redimensionar se necessário
+      const MAX_SIZE = 1024;
+      const scaleFactor = Math.min(MAX_SIZE / imageData.width, MAX_SIZE / imageData.height);
+
+      if (scaleFactor < 1) {
+        const resizedTensor = tf.image.resizeBilinear(imageTensor, [
+          Math.floor(imageData.height * scaleFactor),
+          Math.floor(imageData.width * scaleFactor)
+        ]);
+        tf.dispose(imageTensor);
+        imageTensor = resizedTensor;
+        console.log('Tensor redimensionado:', imageTensor.shape);
+      }
 
       const referencePoints = isLandscape
         ? [
@@ -89,57 +165,96 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
 
       const newPointsStatus: PointsStatus = {};
       const newPointsColors: PointsColors = {};
+      let correctPoints = 0;
 
       for (const point of referencePoints) {
-        const x = Math.round(point.x * imageData.width);
-        const y = Math.round(point.y * imageData.height);
+        const x = Math.round(point.x * imageTensor.shape[1]);
+        const y = Math.round(point.y * imageTensor.shape[0]);
 
-        // Calcular os limites do slice
         const startX = Math.max(0, x - 5);
         const startY = Math.max(0, y - 5);
-        const endX = Math.min(imageData.width, startX + 10);
-        const endY = Math.min(imageData.height, startY + 10);
+        const sliceWidth = Math.min(10, imageTensor.shape[1] - startX);
+        const sliceHeight = Math.min(10, imageTensor.shape[0] - startY);
 
-        // Calcular o tamanho do slice
-        const sliceWidth = endX - startX;
-        const sliceHeight = endY - startY;
+        const region = imageTensor.slice([startY, startX, 0], [sliceHeight, sliceWidth, 4]);
+        console.log(`Região ${point.id}:`, { x, y, startX, startY, sliceWidth, sliceHeight });
 
-        // Fazer o slice com os limites ajustados
-        const region = imageTensor.slice(
-          [startY, startX, 0],
-          [sliceHeight, sliceWidth, 4]
-        );
+        function extractFirstNumber(value: any): number {
+          while (Array.isArray(value)) {
+            value = value[0];
+          }
+          return typeof value === 'number' ? value : 0;
+        }
 
-        // Calcular cor média
-        const mean = region.mean(0).mean(0);
-        const meanValues = await mean.array() as number[];
-        const [r, g, b] = meanValues;
+        // Cálculo corrigido das médias
+        const getChannelMean = async (channel: number) => {
+          const channelSlice = region.slice([0, 0, channel], [sliceHeight, sliceWidth, 1]);
+          const meanTensor = channelSlice.mean();
+          const value = await meanTensor.array();
+
+          console.log(`Canal ${channel} - Valor bruto:`, value);
+
+          const extractedValue = extractFirstNumber(value);
+          console.log(`Canal ${channel} - Valor extraído:`, extractedValue);
+
+          tf.dispose([channelSlice, meanTensor]);
+          return extractedValue;
+        };
+
+        const r = await getChannelMean(0);
+        const g = await getChannelMean(1);
+        const b = await getChannelMean(2);
 
         const color = chroma(r, g, b);
-        const blueDistance = chroma.distance(color, '#0000FF');
-        const isBlue = blueDistance < BLUE_THRESHOLD;
+        const blackDistance = chroma.distance(color, '#000000');
+        const isCorrect = blackDistance < BLACK_THRESHOLD;
 
-        newPointsStatus[point.id] = isBlue;
-        newPointsColors[point.id] = { r, g, b };
+        console.log(`Distância do preto: ${blackDistance}`, `É preto? ${isCorrect}`);
 
-        tf.dispose([region, mean]);
+        const { grayValue, percentage } = analyzeColor(r, g, b);
+
+        console.log(`Valores RGB - R: ${r}, G: ${g}, B: ${b}, Cinza: ${grayValue}`);
+
+        newPointsStatus[point.id] = false; // Não usamos mais a cor para status
+        newPointsColors[point.id] = {
+          r: grayValue,
+          g: grayValue,
+          b: grayValue,
+          percentage
+        };
+
+        if (isCorrect) correctPoints++;
+        tf.dispose(region);
       }
 
-      tf.dispose([imageTensor]);
-
+      tf.dispose(imageTensor);
       return {
         status: newPointsStatus,
         colors: newPointsColors,
-        shouldCapture: Object.values(newPointsStatus).every(Boolean)
+        correctPoints,
+        totalPoints: referencePoints.length,
+        shouldCapture: correctPoints === referencePoints.length
       };
     } catch (error) {
-      console.error('Erro na análise:', error);
+      console.error('Erro detalhado:', error);
       throw error;
     }
   };
 
   const handleCapture = useCallback(async () => {
-    if (!cameraRef.current || isProcessing) return;
+    console.log('Iniciando captura...');
+
+    if (!cameraRef.current) {
+      console.log('Referência da câmera não disponível');
+      return;
+    }
+    if (isProcessing) {
+      console.log('Já está processando');
+      return;
+    }
+
+    setIsProcessing(true);
+    console.log('Processamento iniciado');
 
     setIsProcessing(true);
     try {
@@ -149,7 +264,8 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
         exif: false
       });
 
-      const { status, colors, shouldCapture } = await analyzePoints(photo.uri);
+      const { status, colors, correctPoints, totalPoints, shouldCapture } = await analyzePoints(photo.uri);
+      setAnalysisResult({ correctPoints, totalPoints });
 
       setPointsStatus(status);
       setPointsColors(colors);
@@ -158,7 +274,12 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
         await handleImageCapture(photo.uri);
       }
     } catch (error) {
-      showError('Capture Error', error instanceof Error ? error.message : 'Unknown error');
+      console.error('Erro completo:', {
+        error,
+        message: error instanceof Error ? error.message : 'Erro desconhecido',
+        stack: error instanceof Error ? error.stack : undefined
+      });
+      showError('Erro de Captura', 'Falha ao processar a imagem');
     } finally {
       setIsProcessing(false);
     }
@@ -207,21 +328,25 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
 
   return (
     <View style={styles.container}>
-      <CameraView
-        ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
+      <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
+
       <View style={styles.overlay}>
         <ReferencePoints
           pointsStatus={pointsStatus}
           pointsColors={pointsColors}
           isLandscape={isLandscape}
+          correctPoints={analysisResult?.correctPoints || 0}
+          totalPoints={analysisResult?.totalPoints || 6} // 6 é o número fixo de pontos
         />
       </View>
+
       <CaptureControls
         onCapture={handleCapture}
         onGalleryOpen={handleGalleryOpen}
-        autoCapture={autoCapture}
-        onAutoCaptureToggle={() => setAutoCapture(!autoCapture)}
-        isProcessing={isProcessing} />
+        autoCapture={autoCaptureMode !== 'OFF'}
+        onAutoCaptureToggle={handleAutoCaptureToggle}
+        isProcessing={isProcessing}
+      />
     </View>
   );
 };

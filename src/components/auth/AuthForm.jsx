@@ -13,6 +13,7 @@ import {
 } from 'react-native';
 import { Lock, Eye, EyeOff, X, Shield } from 'lucide-react-native';
 import { styles } from './styles';
+import Button from '../common/Button';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const [password, setPassword] = useState('admin123');
@@ -111,28 +112,26 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                     />
                     <View style={styles.inputActions}>
                       {password.length > 0 && (
-                        <TouchableOpacity
+                        <Button
                           style={styles.actionButton}
                           onPress={() => {
                             setPassword('');
                             passwordInputRef.current.focus();
                           }}
-                        >
-                          <X size={18} color="#9ca3af" />
-                        </TouchableOpacity>
+                          icon={<X size={18} color="#9ca3af" />}
+                        />
                       )}
-                      <TouchableOpacity
+                      <Button
                         style={styles.actionButton}
+                        icon={showPassword ?
+                          <EyeOff size={18} color="#9ca3af" /> :
+                          <Eye size={18} color="#9ca3af" />
+                        }
                         onPress={() => {
                           setShowPassword(!showPassword);
                           passwordInputRef.current.focus();
                         }}
-                      >
-                        {showPassword ?
-                          <EyeOff size={18} color="#9ca3af" /> :
-                          <Eye size={18} color="#9ca3af" />
-                        }
-                      </TouchableOpacity>
+                      />
                     </View>
                   </View>
                 </View>
@@ -140,26 +139,25 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
 
               {/* Botões com novo design */}
               <View style={styles.buttonSection}>
-                <TouchableOpacity
-                  style={[
-                    styles.primaryButton,
-                    password.length === 0 && styles.disabledButton
-                  ]}
+                <Button
+                  title="Entrar"
                   onPress={validatePassword}
+                  variant="primary"
                   disabled={password.length === 0}
-                >
-                  <Text style={styles.buttonText}>Entrar</Text>
-                </TouchableOpacity>
+                  style={[styles.primaryButton, password.length === 0 && styles.disabledButton]}
+                  textStyle={styles.buttonText}
+                />
 
-                <TouchableOpacity
-                  style={styles.secondaryButton}
+                <Button
+                  title="Voltar ao início"
                   onPress={() => {
                     setCurrentView('home');
                     Keyboard.dismiss();
                   }}
-                >
-                  <Text style={styles.secondaryButtonText}>Voltar ao início</Text>
-                </TouchableOpacity>
+                  variant="outline"
+                  textStyle={styles.secondaryButtonText}
+                  style={styles.secondaryButton}
+                />
               </View>
 
               {/* Demo box redesenhada */}

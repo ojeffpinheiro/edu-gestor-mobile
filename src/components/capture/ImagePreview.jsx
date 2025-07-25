@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Image, TouchableOpacity, Text } from 'react-native';
+import { View, Image, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import styles from '../../screens/Camera';
 import { useTheme } from '../../context/ThemeContext';
 import { createCameraStyles } from './CameraStyles';
+import Button from '../common/Button';
 
 const ImagePreview = ({ imageUri, onRetry, onConfirm }) => {
   const { colors } = useTheme();
@@ -14,21 +14,23 @@ const ImagePreview = ({ imageUri, onRetry, onConfirm }) => {
       <Image source={{ uri: imageUri }} style={cameraStyles.previewImage} />
 
       <View style={cameraStyles.previewControls}>
-        <TouchableOpacity
-          style={[cameraStyles.previewButton, cameraStyles.retryButton]}
+        <Button
+          variant="text"
           onPress={onRetry}
+          style={[cameraStyles.previewButton, cameraStyles.retryButton]}
         >
           <Ionicons name="close" size={24} color="white" />
           <Text style={cameraStyles.previewButtonText}>Repetir</Text>
-        </TouchableOpacity>
+      </Button>
 
-        <TouchableOpacity
-          style={[cameraStyles.previewButton, cameraStyles.confirmButton]}
+        <Button
+          variant="text"
           onPress={onConfirm}
+          style={[cameraStyles.previewButton, cameraStyles.confirmButton]}
         >
           <Ionicons name="checkmark" size={24} color="white" />
           <Text style={cameraStyles.previewButtonText}>Confirmar</Text>
-        </TouchableOpacity>
+        </Button>
       </View>
     </View>
   );

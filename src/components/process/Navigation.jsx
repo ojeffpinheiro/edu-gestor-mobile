@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { Camera, BarChart3, Settings } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import createNavigationStyles from './NavigationStyles';
+import NavButton from './NavButton';
 
 const Navigation = ({ currentScreen, onNavigate }) => {
   const { colors } = useTheme();
@@ -10,24 +11,21 @@ const Navigation = ({ currentScreen, onNavigate }) => {
     <View style={styles.container}>
       <Text style={styles.title}>CorreçãoAuto</Text>
       <View style={styles.navButtons}>
-        <TouchableOpacity
-          style={[styles.button, currentScreen === 'home' && styles.activeButton]}
+        <NavButton
+          icon={<Camera size={20} color="white" />}
+          active={currentScreen === 'home'}
           onPress={() => onNavigate('home')}
-        >
-          <Camera size={20} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, currentScreen === 'results' && styles.activeButton]}
+        />
+        <NavButton
+          icon={<BarChart3 size={20} color="white" />}
+          active={currentScreen === 'results'}
           onPress={() => onNavigate('results')}
-        >
-          <BarChart3 size={20} color="white" />
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={[styles.button, currentScreen === 'settings' && styles.activeButton]}
+        />
+        <NavButton
+          icon={<Settings size={20} color="white" />}
+          active={currentScreen === 'settings'}
           onPress={() => onNavigate('settings')}
-        >
-          <Settings size={20} color="white" />
-        </TouchableOpacity>
+        />
       </View>
     </View>
   );

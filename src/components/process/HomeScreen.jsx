@@ -1,8 +1,9 @@
-import { View, Text, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
+import { View, Text, Image, ActivityIndicator, Alert } from 'react-native';
 import { Camera, Upload, CheckCircle, FileText, Save, Eye } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../../context/ThemeContext';
 import { createHomeScreenStyles } from './HomeScreenStyles';
+import Button from '../common/Button';
 
 const HomeScreen = ({
   examTemplate,
@@ -78,10 +79,15 @@ const HomeScreen = ({
           <View style={styles.emptyCapture}>
             <Camera size={48} color="#9ca3af" />
             <Text style={styles.captureText}>Capture ou selecione uma imagem da folha de resposta</Text>
-            <TouchableOpacity style={styles.selectButton} onPress={pickImage}>
-              <Upload size={20} color="white" />
-              <Text style={styles.selectButtonText}>Selecionar Imagem</Text>
-            </TouchableOpacity>
+            <Button
+              title="Selecionar Imagem"
+              onPress={pickImage}
+              variant="primary"
+              icon={<Upload size={20} color="white" />}
+              iconPosition="left"
+              style={styles.selectButton}
+              textStyle={styles.selectButtonText}
+            />
           </View>
         )}
       </View>
@@ -116,20 +122,24 @@ const HomeScreen = ({
           </View>
 
           <View style={styles.actions}>
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.saveButton]}
+            <Button
+              title="Salvar"
               onPress={onSaveCorrection}
-            >
-              <Save size={16} color="white" />
-              <Text style={styles.actionButtonText}>Salvar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity 
-              style={[styles.actionButton, styles.detailsButton]}
+              variant="primary"
+              icon={<Save size={16} color="white" />}
+              iconPosition="left"
+              style={[styles.actionButton, styles.saveButton]}
+              textStyle={styles.actionButtonText}
+            />
+            <Button
+              title="Detalhes"
               onPress={onViewDetails}
-            >
-              <Eye size={16} color="white" />
-              <Text style={styles.actionButtonText}>Detalhes</Text>
-            </TouchableOpacity>
+              variant="secondary"
+              icon={<Eye size={16} color="white" />}
+              iconPosition="left"
+              style={[styles.actionButton, styles.detailsButton]}
+              textStyle={styles.actionButtonText}
+            />
           </View>
         </View>
       )}

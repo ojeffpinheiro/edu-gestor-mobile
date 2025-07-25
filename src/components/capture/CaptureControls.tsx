@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { BorderRadius, Spacing } from '../../styles/designTokens';
+import Button from '../common/Button';
 
 interface CaptureControlsProps {
   onCapture: () => void;
@@ -21,53 +22,70 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const getAutoCaptureColor = () => {
+    switch (autoCaptureMode) {
+      case 'FAST': return colors.success;
+      case 'SLOW': return colors.warning;
+      default: return colors.card;
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Gallery Button */}
-      <TouchableOpacity onPress={onGalleryOpen} style={[styles.button, { backgroundColor: colors.success + '30' }]}>
-        <Ionicons name="images" size={32} color="white" />
-      </TouchableOpacity>
+      <Button
+        onPress={onGalleryOpen}
+        variant="floating"
+        icon={<Ionicons name="images" size={24} color={colors.card} />}
+        style={[styles.button, { backgroundColor: `${colors.success}30` }]}
+        rounded
+        disabled={isProcessing}
+      />
 
       {/* Main Capture Button */}
-      <TouchableOpacity
+      <Button
         onPress={onCapture}
-        style={[styles.captureButton, isProcessing && styles.disabledButton]}
+        variant="floating"
+        size="lg"
+        icon={<Ionicons name="camera" size={32} color={colors.card} />}
+        style={[
+          styles.captureButton, 
+          isProcessing && styles.disabledButton,
+          { borderColor: colors.border }
+        ]}
+        rounded
         disabled={isProcessing}
-      >
-        <Ionicons name="camera" size={40} color="white" />
-      </TouchableOpacity>
+      />
 
       {/* Auto Capture Toggle */}
-      <TouchableOpacity
+      <Button
         onPress={onAutoCaptureToggle}
-        style={[
-          styles.button,
-          autoCaptureMode !== 'OFF' && { backgroundColor: colors.primary, borderColor: colors.border }
-        ]}
-      >
-        <View style={styles.autoCaptureContainer}>
-          <Ionicons
-            name="timer"
-            size={28}
-            color={
-              autoCaptureMode === 'FAST' ? '#00FF00' :
-                autoCaptureMode === 'SLOW' ? '#FFA500' :
-                  'white'
-            }
-          />
-          <Text style={styles.autoCaptureText}>
-            {autoCaptureMode === 'FAST' ? '1.5s' :
-              autoCaptureMode === 'SLOW' ? '3s' :
-                'Auto'}
-          </Text>
-          {autoCaptureMode !== 'OFF' && (
-            <View style={[
-              styles.indicator,
-              { backgroundColor: autoCaptureMode === 'FAST' ? '#00FF00' : '#FFA500' }
-            ]} />
-          )}
-        </View>
-      </TouchableOpacity>
+        variant={autoCaptureMode !== 'OFF' ? 'floating' : 'ghost'}
+        icon={
+          <View style={styles.autoCaptureContainer}>
+            <Ionicons
+              name="timer"
+              size={24}
+              color={getAutoCaptureColor()}
+            />
+            <Text style={[styles.autoCaptureText, { color: colors.card }]}>
+              {autoCaptureMode === 'FAST' ? '1.5s' :
+               autoCaptureMode === 'SLOW' ? '3s' : 'Auto'}
+            </Text>
+            {autoCaptureMode !== 'OFF' && (
+              <View style={[
+                styles.indicator,
+                { 
+                  backgroundColor: autoCaptureMode === 'FAST' ? 
+                    colors.success : colors.warning 
+                }
+              ]} />
+            )}
+          </View>
+        }
+        style={styles.button}
+        rounded
+      />
     </View>
   );
 };
@@ -84,33 +102,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: BorderRadius.round
   },
   button: {
-    padding: 15,
-    borderRadius: 50,
+    width: 50,
+    height: 50,
+    padding: 0,
+  },
+  captureButton: {
+    width: 70,
+    height: 70,
+    borderWidth: 2,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   autoCaptureContainer: {
     alignItems: 'center',
     justifyContent: 'center',
+    position: 'relative',
   },
   autoCaptureText: {
-    color: 'white',
     fontSize: 12,
     marginTop: 4,
   },
   indicator: {
     position: 'absolute',
-    top: 8,
-    right: 8,
+    top: 4,
+    right: 4,
     width: 8,
     height: 8,
     borderRadius: 4,
-  },
-  captureButton: {
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.round,
-    borderWidth: 2,
-  },
-  disabledButton: {
-    opacity: 0.5,
   },
 });
 

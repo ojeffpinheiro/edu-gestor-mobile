@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
 import { BookOpen } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
-import { Card, PrimaryButton } from '../common/sharedComponents';
+import { Card } from '../common/sharedComponents';
+import Button from '../common/Button';
 
 const HomeScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
@@ -37,9 +38,11 @@ const HomeScreen = ({ setCurrentView }) => {
           ))}
         </View>
 
-        <PrimaryButton 
-          title="Iniciar Correção" 
-          onPress={() => setCurrentView('auth')} 
+        <Button
+          title="Iniciar Correção"
+          onPress={() => setCurrentView('auth')}
+          variant="primary"
+          size="lg"
           style={styles.button}
         />
       </Card>

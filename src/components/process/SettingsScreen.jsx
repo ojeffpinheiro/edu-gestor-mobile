@@ -1,11 +1,13 @@
-import { View, Text, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
+import { View, Text, TextInput, Switch, ScrollView } from 'react-native';
 import { FileText, Scan, Settings, Download } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import createSettingsScreenStyles from './SettingsScreenStyles';
+import Button from '../common/Button';
 
 const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
   const { colors } = useTheme();
   const styles = createSettingsScreenStyles(colors);
+  
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Configurações</Text>
@@ -77,14 +79,23 @@ const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
           <Text style={styles.sectionTitle}>Sistema</Text>
         </View>
         
-        <TouchableOpacity style={styles.systemButton}>
-          <Text style={styles.systemButtonText}>Sincronizar com Sistema Escolar</Text>
-        </TouchableOpacity>
+        <Button
+          title="Sincronizar com Sistema Escolar"
+          onPress={() => {}}
+          variant="outline"
+          style={styles.systemButton}
+          textStyle={styles.systemButtonText}
+        />
         
-        <TouchableOpacity style={[styles.systemButton, styles.downloadButton]}>
-          <Download size={16} color="white" />
-          <Text style={[styles.systemButtonText, styles.downloadButtonText]}>Exportar Dados</Text>
-        </TouchableOpacity>
+        <Button
+          title="Exportar Dados"
+          onPress={() => {}}
+          variant="primary"
+          icon={<Download size={16} color="white" />}
+          iconPosition="left"
+          style={[styles.systemButton, styles.downloadButton]}
+          textStyle={[styles.systemButtonText, styles.downloadButtonText]}
+        />
       </View>
     </ScrollView>
   );

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import { styles } from '../styles/commun';
+import Button from '../components/common/Button';
 
 export default function HomeScreen({ navigation }) {
   return (
@@ -9,47 +10,46 @@ export default function HomeScreen({ navigation }) {
       <Text style={styles.subtitle}>Bem-vindo ao App de Correção de Provas</Text>
       
       <ScrollView contentContainerStyle={styles.buttonContainer}>
-        <TouchableOpacity 
-          style={styles.button}
+        <Button
+          title="Autenticação"
           onPress={() => navigation.navigate('Auth')}
-        >
-          <Text style={styles.buttonText}>Autenticação</Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={{ marginBottom: 10 }}
+        />
         
-        <TouchableOpacity 
-          style={styles.button}
+        <Button 
+          title="Identificação"
           onPress={() => navigation.navigate('Identification')}
-        >
-          <Text style={styles.buttonText}>Identificação</Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={{ marginBottom: 10 }}
+        />
         
-        <TouchableOpacity 
-          style={styles.button}
+        <Button 
+          title="Captura"
           onPress={() => navigation.navigate('Capture')}
-        >
-          <Text style={styles.buttonText}>Captura</Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={{ marginBottom: 10 }}
+        />
         
-        <TouchableOpacity 
-          style={styles.button}
+        <Button 
+          title="Processamento"
           onPress={() => navigation.navigate('Processing')}
-        >
-          <Text style={styles.buttonText}>Processamento</Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={{ marginBottom: 10 }}
+        />
         
-        <TouchableOpacity 
-          style={styles.button}
+        <Button 
+          title="Relatórios"
           onPress={() => navigation.navigate('Report')}
-        >
-          <Text style={styles.buttonText}>Relatórios</Text>
-        </TouchableOpacity>
+          variant="primary"
+          style={{ marginBottom: 10 }}
+        />
         
-        <TouchableOpacity 
-          style={styles.button}
+        <Button 
+          title="Correção"
           onPress={() => navigation.navigate('Correction')}
-        >
-          <Text style={styles.buttonText}>Correção</Text>
-        </TouchableOpacity>
+          variant="primary"
+        />
       </ScrollView>
     </View>
   );

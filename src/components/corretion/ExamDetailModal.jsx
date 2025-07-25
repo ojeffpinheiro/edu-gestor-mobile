@@ -1,8 +1,9 @@
-import { View, Text, Modal, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, Modal, ScrollView } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
 import { createExamDetailModalStyles } from './ExamDetailModalStyles';
 import { useTheme } from '../../context/ThemeContext';
+import Button from '../common/Button';
 
 const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
   const { colors } = useTheme();
@@ -48,9 +49,10 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
           {/* Cabeçalho */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Detalhes da Prova</Text>
-            <TouchableOpacity onPress={onClose}>
-              <XCircle size={24} color={colors} />
-            </TouchableOpacity>
+            <Button
+              variant="text"
+              onPress={onClose}
+              icon={<XCircle size={24} color={colors.text} />} />
           </View>
 
           {/* Corpo */}

@@ -1,7 +1,8 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { User } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import createHeaderstyles from './AppHeaderStyles';
+import Button from '../common/Button';
 
 const AppHeader = () => {
   const { colors } = useTheme();
@@ -11,9 +12,11 @@ const AppHeader = () => {
     <View style={styles.header}>
       <Text style={styles.headerTitle}>Correção de Provas</Text>
       <View style={styles.headerRight}>
-        <TouchableOpacity style={styles.headerButton}>
-          <User size={24} color={colors.gray[500]} />
-        </TouchableOpacity>
+        <Button
+          variant="text"
+          onPress={() => { }}
+          style={styles.headerButton}
+          icon={<User size={24} color={colors.gray[500]} />} />
       </View>
     </View>
   );

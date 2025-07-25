@@ -15,6 +15,7 @@ interface ColorPalette {
   card: string;
   textPrimary: string;
   textSecondary: string;
+  disabled: string;
   border: string;
   success: string;
   error: string;
@@ -30,6 +31,7 @@ export const lightColors: ColorPalette = {
   accent: '#8B5CF6',
   background: '#F8FAFC',
   card: '#FFFFFF',
+  disabled: '#E5E5EA',
   textPrimary: '#1F2937',
   textSecondary: '#6B7280',
   border: '#E5E7EB',
@@ -54,6 +56,7 @@ export const darkColors: ColorPalette = {
   accent: '#A78BFA',
   background: '#121212',
   card: '#1F2937',
+  disabled: '#3B3F4E',
   textPrimary: '#F8FAFC',
   textSecondary: '#9CA3AF',
   border: '#374151',

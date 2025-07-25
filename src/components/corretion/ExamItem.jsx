@@ -1,15 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { CheckCircle, XCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { createExamItemStyles } from './ExamItemStyles';
+import Button from '../common/Button';
 
 const ExamItem = ({ exam, onPress }) => {
   const { colors } = useTheme();
   const styles = createExamItemStyles(colors);
 
   return(
-  <TouchableOpacity style={styles.examItem} onPress={onPress}>
+  <Button style={styles.examItem} onPress={onPress} variant='text' >
     <View style={styles.examHeader}>
       <View>
         <Text style={styles.studentName}>{exam.studentName}</Text>
@@ -32,7 +33,7 @@ const ExamItem = ({ exam, onPress }) => {
         </Text>
       )}
     </View>
-  </TouchableOpacity>
+  </Button>
 );
 }
 

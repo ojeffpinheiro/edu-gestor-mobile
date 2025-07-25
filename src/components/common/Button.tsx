@@ -1,163 +1,289 @@
-// src/components/Button.tsx
 import React from 'react';
 import {
   TouchableOpacity,
   Text,
-  StyleSheet,
   ActivityIndicator,
+  StyleSheet,
   ViewStyle,
   TextStyle,
-  StyleProp,
   View,
-  Platform,
+  StyleProp
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { BorderRadius, Shadow, Spacing, Typography } from '../../styles/designTokens';
+import { ColorScheme } from '../../styles/colors';
 
-type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'info';
+type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'outline' | 'ghost' | 'floating' | 'text';
+type ButtonSize = 'sm' | 'md' | 'lg';
 
-interface ButtonProps {
-  onPress: () => void;
-  title: string;
-  variant?: ButtonVariant;
-  disabled?: boolean;
-  loading?: boolean;
-  style?: StyleProp<ViewStyle>;
-  textStyle?: StyleProp<TextStyle>;
-  icon?: React.ReactNode; // Para adicionar ícones
+interface IconProps {
+  color?: string;
+  size?: number;
 }
 
-const Button = ({
-  onPress,
+interface ButtonProps {
+  title?: string;
+  onPress: () => void;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  disabled?: boolean;
+  loading?: boolean;
+  icon?: React.ReactElement<IconProps>;
+  iconPosition?: 'left' | 'right';
+  fullWidth?: boolean;
+  style?: StyleProp<ViewStyle>;
+  textStyle?: StyleProp<TextStyle>;
+  rounded?: boolean;
+}
+
+const Button: React.FC<ButtonProps> = ({
   title,
+  onPress,
   variant = 'primary',
+  size = 'md',
   disabled = false,
   loading = false,
+  icon,
+  iconPosition = 'left',
+  fullWidth = false,
   style,
   textStyle,
-  icon,
-}: ButtonProps) => {
+  rounded = false,
+}) => {
   const { colors } = useTheme();
-  const shadows = Shadow(colors);
+  const styles = createButtonStyles(colors);
 
-  const buttonStyles = StyleSheet.create({
-    base: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.md,
-      ...shadows.button, // Sombra para botões
-    },
-    primary: {
-      backgroundColor: colors.primary,
-    },
-    secondary: {
-      backgroundColor: colors.card,
-      borderColor: colors.border,
-      borderWidth: 1,
-    },
-    success: {
-      backgroundColor: colors.success,
-    },
-    danger: {
-      backgroundColor: colors.error,
-    },
-    info: {
-      backgroundColor: colors.info,
-    },
-    disabled: {
-      opacity: 0.6,
-      backgroundColor: colors.textSecondary, // Cor mais neutra para desabilitado
-      ...Platform.select({
-        ios: { shadowOpacity: 0 }, // Remover sombra quando desabilitado
-        android: { elevation: 0 },
-      }),
-    },
-    textBase: {
-      fontSize: Typography.fontSize.md,
-      fontWeight: Typography.fontWeight.semibold,
-      textAlign: 'center',
-    },
-    textPrimary: {
-      color: colors.card, // Texto branco/claro para botões coloridos
-    },
-    textSecondary: {
-      color: colors.textSecondary, // Texto escuro/neutro para botões secundários
-    },
-    textSuccess: {
-      color: colors.card,
-    },
-    textDanger: {
-      color: colors.card,
-    },
-    textInfo: {
-      color: colors.card,
-    },
-    iconContainer: {
-      marginRight: Spacing.xs,
-    },
-  });
+  const buttonStyles: StyleProp<ViewStyle> = [
+    styles.button,
+    styles[variant],
+    styles[size],
+    disabled && styles.disabled,
+    fullWidth && styles.fullWidth,
+    rounded && styles.rounded,
+    style,
+  ];
 
-  const getButtonVariantStyle = () => {
-    switch (variant) {
-      case 'primary':
-        return buttonStyles.primary;
-      case 'secondary':
-        return buttonStyles.secondary;
-      case 'success':
-        return buttonStyles.success;
-      case 'danger':
-        return buttonStyles.danger;
-      case 'info':
-        return buttonStyles.info;
-      default:
-        return buttonStyles.primary;
-    }
-  };
+  const textStyles: StyleProp<TextStyle> = [
+    styles.textStyle,
+    styles[`text_${variant}`],
+    styles[`text_${size}`],
+    textStyle,
+  ];
 
-  const getButtonTextVariantStyle = () => {
-    switch (variant) {
-      case 'primary':
-        return buttonStyles.textPrimary;
-      case 'secondary':
-        return buttonStyles.textSecondary;
-      case 'success':
-        return buttonStyles.textSuccess;
-      case 'danger':
-        return buttonStyles.textDanger;
-      case 'info':
-        return buttonStyles.textInfo;
-      default:
-        return buttonStyles.textPrimary;
-    }
+  const iconColor = {
+    primary: colors.textPrimary,
+    secondary: colors.card,
+    success: colors.card,
+    danger: colors.card,
+    warning: colors.warning,
+    info: colors.card,
+    outline: colors.primary,
+    ghost: colors.primary,
+    text: colors.textPrimary,
+  }[variant];
+
+  const renderIcon = () => {
+    if (!icon || loading) return null;
+    return React.cloneElement(icon, {
+      color: icon.props.color || iconColor,
+      size: icon.props.size || 18,
+    });
   };
 
   return (
     <TouchableOpacity
+      style={buttonStyles}
       onPress={onPress}
-      style={[
-        buttonStyles.base,
-        getButtonVariantStyle(),
-        disabled || loading ? buttonStyles.disabled : {},
-        style,
-      ]}
       disabled={disabled || loading}
       activeOpacity={0.7}
     >
       {loading ? (
-        <ActivityIndicator color={getButtonTextVariantStyle().color} />
+        <ActivityIndicator size="small" color={iconColor} />
       ) : (
         <>
-          {icon && <View style={buttonStyles.iconContainer}>{icon}</View>}
-          <Text style={[buttonStyles.textBase, getButtonTextVariantStyle(), textStyle]}>
-            {title}
-          </Text>
+          {iconPosition === 'left' && icon && (
+            <View style={styles.iconLeft}>{renderIcon()}</View>
+          )}
+
+          {title && <Text style={textStyles}>{title}</Text>}
+
+          {iconPosition === 'right' && icon && (
+            <View style={styles.iconRight}>{renderIcon()}</View>
+          )}
         </>
       )}
     </TouchableOpacity>
   );
+};
+
+const createButtonStyles = (colors: ColorScheme) => {
+  const baseStyles = {
+    // Base styles
+    button: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      borderRadius: 8,
+      borderWidth: 1,
+      borderColor: 'transparent',
+    } as ViewStyle,
+    
+    fullWidth: {
+      width: '100%',
+    } as ViewStyle,
+    
+    rounded: {
+      borderRadius: 24,
+    } as ViewStyle,
+    
+    textStyle: {
+      fontWeight: '600',
+    } as TextStyle,
+
+    // Variants
+    primary: {
+      backgroundColor: colors.primary,
+      borderColor: colors.primary,
+    } as ViewStyle,
+    
+    text_primary: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    secondary: {
+      backgroundColor: colors.secondary,
+      borderColor: colors.secondary,
+    } as ViewStyle,
+    
+    text_secondary: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    success: {
+      backgroundColor: colors.success,
+      borderColor: colors.success,
+    } as ViewStyle,
+    
+    text_success: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    danger: {
+      backgroundColor: colors.error,
+      borderColor: colors.error,
+    } as ViewStyle,
+    
+    text_danger: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    warning: {
+      backgroundColor: colors.warning,
+      borderColor: colors.warning,
+    } as ViewStyle,
+    
+    text_warning: {
+      color: colors.warning,
+    } as TextStyle,
+
+    info: {
+      backgroundColor: colors.info,
+      borderColor: colors.info,
+    } as ViewStyle,
+    
+    text_info: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    outline: {
+      backgroundColor: 'transparent',
+      borderColor: colors.primary,
+    } as ViewStyle,
+    
+    text_outline: {
+      color: colors.primary,
+    } as TextStyle,
+
+    ghost: {
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+    } as ViewStyle,
+    
+    text_ghost: {
+      color: colors.primary,
+    } as TextStyle,
+
+    floating: {
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      justifyContent: 'center',
+      alignItems: 'center',
+      shadowColor: '#000',
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+    } as ViewStyle,
+    
+    text_floating: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    text: {
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      padding: 0,
+    } as ViewStyle,
+    
+    text_text: {
+      color: colors.textPrimary,
+    } as TextStyle,
+
+    // Sizes
+    sm: {
+      paddingVertical: 8,
+      paddingHorizontal: 12,
+    } as ViewStyle,
+    
+    text_sm: {
+      fontSize: 12,
+    } as TextStyle,
+
+    md: {
+      paddingVertical: 12,
+      paddingHorizontal: 16,
+    } as ViewStyle,
+    
+    text_md: {
+      fontSize: 14,
+    } as TextStyle,
+
+    lg: {
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+    } as ViewStyle,
+    
+    text_lg: {
+      fontSize: 16,
+    } as TextStyle,
+
+    // States
+    disabled: {
+      opacity: 0.6,
+    } as ViewStyle,
+
+    // Icon positioning
+    iconLeft: {
+      marginRight: 8,
+    } as ViewStyle,
+    
+    iconRight: {
+      marginLeft: 8,
+    } as ViewStyle,
+  };
+
+  return StyleSheet.create(baseStyles);
 };
 
 export default Button;

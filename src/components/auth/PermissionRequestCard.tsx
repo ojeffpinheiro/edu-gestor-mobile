@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
+import { View, Text, Alert, Linking } from 'react-native';
 import { CameraIcon, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing } from '../../styles/designTokens';
+import Button from '../common/Button';
 
 interface PermissionRequestCardProps {
   onRequestPermission: () => void;
@@ -25,30 +26,25 @@ const PermissionRequestCard = ({ onRequestPermission, onBack, isError = false }:
           {isError ? 'Permissão Necessária' : 'Solicitando permissão...'}
         </Text>
         <Text style={{ color: colors.textSecondary, textAlign: 'center', marginTop: Spacing.sm }}>
-          {isError 
+          {isError
             ? 'É necessário permitir o acesso à câmera para usar o scanner'
             : 'Aguardando permissão da câmera'}
         </Text>
       </View>
 
-      <TouchableOpacity
-        style={[ButtonStyles.primary, { backgroundColor: colors.primary }]}
+      <Button
+        title="Permitir Acesso à Câmera"
         onPress={onRequestPermission}
-      >
-        <CameraIcon size={20} color={colors.card} style={{ marginRight: Spacing.xs }} />
-        <Text style={ButtonStyles.text}>
-          Permitir Acesso à Câmera
-        </Text>
-      </TouchableOpacity>
+        variant="primary"
+        icon={<CameraIcon size={20} />}
+        iconPosition="left"
+      />
 
-      <TouchableOpacity
-        style={[ButtonStyles.secondary, { marginTop: Spacing.md }]}
+      <Button
+        title="Voltar"
         onPress={onBack}
-      >
-        <Text style={[ButtonStyles.text, { color: colors.textSecondary }]}>
-          Voltar
-        </Text>
-      </TouchableOpacity>
+        variant="ghost"
+      />
     </View>
   );
 };

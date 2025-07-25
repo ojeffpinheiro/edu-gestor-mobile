@@ -2,8 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { 
   View, 
   StyleSheet, 
-  Text, 
-  TouchableOpacity, 
+  Text,
   Image, 
   Platform, 
   ActivityIndicator, 

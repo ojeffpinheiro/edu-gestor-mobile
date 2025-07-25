@@ -29,7 +29,7 @@ const createCorrectionTabStyles = (colors: ColorScheme) => StyleSheet.create({
     gap: Spacing.sm,
   },
   buttonText: {
-    color: colors.textSecondary,
+    color: colors.textPrimary,
     fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.semibold,
   },

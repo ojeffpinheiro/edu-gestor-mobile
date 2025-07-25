@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, Animated, Text } from 'react-native';
+import { View, StyleSheet, Animated, Text } from 'react-native';
 import { ScanLine, Flashlight, X, Zap } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { ButtonStyles } from '../../styles/sharedComponents';
 import { Spacing } from '../../styles/designTokens';
+import Button from '../common/Button';
 
 interface ScannerControlsProps {
   scannerActive: boolean;
@@ -32,59 +32,49 @@ const ScannerControls = ({
     <View style={styles.container}>
       {scannerActive ? (
         <>
-          <TouchableOpacity
-            style={[styles.floatingButton, { backgroundColor: 'rgba(0, 0, 0, 0.7)' }]}
+          <Button
+            variant="floating"
             onPress={onStopScanning}
-          >
-            <X size={20} color={colors.card} />
-          </TouchableOpacity>
+            icon={<X size={20} />}
+            style={{ top: Spacing.md, right: Spacing.md }}
+          />
 
-          <TouchableOpacity
-            style={[
-              styles.floatingButton,
-              { backgroundColor: torchOn ? colors.warning + '20' : 'rgba(0, 0, 0, 0.7)' },
-              { bottom: Spacing.md, right: Spacing.md }
-            ]}
+          <Button
+            variant="floating"
             onPress={onToggleTorch}
-          >
-            <Flashlight size={20} color={torchOn ? colors.warning : colors.card} />
-          </TouchableOpacity>
+            icon={<Flashlight size={20} color={torchOn ? colors.warning : colors.card} />}
+            style={{ 
+                backgroundColor: torchOn ? colors.warning + '20' : 'rgba(0, 0, 0, 0.7)',
+                bottom: Spacing.md,
+                right: Spacing.md
+              }
+            }
+          />
         </>
       ) : (
         <View style={styles.buttonContainer}>
-          <TouchableOpacity
-            style={[
-              ButtonStyles.primary,
-              { backgroundColor: scannerActive ? colors.gray[400] : colors.primary },
-              scannerActive && styles.disabledButton
-            ]}
+          <Button
+            title={scannerActive ? 'Escaneando...' : 'Iniciar Scanner'}
             onPress={onStartScanning}
+            variant="primary"
             disabled={scannerActive}
-          >
-            <ScanLine size={20} color={colors.card} style={{ marginRight: Spacing.xs }} />
-            <Text style={ButtonStyles.text}>
-              {scannerActive ? 'Escaneando...' : 'Iniciar Scanner'}
-            </Text>
-          </TouchableOpacity>
+            icon={<ScanLine size={20} />}
+            iconPosition="left"
+          />
 
-          <TouchableOpacity
-            style={ButtonStyles.secondary}
+          <Button
+            title="Simular Código (Teste)"
             onPress={onSimulateScan}
-          >
-            <Zap size={18} color={colors.textSecondary} style={{ marginRight: Spacing.xs }} />
-            <Text style={[ButtonStyles.text, { color: colors.textSecondary }]}>
-              Simular Código (Teste)
-            </Text>
-          </TouchableOpacity>
+            variant="secondary"
+            icon={<Zap size={18} />}
+            iconPosition="left"
+          />
 
-          <TouchableOpacity
-            style={[ButtonStyles.secondary, { marginTop: Spacing.md }]}
+          <Button
+            title="Voltar"
             onPress={onBack}
-          >
-            <Text style={[ButtonStyles.text, { color: colors.textSecondary }]}>
-              Voltar
-            </Text>
-          </TouchableOpacity>
+            variant="ghost"
+          />
         </View>
       )}
     </View>
@@ -98,21 +88,6 @@ const styles = StyleSheet.create({
   },
   buttonContainer: {
     gap: Spacing.md,
-  },
-  floatingButton: {
-    position: 'absolute',
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-    top: Spacing.md,
-    right: Spacing.md,
   },
   disabledButton: {
     opacity: 0.7,

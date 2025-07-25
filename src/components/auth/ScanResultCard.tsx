@@ -1,9 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Animated } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { ButtonStyles, CardStyles } from '../../styles/sharedComponents';
 import { Spacing } from '../../styles/designTokens';
+import Button from '../common/Button';
 
 interface ScanResultCardProps {
   code: string;
@@ -38,15 +38,13 @@ const ScanResultCard = ({ code, animation, onContinue }: ScanResultCardProps) =>
         </View>
       </View>
 
-      <TouchableOpacity
-        style={[ButtonStyles.primary, { backgroundColor: colors.success, marginTop: Spacing.md }]}
+      <Button
+        title="Continuar para Identificação"
         onPress={onContinue}
-      >
-        <CheckCircle size={20} color={colors.card} style={{ marginRight: Spacing.xs }} />
-        <Text style={ButtonStyles.text}>
-          Continuar para Identificação
-        </Text>
-      </TouchableOpacity>
+        variant="success"
+        icon={<CheckCircle size={20} />}
+        iconPosition="left"
+      />
     </Animated.View>
   );
 };

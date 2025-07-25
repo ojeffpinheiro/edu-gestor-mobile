@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { Download, FileText, Target, Trophy, TrendingUp } from 'lucide-react-native';
 import StatsCard from './StatsCard';
 import { useTheme } from '../../context/ThemeContext';
 import createReportsTabStyles from './ReportsTabStyles';
+import Button from '../common/Button';
 
 const ReportsTab = ({ report }) => {
   const { colors } = useTheme();
@@ -45,10 +46,14 @@ const ReportsTab = ({ report }) => {
       </View>
 
       <View style={styles.reportActions}>
-        <TouchableOpacity style={styles.primaryButton}>
-          <Download size={20} color={colors.card} />
-          <Text style={styles.buttonText}>Exportar Relatório</Text>
-        </TouchableOpacity>
+        <Button
+          variant="primary"
+          onPress={() => { }}
+          icon={<Download size={20} color={colors.card} />}
+          title="Exportar Relatório"
+          style={styles.primaryButton}
+          textStyle={styles.buttonText}
+        />
       </View>
     </View>
   );

@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, Alert, StyleSheet } from 'react-native';
 import { correctExam, generateReport } from '../utils/examUtils';
+import { Exam } from '../types/examTypes';
 import ReportsTab from '../components/corretion/ReportsTab';
 import SettingsTab from '../components/corretion/SettingsTab';
 import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
-import { Exam } from '../types/examTypes';
 import CorrectionTab from '../components/corretion/CorrectionTab';
 
 const CorrectionScreen = () => {

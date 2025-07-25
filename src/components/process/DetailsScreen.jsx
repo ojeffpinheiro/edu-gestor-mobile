@@ -1,7 +1,8 @@
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView } from 'react-native';
 import QuestionItem from './QuestionItem';
 import { createDetailsScreenStyles } from './DetailsScreenStyles';
 import { useTheme } from '../../context/ThemeContext';
+import Button from '../common/Button';
 
 const DetailsScreen = ({ correctionResults, onBack }) => {
     const { colors } = useTheme();
@@ -9,9 +10,7 @@ const DetailsScreen = ({ correctionResults, onBack }) => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backButton}>
-          <Text style={styles.backButtonText}>←</Text>
-        </TouchableOpacity>
+        <Button style={styles.backButton} onPress={onBack} title='←' />
         <Text style={styles.title}>Detalhes da Correção</Text>
       </View>
 

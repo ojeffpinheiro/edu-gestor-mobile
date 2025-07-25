@@ -18,8 +18,6 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   // Animações
   const scanLineAnimation = useRef(new Animated.Value(0)).current;
   const pulseAnimation = useRef(new Animated.Value(1)).current;
-  const fadeAnimation = useRef(new Animated.Value(0)).current;
-  const scaleAnimation = useRef(new Animated.Value(0.8)).current;
   const successAnimation = useRef(new Animated.Value(0)).current;
 
   const barcodeTypes = [
@@ -79,9 +77,7 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
     setScannerActive(false);
     setIsScanning(false);
   };
-
-  // Efeitos para animações (manter os mesmos useEffect do original)
-
+  
   // Solicitar permissão da câmera
   useEffect(() => {
     const getCameraPermissions = async () => {

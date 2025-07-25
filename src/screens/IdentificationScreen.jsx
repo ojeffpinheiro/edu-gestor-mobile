@@ -3,7 +3,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
   TextInput,
   Alert,
   ScrollView,
@@ -14,6 +13,7 @@ import {
 import { Camera, CameraView } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import { MaterialIcons } from '@expo/vector-icons';
+import Button from '../components/common/Button';
 
 const { width, height } = Dimensions.get('window');
 
@@ -157,10 +157,13 @@ export default function IdentificationScreen() {
           maxLength={2}
         />
 
-        <TouchableOpacity style={styles.botaoPrimario} onPress={iniciarCaptura}>
-          <MaterialIcons name="camera-alt" size={24} color="white" />
-          <Text style={styles.textoBotaoPrimario}>Iniciar Captura</Text>
-        </TouchableOpacity>
+        <Button
+          title="Iniciar Captura"
+          onPress={iniciarCaptura}
+          variant="primary"
+          icon={<MaterialIcons name="camera-alt" size={24} color="white" />}
+          iconPosition="left"
+        />
       </View>
 
       <View style={styles.instrucoes}>
@@ -191,9 +194,11 @@ export default function IdentificationScreen() {
       return (
         <View style={styles.container}>
           <Text style={styles.erro}>Permissão da câmera negada</Text>
-          <TouchableOpacity style={styles.botaoSecundario} onPress={obterPermissaoCamera}>
-            <Text style={styles.textoBotaoSecundario}>Tentar Novamente</Text>
-          </TouchableOpacity>
+          <Button
+            title="Tentar Novamente"
+            onPress={obterPermissaoCamera}
+            variant="outline"
+          />
         </View>
       );
     }
@@ -205,35 +210,24 @@ export default function IdentificationScreen() {
           style={styles.camera}
           facing="back" />
 
-          <View style={styles.overlayCamera}>
-            <View style={styles.headerCamera}>
-              <TouchableOpacity onPress={() => setEtapa('config')}>
-                <MaterialIcons name="arrow-back" size={28} color="white" />
-              </TouchableOpacity>
-              <Text style={styles.tituloCamera}>
-                Posicione o gabarito na tela
-              </Text>
-            </View>
+        <View style={styles.overlayCamera}>
+          <Button onPress={() => setEtapa('config')}
+            icon={<MaterialIcons name="arrow-back" size={28} color="white" />}
+            title='Posicione o gabarito na tela' />
 
-            <View style={styles.guiaCaptura}>
-              <View style={styles.bordaGuia} />
-            </View>
-
-            <View style={styles.controlesCamera}>
-              <TouchableOpacity
-                style={styles.botaoGaleria}
-                onPress={escolherDaGaleria}
-              >
-                <MaterialIcons name="photo-library" size={24} color="white" />
-              </TouchableOpacity>
-
-              <TouchableOpacity style={styles.botaoCaptura} onPress={tirarFoto}>
-                <View style={styles.botaoCapturaInner} />
-              </TouchableOpacity>
-
-              <View style={styles.espaco} />
-            </View>
+          <View style={styles.guiaCaptura}>
+            <View style={styles.bordaGuia} />
           </View>
+
+          <View style={styles.controlesCamera}>
+            <Button style={styles.botaoGaleria} onPress={escolherDaGaleria} 
+              icon={ <MaterialIcons name="photo-library" size={24} color="white" />}  />
+            
+            <Button style={styles.botaoCapturar} onPress={tirarFoto} />
+
+            <View style={styles.espaco} />
+          </View>
+        </View>
       </View>
     );
   };
@@ -241,13 +235,15 @@ export default function IdentificationScreen() {
   const renderizarResultado = () => (
     <ScrollView style={styles.container}>
       <View style={styles.headerResultado}>
-        <TouchableOpacity onPress={reiniciar}>
-          <MaterialIcons name="arrow-back" size={28} color="#333" />
-        </TouchableOpacity>
+        <Button onPress={reiniciar} 
+          icon={<MaterialIcons name="arrow-back" size={28} color="#333" />} />
+        
         <Text style={styles.tituloResultado}>Resultado</Text>
-        <TouchableOpacity onPress={exportarResultado}>
-          <MaterialIcons name="share" size={28} color="#4CAF50" />
-        </TouchableOpacity>
+        <Button
+          onPress={exportarResultado}
+          variant="ghost"
+          icon={<MaterialIcons name="share" size={24} color="#4CAF50" />}
+        />
       </View>
 
       {imagemUri && (

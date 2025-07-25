@@ -4,23 +4,25 @@ import { ColorScheme } from "../../styles/colors";
 
 const createTabNavigationStyles  = (colors: ColorScheme) => StyleSheet.create({
   bottomNav: {
+    justifyContent: 'space-around',
     flexDirection: 'row',
-    backgroundColor: colors.card,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+    backgroundColor: colors.card,
     paddingVertical: Spacing.sm,
   },
   navItem: {
-    flex: 1,
     alignItems: 'center',
+    flex: 1,
     paddingVertical: Spacing.sm,
+    paddingHorizontal: 16,
   },
   navItemActive: {
     backgroundColor: colors.gray[200],
   },
   navText: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.gray[500],
     marginTop: Spacing.xs,
   },
   navTextActive: {

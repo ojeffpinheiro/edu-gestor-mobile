@@ -5,6 +5,7 @@ import { createMainStyles } from '../../styles/mainStyles';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
 import { useNavigation } from '@react-navigation/native';
+import Button from '../common/Button';
 
 const students = [
   { id: '001', name: 'Ana Silva', class: '3A' },
@@ -44,14 +45,13 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
   return (
     <View style={styles.container}>
       <View style={[styles.card, { padding: 0 }]}>
-        {/* Modern Header */}
         <View style={[localStyles.headerContainer, { backgroundColor: colors.primary }]}>
-          <TouchableOpacity 
-            style={localStyles.backButton}
+          <Button
             onPress={() => setCurrentView('scanner')}
-          >
-            <ChevronLeft size={24} color={colors.card} />
-          </TouchableOpacity>
+            variant="ghost"
+            icon={<ChevronLeft size={24} color={colors.card} />}
+            style={localStyles.backButton}
+          />
           <View style={localStyles.headerContent}>
             <Text style={[localStyles.headerTitle, { color: colors.card }]}>Identificação de Aluno</Text>
             <Text style={[localStyles.headerSubtitle, { color: colors.card + 'CC' }]}>
@@ -74,7 +74,7 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
             Lista de Alunos
           </Text>
 
-          <ScrollView 
+          <ScrollView
             style={localStyles.studentsList}
             showsVerticalScrollIndicator={false}
           >
@@ -88,13 +88,13 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
                 <TouchableOpacity
                   style={[
                     localStyles.studentItem,
-                    { 
+                    {
                       borderColor: colors.border,
                       backgroundColor: colors.card,
                       ...Shadow(colors).button
                     },
-                    selectedStudent === student.id && { 
-                      borderColor: colors.primary, 
+                    selectedStudent === student.id && {
+                      borderColor: colors.primary,
                       backgroundColor: colors.primary + '10',
                     }
                   ]}
@@ -126,9 +126,9 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
 
           {selectedStudent && (
             <View style={[
-              localStyles.successBox, 
-              { 
-                borderColor: colors.success, 
+              localStyles.successBox,
+              {
+                borderColor: colors.success,
                 backgroundColor: colors.success + '10',
                 ...Shadow(colors).button
               }
@@ -146,28 +146,19 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
           )}
 
           <View style={localStyles.buttonsContainer}>
-            <TouchableOpacity
-              style={[
-                styles.primaryButton, 
-                !selectedStudent && styles.disabledButton,
-                { marginBottom: Spacing.sm }
-              ]}
+            <Button
+              title="Continuar para Captura"
               onPress={() => navigation.navigate('Capture')}
+              variant="primary"
               disabled={!selectedStudent}
-              activeOpacity={0.8}
-            >
-              <Text style={styles.buttonText}>Continuar para Captura</Text>
-            </TouchableOpacity>
+              style={{ marginBottom: Spacing.sm }}
+            />
 
-            <TouchableOpacity
-              style={[styles.secondaryButton, { borderColor: colors.border }]}
+            <Button
+              title="Voltar"
               onPress={() => setCurrentView('scanner')}
-              activeOpacity={0.8}
-            >
-              <Text style={[styles.secondaryButtonText, { color: colors.textSecondary }]}>
-                Voltar
-              </Text>
-            </TouchableOpacity>
+              variant="outline"
+            />
           </View>
         </View>
       </View>

@@ -1,6 +1,7 @@
 import React from 'react';
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { styles } from '../styles/commun';
+import Button from '../components/common/Button';
 
 const ReportScreen = ({ navigation }) => {
   return (
@@ -8,12 +9,12 @@ const ReportScreen = ({ navigation }) => {
       <Text style={styles.title}>Relatório</Text>
       <Text style={styles.subtitle}>Resultados da correção</Text>
       
-      <TouchableOpacity 
-        style={styles.button}
+      <Button
+        title="Voltar ao Início"
         onPress={() => navigation.navigate('Home')}
-      >
-        <Text style={styles.buttonText}>Voltar ao Início</Text>
-      </TouchableOpacity>
+        variant="primary"
+        style={{ marginTop: 20 }}
+      />
     </View>
   );
 }

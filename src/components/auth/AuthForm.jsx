@@ -14,6 +14,7 @@ import {
 import { Lock, Eye, EyeOff, X, Shield } from 'lucide-react-native';
 import { styles } from './styles';
 import Button from '../common/Button';
+import InputField from '../common/InputField';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const [password, setPassword] = useState('admin123');
@@ -85,57 +86,17 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                 <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
               </View>
 
-              {/* Container do input com animação */}
-              <View style={styles.inputSection}>
-                <Text style={styles.inputLabel}>Senha</Text>
-                <View style={styles.inputContainer}>
-                  <View style={styles.inputWrapper}>
-                    <Lock size={20} color="#6b7280" style={styles.inputIcon} />
-                    <TextInput
-                      placeholder="Digite sua senha"
-                      placeholderTextColor="#9ca3af"
-                      secureTextEntry={!showPassword}
+              <InputField label='Senha' 
+                      placeholder="Digite sua senha" 
                       value={password}
-                      onChangeText={(text) => {
+                      onChange={(text) => {
                         setPassword(text);
                         if (passwordInputRef.current) {
                           passwordInputRef.current.focus();
                         }
                       }}
-                      ref={passwordInputRef}
-                      onFocus={() => setIsTyping(true)}
-                      onBlur={() => setIsTyping(false)}
-                      style={[
-                        styles.input,
-                        isTyping && styles.inputFocused
-                      ]}
-                    />
-                    <View style={styles.inputActions}>
-                      {password.length > 0 && (
-                        <Button
-                          style={styles.actionButton}
-                          onPress={() => {
-                            setPassword('');
-                            passwordInputRef.current.focus();
-                          }}
-                          icon={<X size={18} color="#9ca3af" />}
-                        />
-                      )}
-                      <Button
-                        style={styles.actionButton}
-                        icon={showPassword ?
-                          <EyeOff size={18} color="#9ca3af" /> :
-                          <Eye size={18} color="#9ca3af" />
-                        }
-                        onPress={() => {
-                          setShowPassword(!showPassword);
-                          passwordInputRef.current.focus();
-                        }}
-                      />
-                    </View>
-                  </View>
-                </View>
-              </View>
+                      secureTextEntry={!showPassword}
+                     onToggleVisibility={() => setShowPassword(!showPassword)} />
 
               {/* Botões com novo design */}
               <View style={styles.buttonSection}>

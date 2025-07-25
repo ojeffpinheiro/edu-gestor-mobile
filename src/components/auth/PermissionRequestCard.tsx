@@ -1,49 +1,65 @@
 import React from 'react';
-import { View, Text, Alert, Linking } from 'react-native';
-import { CameraIcon, X } from 'lucide-react-native';
+import { View, Text, Linking, StyleSheet } from 'react-native';
+import { Camera, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing } from '../../styles/designTokens';
-import Button from '../common/Button';
 import Card from '../common/Card';
+import Button from '../common/Button';
+import StatusIcon from '../StatusIcon';
+import { createPermissionRequestCardStyles } from './styles';
 
 interface PermissionRequestCardProps {
-  onRequestPermission: () => void;
+  onRequestPermission: () => Promise<void>;
   onBack: () => void;
   isError?: boolean;
 }
 
-const PermissionRequestCard = ({ onRequestPermission, onBack, isError = false }: PermissionRequestCardProps) => {
+const PermissionRequestCard = ({ 
+  onRequestPermission, 
+  onBack, 
+  isError = false 
+}: PermissionRequestCardProps) => {
   const { colors } = useTheme();
+  const styles = createPermissionRequestCardStyles(colors);
+
+  const handleOpenSettings = async () => {
+    await Linking.openSettings();
+  };
 
   return (
-    <Card variant='base' >
-      <View style={{ alignItems: 'center', marginBottom: Spacing.lg }}>
-        <Button  onPress={() => {}}
-          variant='primary' style={[{ backgroundColor: isError ? colors.error + '15' : colors.primary + '15' }]} 
-          icon={isError ? <X size={28} color={colors.error} /> : <CameraIcon size={28} color={colors.primary} />}/>
-        <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.textPrimary, marginTop: Spacing.md }}>
-          {isError ? 'Permissão Necessária' : 'Solicitando permissão...'}
+    <Card style={styles.permissionCard}>
+      <View style={styles.contentContainer}>
+        <StatusIcon
+          icon={isError ? X : Camera}
+          variant={isError ? 'error' : 'info'}
+          size="lg"
+        />
+
+        <Text style={styles.title}>
+          {isError ? 'Permissão Necessária' : 'Solicitando Permissão'}
         </Text>
-        <Text style={{ color: colors.textSecondary, textAlign: 'center', marginTop: Spacing.sm }}>
+
+        <Text style={styles.message}>
           {isError
-            ? 'É necessário permitir o acesso à câmera para usar o scanner'
-            : 'Aguardando permissão da câmera'}
+            ? 'Para usar o scanner, é necessário permitir o acesso à câmera nas configurações do dispositivo.'
+            : 'Estamos solicitando permissão para acessar a câmera do seu dispositivo.'}
         </Text>
+
+        <View style={styles.buttonsContainer}>
+          <Button
+            title={isError ? 'Abrir Configurações' : 'Permitir Acesso'}
+            onPress={isError ? handleOpenSettings : onRequestPermission}
+            variant={isError ? 'primary' : 'primary'}
+            icon={isError ? null : <Camera size={20} />}
+            style={styles.mainButton}
+          />
+
+          <Button
+            title="Voltar"
+            onPress={onBack}
+            variant="secondary"
+          />
+        </View>
       </View>
-
-      <Button
-        title="Permitir Acesso à Câmera"
-        onPress={onRequestPermission}
-        variant="primary"
-        icon={<CameraIcon size={20} />}
-        iconPosition="left"
-      />
-
-      <Button
-        title="Voltar"
-        onPress={onBack}
-        variant="ghost"
-      />
     </Card>
   );
 };

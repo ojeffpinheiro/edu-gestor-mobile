@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, ScrollView, Alert, Linking, Animated, Text } from 'react-native';
+import { View, ScrollView, Alert, Linking, Animated } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useTheme } from '../../context/ThemeContext';
 import PermissionRequestCard from './PermissionRequestCard';
@@ -7,9 +7,13 @@ import ScanResultCard from './ScanResultCard';
 import ScannerControls from './ScannerControls';
 import ScannerOverlay from './ScannerOverlay';
 import SectionHeader from '../common/SectionHeader';
+import Card from '../common/Card';
+import { createScannerScreenStyles } from './styles';
+import { ScanLine } from 'lucide-react-native';
 
 const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   const { colors } = useTheme();
+  const styles = createScannerScreenStyles(colors);
   const [scannerActive, setScannerActive] = useState(false);
   const [hasPermission, setHasPermission] = useState(null);
   const [isScanning, setIsScanning] = useState(false);
@@ -19,11 +23,26 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   // Animações
   const scanLineAnimation = useRef(new Animated.Value(0)).current;
   const pulseAnimation = useRef(new Animated.Value(1)).current;
-  const successAnimation = useRef(new Animated.Value(0)).current;
 
   const barcodeTypes = [
-    'qr', 'pdf417', 'ean13', 'ean8', 'code128', 'code39', 'code93', 'codabar', 'itf14', 'upc_a', 'upc_e', 'aztec', 'datamatrix'
+    'qr', 'pdf417', 'ean13', 'ean8', 'code128', 'code39', 'code93',
+    'codabar', 'itf14', 'upc_a', 'upc_e', 'aztec', 'datamatrix'
   ];
+
+  useEffect(() => {
+    if (isScanning) {
+      Animated.loop(
+        Animated.timing(scanLineAnimation, {
+          toValue: 1,
+          duration: 2000,
+          easing: Easing.linear,
+          useNativeDriver: true,
+        })
+      ).start();
+    } else {
+      scanLineAnimation.setValue(0);
+    }
+  }, [isScanning]);
 
   const toggleTorch = async () => {
     try {
@@ -79,7 +98,6 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
     setIsScanning(false);
   };
 
-  // Solicitar permissão da câmera
   useEffect(() => {
     const getCameraPermissions = async () => {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -97,21 +115,21 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.card }}>
-      <ScrollView style={{ flex: 1 }}>
-        <View style={CardStyles.base}>
+    <View style={styles.screenContainer}>
+      <ScrollView style={styles.scrollContainer}>
+        <Card>
           <SectionHeader
             title="Scanner"
             subtitle="Capture a imagem do documento"
-            icon={<ScannerIcon />}
+            iconName="camera"
           />
 
-          <View style={{ height: 300, borderRadius: 12, overflow: 'hidden', marginBottom: Spacing.xl }}>
+          <View style={styles.scannerContainer}>
             {scannerActive ? (
-              <View style={{ flex: 1, position: 'relative' }}>
+              <View style={styles.cameraContainer}>
                 <CameraView
                   ref={camera}
-                  style={{ flex: 1 }}
+                  style={styles.camera}
                   onBarcodeScanned={isScanning ? handleBarcodeScanned : undefined}
                   barcodeScannerSettings={{ barcodeTypes }}
                   torchEnabled={torchOn}
@@ -119,17 +137,13 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
                 <ScannerOverlay scanLineAnimation={scanLineAnimation} isScanning={isScanning} />
               </View>
             ) : (
-              <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.gray[100] }}>
+              <View style={styles.scannerPlaceholder}>
                 <Animated.View style={{ transform: [{ scale: pulseAnimation }] }}>
-                  <View style={{ backgroundColor: colors.primary + '20', padding: Spacing.lg, borderRadius: 50 }}>
-                    <ScanLine size={40} color={colors.primary} />
+                  <View style={styles.scannerIconContainer}>
+                    <ScanLine size={40} color={colors.primary.main} />
                   </View>
-                  <Text style={{ color: colors.textPrimary, marginTop: Spacing.md, fontWeight: '600' }}>
-                    Pronto para escanear
-                  </Text>
-                  <Text style={{ color: colors.textSecondary, marginTop: Spacing.xs }}>
-                    Toque no botão abaixo para iniciar
-                  </Text>
+                  <Text style={styles.scannerReadyText}>Pronto para escanear</Text>
+                  <Text style={styles.scannerHintText}>Toque no botão abaixo para iniciar</Text>
                 </Animated.View>
               </View>
             )}
@@ -138,7 +152,6 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
           {scannedCode && (
             <ScanResultCard
               code={scannedCode}
-              animation={successAnimation}
               onContinue={() => setCurrentView('students')}
             />
           )}
@@ -153,7 +166,7 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
             onSimulateScan={simulateBarcodeScan}
             onBack={() => setCurrentView('auth')}
           />
-        </View>
+        </Card>
       </ScrollView>
     </View>
   );

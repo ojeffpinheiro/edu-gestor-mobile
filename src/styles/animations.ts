@@ -58,4 +58,21 @@ export const AnimationHelpers = {
   createAnimatedValue: (initialValue = 0) => {
     return new Animated.Value(initialValue);
   },
+  
+  pressAnimation: (value: Animated.Value, callback?: () => void) => {
+    Animated.sequence([
+      Animated.timing(value, {
+        toValue: 0.95,
+        duration: 100,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      }),
+      Animated.timing(value, {
+        toValue: 1,
+        duration: 100,
+        easing: Easing.inOut(Easing.ease),
+        useNativeDriver: true
+      })
+    ]).start(() => callback?.());
+  },
 };

@@ -1,25 +1,24 @@
 import React from 'react';
-import { View, StyleSheet, Animated, Text } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ScanLine, Flashlight, X, Zap } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
+import { AnimationHelpers } from '../../styles/animations';
+import { createScannerControlsStyles } from './styles';
 
 interface ScannerControlsProps {
-  scannerActive: boolean;
-  torchOn: boolean;
-  pulseAnimation: Animated.Value;
+  isActive: boolean;
+  torchEnabled: boolean;
   onStartScanning: () => void;
   onStopScanning: () => void;
   onToggleTorch: () => void;
-  onSimulateScan: () => void;
+  onSimulateScan?: () => void;
   onBack: () => void;
 }
 
 const ScannerControls = ({
-  scannerActive,
-  torchOn,
-  pulseAnimation,
+  isActive,
+  torchEnabled,
   onStartScanning,
   onStopScanning,
   onToggleTorch,
@@ -27,71 +26,73 @@ const ScannerControls = ({
   onBack,
 }: ScannerControlsProps) => {
   const { colors } = useTheme();
+  const styles = createScannerControlsStyles(colors);
+  const pulseAnimation = AnimationHelpers.createAnimatedValue(1);
 
   return (
-    <View style={styles.container}>
-      {scannerActive ? (
+    <View style={styles.scannerControlsContainer}>
+      {isActive ? (
         <>
           <Button
             variant="floating"
             onPress={onStopScanning}
-            icon={<X size={20} />}
-            style={{ top: Spacing.md, right: Spacing.md }}
+            icon={<X size={20} color={colors.text.onPrimary} />}
+            style={styles.closeButton}
+            accessibilityLabel="Fechar scanner"
           />
 
           <Button
             variant="floating"
             onPress={onToggleTorch}
-            icon={<Flashlight size={20} color={torchOn ? colors.warning : colors.card} />}
-            style={{ 
-                backgroundColor: torchOn ? colors.warning + '20' : 'rgba(0, 0, 0, 0.7)',
-                bottom: Spacing.md,
-                right: Spacing.md
-              }
+            icon={
+              <Flashlight 
+                size={20} 
+                color={torchEnabled ? colors.feedback.warning : colors.text.onPrimary} 
+              />
             }
+            style={[
+              styles.torchButton,
+              torchEnabled && styles.torchButtonActive
+            ]}
+            accessibilityLabel={torchEnabled ? "Desligar flash" : "Ligar flash"}
           />
         </>
       ) : (
-        <View style={styles.buttonContainer}>
+        <View style={styles.buttonGroup}>
           <Button
-            title={scannerActive ? 'Escaneando...' : 'Iniciar Scanner'}
+             title={isActive ? 'Escaneando...' : 'Iniciar Scanner'}
             onPress={onStartScanning}
             variant="primary"
-            disabled={scannerActive}
-            icon={<ScanLine size={20} />}
+            disabled={isActive}
+            icon={<ScanLine size={20} color={colors.text.onPrimary} />}
             iconPosition="left"
+            style={styles.mainButton}
+            accessibilityLabel="Iniciar scanner de código"
           />
 
-          <Button
-            title="Simular Código (Teste)"
-            onPress={onSimulateScan}
-            variant="secondary"
-            icon={<Zap size={18} />}
-            iconPosition="left"
-          />
+          {onSimulateScan && (
+            <Button
+              title="Simular Código"
+              onPress={onSimulateScan}
+              variant="secondary"
+              icon={<Zap size={18} color={colors.primary.main} />}
+              iconPosition="left"
+              style={styles.secondaryButton}
+              accessibilityLabel="Simular leitura de código"
+            />
+          )}
 
           <Button
             title="Voltar"
             onPress={onBack}
             variant="ghost"
+            style={styles.backButton}
+            accessibilityLabel="Voltar para tela anterior"
           />
         </View>
       )}
     </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    position: 'relative',
-    marginTop: Spacing.lg,
-  },
-  buttonContainer: {
-    gap: Spacing.md,
-  },
-  disabledButton: {
-    opacity: 0.7,
-  },
-});
 
 export default ScannerControls;

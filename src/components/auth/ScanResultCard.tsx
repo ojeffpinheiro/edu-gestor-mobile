@@ -2,60 +2,43 @@ import React from 'react';
 import { View, Text, StyleSheet, Animated } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
-import Card from '../common/Card';
 import StatusCard from '../common/StatusCard';
+import { Spacing } from '../../styles/designTokens';
+import { createScanResultCardStyles } from './styles';
 
 interface ScanResultCardProps {
   code: string;
-  animation: Animated.Value;
   onContinue: () => void;
+  animation?: Animated.Value;
 }
 
-const ScanResultCard = ({ code, animation, onContinue }: ScanResultCardProps) => {
+const ScanResultCard = ({ code, onContinue, animation }: ScanResultCardProps) => {
   const { colors } = useTheme();
+  const styles = createScanResultCardStyles(colors);
 
   return (
     <StatusCard
       variant="success"
-      icon={<CheckCircle />}
+      icon={<CheckCircle size={24} color={colors.feedback.success} />}
       title="Código Detectado"
-      style={{ padding: Spacing.lg }}
+      style={styles.scanResultCard}
     >
-      <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold' }}>
-        {code}
-      </Text>
-      <Button
-        title="Continuar para Identificação"
-        onPress={onContinue}
-        variant="success"
-        icon={<CheckCircle size={20} />}
-        iconPosition="left"
-        style={{ marginTop: Spacing.md }}
-      />
+      <View style={styles.content}>
+        <Text style={styles.codeText}>{code}</Text>
+        
+        <Button
+          title="Continuar para Identificação"
+          onPress={onContinue}
+          variant="success"
+          icon={<CheckCircle size={20} color={colors.text.onPrimary} />}
+          iconPosition="left"
+          style={styles.button}
+          accessibilityLabel="Continuar para identificação do aluno"
+        />
+      </View>
     </StatusCard>
   );
 };
-
-const styles = StyleSheet.create({
-  successIcon: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  successTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    marginBottom: 4,
-  },
-  successCode: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    letterSpacing: 1,
-  },
-});
 
 export default ScanResultCard;

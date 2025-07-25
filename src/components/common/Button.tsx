@@ -33,6 +33,8 @@ interface ButtonProps {
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
   rounded?: boolean;
+  accessibilityLabel?: string;
+  accessibilityHint?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({
@@ -48,6 +50,8 @@ const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
   rounded = false,
+  accessibilityLabel,
+  accessibilityHint,
 }) => {
   const { colors } = useTheme();
   const styles = createButtonStyles(colors);
@@ -95,6 +99,8 @@ const Button: React.FC<ButtonProps> = ({
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
+      accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
     >
       {loading ? (
         <ActivityIndicator size="small" color={iconColor} />

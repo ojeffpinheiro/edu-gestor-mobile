@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
 import Card from '../common/Card';
+import StatusCard from '../common/StatusCard';
 
 interface ScanResultCardProps {
   code: string;
@@ -16,29 +17,24 @@ const ScanResultCard = ({ code, animation, onContinue }: ScanResultCardProps) =>
   const { colors } = useTheme();
 
   return (
-    <Card variant='success' padding='lg'>
-      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-        <View style={[styles.successIcon, { backgroundColor: colors.success + '20' }]}>
-          <CheckCircle size={24} color={colors.success} />
-        </View>
-        <View style={{ marginLeft: Spacing.md }}>
-          <Text style={[styles.successTitle, { color: colors.success }]}>
-            Código Detectado
-          </Text>
-          <Text style={[styles.successCode, { color: colors.textPrimary }]}>
-            {code}
-          </Text>
-        </View>
-      </View>
-
+    <StatusCard
+      variant="success"
+      icon={<CheckCircle />}
+      title="Código Detectado"
+      style={{ padding: Spacing.lg }}
+    >
+      <Text style={{ color: colors.textPrimary, fontSize: 18, fontWeight: 'bold' }}>
+        {code}
+      </Text>
       <Button
         title="Continuar para Identificação"
         onPress={onContinue}
         variant="success"
         icon={<CheckCircle size={20} />}
         iconPosition="left"
+        style={{ marginTop: Spacing.md }}
       />
-    </Card>
+    </StatusCard>
   );
 };
 

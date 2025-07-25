@@ -7,6 +7,8 @@ import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTo
 import { useNavigation } from '@react-navigation/native';
 import Button from '../common/Button';
 import Card from '../common/Card';
+import StatusMessage from '../common/StatusMessage';
+import SelectableListItem from '../SelectableListItem';
 
 const students = [
   { id: '001', name: 'Ana Silva', class: '3A' },
@@ -125,26 +127,22 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
             ))}
           </ScrollView>
 
-          {selectedStudent && (
-            <View style={[
-              localStyles.successBox,
-              {
-                borderColor: colors.success,
-                backgroundColor: colors.success + '10',
-                ...Shadow(colors).button
-              }
-            ]}>
-              <View style={localStyles.successHeader}>
-                <CheckCircle size={20} color={colors.success} />
-                <Text style={[localStyles.successTitle, { color: colors.success }]}>
-                  Aluno Selecionado
-                </Text>
-              </View>
-              <Text style={[localStyles.successText, { color: colors.success }]}>
-                {students.find(s => s.id === selectedStudent)?.name}
-              </Text>
-            </View>
-          )}
+          {students.map((student) => (
+  <SelectableListItem
+    key={student.id}
+    primaryText={student.name}
+    secondaryTexts={[
+      `Turma: ${student.class}`,
+      `ID: ${student.id}`
+    ]}
+    isSelected={selectedStudent === student.id}
+    onPress={() => handleStudentSelect(student.id)}
+    style={{
+      ...Shadow(colors).button,
+      marginBottom: Spacing.sm
+    }}
+  />
+))}
 
           <View style={localStyles.buttonsContainer}>
             <Button

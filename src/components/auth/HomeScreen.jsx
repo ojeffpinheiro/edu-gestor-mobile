@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
 import { Card } from '../common/sharedComponents';
 import Button from '../common/Button';
+import InfoBox from '../common/InfoBox';
 
 const HomeScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
@@ -26,16 +27,17 @@ const HomeScreen = ({ setCurrentView }) => {
 
         <View style={[styles.infoBox, { backgroundColor: `${colors.primary}10` }]}>
           <Text style={[styles.infoTitle, { color: colors.primary }]}>Como funciona:</Text>
-          {[
-            'Autentique-se com sua senha',
-            'Escaneie o código da prova',
-            'Identifique o aluno',
-            'Capture a folha de resposta'
-          ].map((item, index) => (
-            <Text key={index} style={[styles.infoItem, { color: colors.primary }]}>
-              • {item}
-            </Text>
-          ))}
+          <InfoBox
+            title="Como funciona:"
+            items={[
+              'Autentique-se com sua senha',
+              'Escaneie o código da prova',
+              'Identifique o aluno',
+              'Capture a folha de resposta'
+            ]}
+            variant="primary"
+            style={{ marginBottom: Spacing.xl }}
+          />
         </View>
 
         <Button

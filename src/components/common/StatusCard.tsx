@@ -14,17 +14,17 @@ interface StatusCardProps {
 // Exemplo de implementação
 const StatusCard = ({ variant, icon, title, children, style }: StatusCardProps) => {
   const { colors } = useTheme();
-  
+
   const variantColors = {
     success: colors.success,
     error: colors.error,
     info: colors.primary,
   };
-  
+
   return (
     <View style={[
-      styles.container, 
-      { 
+      styles.container,
+      {
         backgroundColor: variantColors[variant] + '10',
         borderColor: variantColors[variant],
       },
@@ -38,7 +38,11 @@ const StatusCard = ({ variant, icon, title, children, style }: StatusCardProps) 
       </View>
       {children && (
         <View style={styles.content}>
-          {children}
+          {typeof children === 'string' ? (
+            <Text style={{ color: colors.textPrimary }}>{children}</Text>
+          ) : (
+            children
+          )}
         </View>
       )}
     </View>

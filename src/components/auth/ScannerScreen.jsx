@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, ScrollView, Alert, Linking, Animated } from 'react-native';
+import { View, ScrollView, Alert, Linking, Animated, Text } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
 import { useTheme } from '../../context/ThemeContext';
 import PermissionRequestCard from './PermissionRequestCard';
 import ScanResultCard from './ScanResultCard';
 import ScannerControls from './ScannerControls';
 import ScannerOverlay from './ScannerOverlay';
+import SectionHeader from '../common/SectionHeader';
 
 const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   const { colors } = useTheme();
@@ -77,7 +78,7 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
     setScannerActive(false);
     setIsScanning(false);
   };
-  
+
   // Solicitar permissão da câmera
   useEffect(() => {
     const getCameraPermissions = async () => {
@@ -99,19 +100,11 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
     <View style={{ flex: 1, backgroundColor: colors.card }}>
       <ScrollView style={{ flex: 1 }}>
         <View style={CardStyles.base}>
-          <View style={{ alignItems: 'center', marginBottom: Spacing.xl }}>
-            <View style={[ButtonStyles.primary, { backgroundColor: colors.primary + '15' }]}>
-              <View style={{ backgroundColor: colors.primary + '25', padding: Spacing.md, borderRadius: 50 }}>
-                <ScanLine size={28} color={colors.primary} />
-              </View>
-            </View>
-            <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.textPrimary }}>
-              Scanner Inteligente
-            </Text>
-            <Text style={{ color: colors.textSecondary, textAlign: 'center', marginTop: Spacing.sm }}>
-              Escaneie QR Code ou código de barras da prova/turma
-            </Text>
-          </View>
+          <SectionHeader
+            title="Scanner"
+            subtitle="Capture a imagem do documento"
+            icon={<ScannerIcon />}
+          />
 
           <View style={{ height: 300, borderRadius: 12, overflow: 'hidden', marginBottom: Spacing.xl }}>
             {scannerActive ? (
@@ -143,10 +136,10 @@ const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
           </View>
 
           {scannedCode && (
-            <ScanResultCard 
-              code={scannedCode} 
-              animation={successAnimation} 
-              onContinue={() => setCurrentView('students')} 
+            <ScanResultCard
+              code={scannedCode}
+              animation={successAnimation}
+              onContinue={() => setCurrentView('students')}
             />
           )}
 

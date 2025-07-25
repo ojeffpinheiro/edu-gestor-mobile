@@ -48,10 +48,10 @@ const SelectableListItem = ({
         </View>
       </View>
       {isSelected && (
-        <CheckCircle 
-          size={24} 
-          color={colors.primary} 
-          style={styles.icon} 
+        <CheckCircle
+          size={24}
+          color={colors.primary}
+          style={styles.icon}
         />
       )}
     </TouchableOpacity>

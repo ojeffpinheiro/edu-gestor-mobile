@@ -68,7 +68,9 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
       {icon && <View style={styles.iconContainer}>{icon}</View>}
       <View style={styles.textContainer}>
         <Text style={[styles.title, { color: textColor }, titleStyle]}>{title}</Text>
-        <Text style={[styles.message, { color: textColor }, messageStyle]}>{message}</Text>
+        <Text style={[styles.message, { color: textColor }, messageStyle]}>
+          {message}
+        </Text>
       </View>
     </View>
   );

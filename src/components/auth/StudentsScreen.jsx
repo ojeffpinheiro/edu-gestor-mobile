@@ -6,6 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../common/Button';
+import Card from '../common/Card';
 
 const students = [
   { id: '001', name: 'Ana Silva', class: '3A' },
@@ -44,7 +45,7 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
 
   return (
     <View style={styles.container}>
-      <View style={[styles.card, { padding: 0 }]}>
+      <Card variant='elevated' style={{ padding: 0 }}>
         <View style={[localStyles.headerContainer, { backgroundColor: colors.primary }]}>
           <Button
             onPress={() => setCurrentView('scanner')}
@@ -161,7 +162,7 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
             />
           </View>
         </View>
-      </View>
+      </Card>
     </View>
   );
 };

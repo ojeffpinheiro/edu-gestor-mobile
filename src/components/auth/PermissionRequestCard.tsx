@@ -4,6 +4,7 @@ import { CameraIcon, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
+import Card from '../common/Card';
 
 interface PermissionRequestCardProps {
   onRequestPermission: () => void;
@@ -15,13 +16,11 @@ const PermissionRequestCard = ({ onRequestPermission, onBack, isError = false }:
   const { colors } = useTheme();
 
   return (
-    <View style={CardStyles.base}>
+    <Card variant='base' >
       <View style={{ alignItems: 'center', marginBottom: Spacing.lg }}>
-        <View style={[ButtonStyles.primary, { backgroundColor: isError ? colors.error + '15' : colors.primary + '15' }]}>
-          <View style={{ backgroundColor: isError ? colors.error + '25' : colors.primary + '25', padding: Spacing.md, borderRadius: 50 }}>
-            {isError ? <X size={28} color={colors.error} /> : <CameraIcon size={28} color={colors.primary} />}
-          </View>
-        </View>
+        <Button  onPress={() => {}}
+          variant='primary' style={[{ backgroundColor: isError ? colors.error + '15' : colors.primary + '15' }]} 
+          icon={isError ? <X size={28} color={colors.error} /> : <CameraIcon size={28} color={colors.primary} />}/>
         <Text style={{ fontSize: 24, fontWeight: 'bold', color: colors.textPrimary, marginTop: Spacing.md }}>
           {isError ? 'Permissão Necessária' : 'Solicitando permissão...'}
         </Text>
@@ -45,7 +44,7 @@ const PermissionRequestCard = ({ onRequestPermission, onBack, isError = false }:
         onPress={onBack}
         variant="ghost"
       />
-    </View>
+    </Card>
   );
 };
 

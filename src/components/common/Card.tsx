@@ -1,38 +1,89 @@
-import React, { useEffect, useState } from 'react';
-import { Animated } from 'react-native';
-import { CardStyles } from '../../styles/sharedComponents';
+import React from 'react';
+import { View, StyleSheet, ViewStyle } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { Spacing, BorderRadius } from '../../styles/designTokens';
 
-export const AnimatedCard = ({ children, style }) => {
-  const [opacity] = useState(new Animated.Value(0));
-  const [scale] = useState(new Animated.Value(0.9));
+export type CardVariant = 'base' | 'elevated' | 'success' | 'error' | 'info';
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.spring(scale, {
-        toValue: 1,
-        friction: 5,
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
+interface CardProps {
+  children: React.ReactNode;
+  style?: ViewStyle;
+  variant?: CardVariant;
+  padding?: 'sm' | 'md' | 'lg' | 'xl';
+}
+
+const Card: React.FC<CardProps> = ({
+  children,
+  style,
+  variant = 'base',
+  padding = 'md',
+}) => {
+  const { colors } = useTheme();
+
+  // Mapeamento de padding
+  const paddingMap = {
+    sm: Spacing.sm,
+    md: Spacing.md,
+    lg: Spacing.lg,
+    xl: Spacing.xl,
+  };
+
+  // Estilos dinâmicos baseados na variant
+  const getVariantStyle = (): ViewStyle => {
+    const baseStyle: ViewStyle = {
+      backgroundColor: colors.card,
+      borderRadius: BorderRadius.md,
+      padding: paddingMap[padding],
+    };
+
+    switch (variant) {
+      case 'elevated':
+        return {
+          ...baseStyle,
+          elevation: 3,
+          shadowColor: colors.shadow,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.2,
+          shadowRadius: 4,
+        };
+      case 'success':
+        return {
+          ...baseStyle,
+          backgroundColor: colors.success + '10',
+          borderLeftWidth: 4,
+          borderLeftColor: colors.success,
+        };
+      case 'error':
+        return {
+          ...baseStyle,
+          backgroundColor: colors.error + '10',
+          borderLeftWidth: 4,
+          borderLeftColor: colors.error,
+        };
+      case 'info':
+        return {
+          ...baseStyle,
+          backgroundColor: colors.info + '10',
+          borderLeftWidth: 4,
+          borderLeftColor: colors.info,
+        };
+      default: // 'base'
+        return baseStyle;
+    }
+  };
 
   return (
-    <Animated.View
-      style={[
-        CardStyles.base,
-        style,
-        {
-          opacity,
-          transform: [{ scale }],
-        },
-      ]}
-    >
+    <View style={[styles.cardContainer, getVariantStyle(), style]}>
       {children}
-    </Animated.View>
+    </View>
   );
 };
+
+// Estilos base compartilhados
+const styles = StyleSheet.create({
+  cardContainer: {
+    marginVertical: Spacing.sm,
+  },
+});
+
+export default Card;

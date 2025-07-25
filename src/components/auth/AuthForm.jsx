@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   Alert,
   KeyboardAvoidingView,
@@ -11,15 +10,18 @@ import {
   Keyboard,
   Animated
 } from 'react-native';
-import { Lock, Eye, EyeOff, X, Shield } from 'lucide-react-native';
-import { styles } from './styles';
-import Button from '../common/Button';
+import { Shield } from 'lucide-react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { createStyles } from './styles';
 import InputField from '../common/InputField';
+import Button from '../common/Button';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
+  
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
-  const [isTyping, setIsTyping] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(30));
   const passwordInputRef = useRef(null);
@@ -35,7 +37,6 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   };
 
   useEffect(() => {
-    // Animação de entrada
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
@@ -57,7 +58,6 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={{ flex: 1 }}
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -75,30 +75,31 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                 }
               ]}
             >
-              {/* Header com gradiente visual */}
               <View style={styles.header}>
                 <View style={styles.iconContainer}>
                   <View style={styles.iconGradient}>
-                    <Shield size={28} color="#ffffff" />
+                    <Shield size={28} color={colors.text.onPrimary} />
                   </View>
                 </View>
                 <Text style={styles.title}>Bem-vindo de volta</Text>
                 <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
               </View>
 
-              <InputField label='Senha' 
-                      placeholder="Digite sua senha" 
-                      value={password}
-                      onChange={(text) => {
-                        setPassword(text);
-                        if (passwordInputRef.current) {
-                          passwordInputRef.current.focus();
-                        }
-                      }}
-                      secureTextEntry={!showPassword}
-                     onToggleVisibility={() => setShowPassword(!showPassword)} />
+              <InputField
+                label='Senha'
+                placeholder="Digite sua senha"
+                value={password}
+                onChange={(text) => {
+                  setPassword(text);
+                  if (passwordInputRef.current) {
+                    passwordInputRef.current.focus();
+                  }
+                }}
+                secureTextEntry={!showPassword}
+                onToggleVisibility={() => setShowPassword(!showPassword)}
+                colors={colors}
+              />
 
-              {/* Botões com novo design */}
               <View style={styles.buttonSection}>
                 <Button
                   title="Entrar"
@@ -107,6 +108,7 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                   disabled={password.length === 0}
                   style={[styles.primaryButton, password.length === 0 && styles.disabledButton]}
                   textStyle={styles.buttonText}
+                  colors={colors}
                 />
 
                 <Button
@@ -118,10 +120,10 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                   variant="outline"
                   textStyle={styles.secondaryButtonText}
                   style={styles.secondaryButton}
+                  colors={colors}
                 />
               </View>
 
-              {/* Demo box redesenhada */}
               <View style={styles.demoBox}>
                 <View style={styles.demoHeader}>
                   <View style={styles.demoBadge}>

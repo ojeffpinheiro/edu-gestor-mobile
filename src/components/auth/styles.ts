@@ -1,495 +1,282 @@
 import { StyleSheet } from 'react-native';
+import { ColorScheme } from '../../styles/colors';
+import { BorderRadius, Shadow, Spacing, Typography } from '../../styles/designTokens';
 
-export const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 20,
-    backgroundColor: '#f8fafc',
-    justifyContent: 'center',
-  },
-
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 24,
-    padding: 32,
-    margin: 16,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 8,
+export const createStyles = (colors: ColorScheme) => {
+  return StyleSheet.create({
+    // Containers
+    container: {
+      flex: 1,
+      padding: Spacing.md,
+      backgroundColor: colors.background.primary,
+      justifyContent: 'center',
     },
-    shadowOpacity: 0.12,
-    shadowRadius: 24,
-    elevation: 12,
-    borderWidth: 1,
-    borderColor: '#f1f5f9',
-  },
 
-  header: {
-    alignItems: 'center',
-    marginBottom: 32,
-  },
-
-  iconContainer: {
-    marginBottom: 20,
-  },
-
-  iconGradient: {
-    backgroundColor: '#3b82f6',
-    borderRadius: 20,
-    width: 80,
-    height: 80,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#3b82f6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
+    // Cards
+    card: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.xl,
+      padding: Spacing.xxl,
+      margin: Spacing.md,
+      ...Shadow(colors).md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
 
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#1e293b',
-    marginBottom: 8,
-    textAlign: 'center',
-    letterSpacing: -0.5,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    color: '#64748b',
-    textAlign: 'center',
-    lineHeight: 24,
-    fontWeight: '400',
-  },
-
-  inputSection: {
-    marginBottom: 32,
-  },
-
-  inputLabel: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#374151',
-    marginBottom: 8,
-    marginLeft: 4,
-  },
-
-  inputContainer: {
-    position: 'relative',
-  },
-
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#e2e8f0',
-    borderRadius: 16,
-    backgroundColor: '#f8fafc',
-    paddingHorizontal: 16,
-    paddingVertical: 4,
-  },
-
-  inputIcon: {
-    marginRight: 12,
-  },
-
-  input: {
-    flex: 1,
-    fontSize: 16,
-    color: '#1e293b',
-    paddingVertical: 16,
-    paddingHorizontal: 0,
-    fontWeight: '500',
-  },
-
-  inputFocused: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#ffffff',
-    shadowColor: '#3b82f6',
-    shadowOffset: {
-      width: 0,
-      height: 0,
+    // Header
+    header: {
+      alignItems: 'center',
+      marginBottom: Spacing.xxl,
     },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 4,
-  },
 
-  inputActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-
-  actionButton: {
-    padding: 8,
-    borderRadius: 8,
-    backgroundColor: 'transparent',
-  },
-
-  buttonSection: {
-    marginBottom: 24,
-  },
-
-  primaryButton: {
-    backgroundColor: '#3b82f6',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-    marginBottom: 16,
-    shadowColor: '#3b82f6',
-    shadowOffset: {
-      width: 0,
-      height: 4,
+    iconContainer: {
+      marginBottom: Spacing.lg,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 12,
-    elevation: 8,
-  },
 
-  disabledButton: {
-    backgroundColor: '#94a3b8',
-    opacity: 0.6,
-    shadowOpacity: 0.1,
-  },
-
-  secondaryButton: {
-    backgroundColor: 'transparent',
-    borderColor: '#e2e8f0',
-    borderWidth: 2,
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 16,
-    alignItems: 'center',
-  },
-
-  buttonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-
-  secondaryButtonText: {
-    color: '#64748b',
-    fontSize: 16,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-  },
-
-  demoBox: {
-    backgroundColor: '#fef3c7',
-    borderRadius: 16,
-    padding: 20,
-    borderWidth: 1,
-    borderColor: '#f59e0b',
-    marginTop: 8,
-  },
-
-  demoHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-
-  demoBadge: {
-    backgroundColor: '#f59e0b',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8,
-    marginRight: 8,
-  },
-
-  demoBadgeText: {
-    color: '#ffffff',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 0.5,
-  },
-
-  demoText: {
-    color: '#92400e',
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: '500',
-  },
-
-  demoPassword: {
-    fontWeight: '700',
-    backgroundColor: '#f59e0b',
-    color: '#ffffff',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 6,
-    fontSize: 13,
-    letterSpacing: 0.5,
-  },
-
-  // Estilos existentes do scanner (mantidos para compatibilidade)
-  scannerContainer: {
-    width: '100%',
-    height: 250,
-    borderRadius: 12,
-    overflow: 'hidden',
-    backgroundColor: '#f3f4f6',
-    marginBottom: 20,
-  },
-
-  cameraContainer: {
-    flex: 1,
-    position: 'relative',
-  },
-
-  camera: {
-    flex: 1,
-    width: '100%',
-    height: '100%',
-  },
-
-  scannerOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-
-  scannerFrame: {
-    width: 200,
-    height: 200,
-    position: 'relative',
-    borderWidth: 2,
-    borderColor: 'transparent',
-  },
-
-  scannerCorner: {
-    position: 'absolute',
-    width: 20,
-    height: 20,
-    borderColor: '#3b82f6',
-    borderWidth: 3,
-    borderTopWidth: 3,
-    borderLeftWidth: 3,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-    top: -2,
-    left: -2,
-  },
-
-  topRight: {
-    top: -2,
-    right: -2,
-    left: 'auto',
-    transform: [{ rotate: '90deg' }],
-  },
-
-  bottomLeft: {
-    bottom: -2,
-    left: -2,
-    top: 'auto',
-    transform: [{ rotate: '270deg' }],
-  },
-
-  bottomRight: {
-    bottom: -2,
-    right: -2,
-    top: 'auto',
-    left: 'auto',
-    transform: [{ rotate: '180deg' }],
-  },
-
-  scannerInstructions: {
-    color: '#ffffff',
-    fontSize: 14,
-    textAlign: 'center',
-    marginTop: 20,
-    paddingHorizontal: 20,
-    fontWeight: '500',
-  },
-
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.6)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 10,
-  },
-
-  scannerPlaceholder: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f9fafb',
-    minHeight: 200,
-  },
-
-  scannerInactive: {
-    alignItems: 'center',
-  },
-
-  scannerText: {
-    fontSize: 14,
-    color: '#64748b',
-    marginTop: 10,
-    textAlign: 'center',
-  },
-
-  successBox: {
-    backgroundColor: '#f0fdf4',
-    borderColor: '#22c55e',
-    borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 20,
-  },
-
-  successHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-
-  successTitle: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#22c55e',
-    marginLeft: 8,
-  },
-
-  successCode: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#16a34a',
-    marginLeft: 28,
-  },
-
-  successButton: {
-    backgroundColor: '#22c55e',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderRadius: 12,
-    alignItems: 'center',
-    marginBottom: 12,
-    shadowColor: '#22c55e',
-    shadowOffset: {
-      width: 0,
-      height: 4,
+    iconGradient: {
+      backgroundColor: colors.primary.main,
+      borderRadius: BorderRadius.lg,
+      width: 80,
+      height: 80,
+      justifyContent: 'center',
+      alignItems: 'center',
+      ...Shadow(colors).md,
     },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 6,
-  },
 
-  // Estilos para lista de estudantes
-  studentsList: {
-    maxHeight: 300,
-    marginBottom: 24,
-  },
+    // Typography
+    title: {
+      fontSize: Typography.fontSize.xxl,
+      fontWeight: Typography.fontWeight.bold,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
+      textAlign: 'center',
+      letterSpacing: -0.5,
+    },
 
-  studentItem: {
-    borderWidth: 2,
-    borderColor: '#e2e8f0',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
-    backgroundColor: '#ffffff',
-  },
+    subtitle: {
+      fontSize: Typography.fontSize.md,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      lineHeight: Typography.lineHeight.md,
+      fontWeight: Typography.fontWeight.regular,
+    },
 
-  selectedStudent: {
-    borderColor: '#3b82f6',
-    backgroundColor: '#eff6ff',
-  },
+    // Inputs
+    inputSection: {
+      marginBottom: Spacing.xxl,
+    },
 
-  studentInfo: {
-    marginBottom: 8,
-  },
+    inputLabel: {
+      fontSize: Typography.fontSize.sm,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
+      marginLeft: Spacing.xxs,
+    },
 
-  studentName: {
-    fontWeight: '600',
-    color: '#1e293b',
-    fontSize: 16,
-  },
+    inputContainer: {
+      position: 'relative',
+    },
 
-  studentClass: {
-    color: '#64748b',
-    fontSize: 14,
-  },
+    inputWrapper: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      borderWidth: 2,
+      borderColor: colors.border.light,
+      borderRadius: BorderRadius.lg,
+      backgroundColor: colors.background.secondary,
+      paddingHorizontal: Spacing.md,
+      paddingVertical: Spacing.xxs,
+    },
 
-  studentIdContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+    inputIcon: {
+      marginRight: Spacing.sm,
+    },
 
-  studentId: {
-    color: '#9ca3af',
-    fontSize: 14,
-  },
+    input: {
+      flex: 1,
+      fontSize: Typography.fontSize.md,
+      color: colors.text.primary,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: 0,
+      fontWeight: Typography.fontWeight.medium,
+    },
 
-  scannerActive: {
-    alignItems: 'center',
-  },
+    inputFocused: {
+      borderColor: colors.primary.main,
+      backgroundColor: colors.background.secondary,
+      ...Shadow(colors).xs,
+    },
 
-  successText: {
-    color: '#16a34a',
-  },
+    inputActions: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.xs,
+    },
 
-  buttonContainer: {
-    width: '100%',
-    marginBottom: 10,
-  },
+    actionButton: {
+      padding: Spacing.sm,
+      borderRadius: BorderRadius.md,
+      backgroundColor: 'transparent',
+    },
 
-  infoBox: {
-    backgroundColor: '#eff6ff',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 24,
-    borderWidth: 1,
-    borderColor: '#3b82f6',
-  },
+    // Buttons
+    buttonSection: {
+      marginBottom: Spacing.lg,
+    },
 
-  infoTitle: {
-    fontWeight: '600',
-    color: '#1e40af',
-    marginBottom: 8,
-    fontSize: 16,
-  },
+    primaryButton: {
+      backgroundColor: colors.primary.main,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      borderRadius: BorderRadius.lg,
+      alignItems: 'center',
+      marginBottom: Spacing.md,
+      ...Shadow(colors).md,
+    },
 
-  infoText: {
-    color: '#1e40af',
-    fontSize: 14,
-    lineHeight: 20,
-  },
+    disabledButton: {
+      backgroundColor: colors.gray[400],
+      opacity: 0.6,
+      shadowOpacity: 0.1,
+    },
 
-  infoList: {
-    marginTop: 8,
-  },
+    secondaryButton: {
+      backgroundColor: 'transparent',
+      borderColor: colors.border.light,
+      borderWidth: 2,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      borderRadius: BorderRadius.lg,
+      alignItems: 'center',
+    },
 
-  infoItem: {
-    color: '#1e40af',
-    fontSize: 14,
-    marginBottom: 4,
-    lineHeight: 20,
-  },
+    buttonText: {
+      color: colors.text.onPrimary,
+      fontSize: Typography.fontSize.md,
+      fontWeight: Typography.fontWeight.semibold,
+      letterSpacing: 0.5,
+    },
 
-  eyeIcon: {
-    position: 'absolute',
-    right: 16,
-    top: 16,
-  },
-});
+    secondaryButtonText: {
+      color: colors.text.secondary,
+      fontSize: Typography.fontSize.md,
+      fontWeight: Typography.fontWeight.semibold,
+      letterSpacing: 0.5,
+    },
+
+    // Feedback/Demo boxes
+    demoBox: {
+      backgroundColor: colors.feedback.warning + '20',
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.feedback.warning,
+      marginTop: Spacing.xs,
+    },
+
+    demoHeader: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      marginBottom: Spacing.sm,
+    },
+
+    demoBadge: {
+      backgroundColor: colors.feedback.warning,
+      paddingHorizontal: Spacing.xs,
+      paddingVertical: Spacing.xxs,
+      borderRadius: BorderRadius.md,
+      marginRight: Spacing.xs,
+    },
+
+    demoBadgeText: {
+      color: colors.text.onPrimary,
+      fontSize: Typography.fontSize.xs,
+      fontWeight: Typography.fontWeight.bold,
+      letterSpacing: 0.5,
+    },
+
+    demoText: {
+      color: colors.feedback.warning,
+      fontSize: Typography.fontSize.sm,
+      lineHeight: Typography.lineHeight.sm,
+      fontWeight: Typography.fontWeight.medium,
+    },
+
+    demoPassword: {
+      fontWeight: Typography.fontWeight.bold,
+      backgroundColor: colors.feedback.warning,
+      color: colors.text.onPrimary,
+      paddingHorizontal: Spacing.xs,
+      paddingVertical: 2,
+      borderRadius: BorderRadius.sm,
+      fontSize: 13,
+      letterSpacing: 0.5,
+    },
+
+    // Student list
+    studentsList: {
+      maxHeight: 300,
+      marginBottom: Spacing.lg,
+    },
+
+    studentItem: {
+      borderWidth: 2,
+      borderColor: colors.border.light,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
+      marginBottom: Spacing.sm,
+      backgroundColor: colors.background.secondary,
+    },
+
+    selectedStudent: {
+      borderColor: colors.primary.main,
+      backgroundColor: colors.primary.main + '10',
+    },
+
+    studentName: {
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      fontSize: Typography.fontSize.md,
+    },
+
+    studentClass: {
+      color: colors.text.secondary,
+      fontSize: Typography.fontSize.sm,
+    },
+
+    studentId: {
+      color: colors.text.tertiary,
+      fontSize: Typography.fontSize.sm,
+    },
+
+    // Info box
+    infoBox: {
+      backgroundColor: colors.primary.main + '10',
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.lg,
+      marginBottom: Spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
+
+    infoTitle: {
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.primary.dark,
+      marginBottom: Spacing.sm,
+      fontSize: Typography.fontSize.md,
+    },
+
+    infoText: {
+      color: colors.primary.dark,
+      fontSize: Typography.fontSize.sm,
+      lineHeight: Typography.lineHeight.sm,
+    },
+
+    eyeIcon: {
+      position: 'absolute',
+      right: Spacing.md,
+      top: Spacing.md,
+    },
+  });
+};

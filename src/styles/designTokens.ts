@@ -1,4 +1,5 @@
 import { Platform } from 'react-native';
+import { ColorScheme } from './colors';
 
 export const Spacing = {
   none: 0,
@@ -22,42 +23,43 @@ export const BorderRadius = {
   round: 999, // Para elementos circulares
 };
 
-export const Shadow = (colors: any) => ({
-  default: Platform.select({
+export const Shadow = (colors: ColorScheme) => ({
+  none: {},
+  xs: Platform.select({
     ios: {
-      shadowColor: colors.shadow,
+      shadowColor: colors.gray[900],
+      shadowOffset: { width: 0, height: 1 },
+      shadowOpacity: 0.05,
+      shadowRadius: 2,
+    },
+    android: { elevation: 1 },
+  }),
+  sm: Platform.select({
+    ios: {
+      shadowColor: colors.gray[900],
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
     },
-    android: {
-      elevation: 3,
-      shadowColor: colors.shadow,
-    },
+    android: { elevation: 2 },
   }),
-  strong: Platform.select({
+  md: Platform.select({
     ios: {
-      shadowColor: colors.shadow,
-      shadowOffset: { width: 0, height: 8 },
-      shadowOpacity: 0.2,
-      shadowRadius: 12,
-    },
-    android: {
-      elevation: 8,
-      shadowColor: colors.shadow,
-    },
-  }),
-  button: Platform.select({
-    ios: {
-      shadowColor: colors.shadow,
+      shadowColor: colors.gray[900],
       shadowOffset: { width: 0, height: 4 },
       shadowOpacity: 0.15,
       shadowRadius: 6,
     },
-    android: {
-      elevation: 4,
-      shadowColor: colors.shadow,
+    android: { elevation: 4 },
+  }),
+  lg: Platform.select({
+    ios: {
+      shadowColor: colors.gray[900],
+      shadowOffset: { width: 0, height: 8 },
+      shadowOpacity: 0.2,
+      shadowRadius: 12,
     },
+    android: { elevation: 8 },
   }),
 });
 
@@ -83,6 +85,14 @@ export const Typography = {
     semibold: '600' as '600',
     bold: '700' as '700',
     extrabold: '800' as '800',
+  },
+  lineHeight: {
+    xs: 16,
+    sm: 20,
+    md: 24,
+    lg: 28,
+    xl: 32,
+    xxl: 36,
   },
   button: {
     fontSize: 16,

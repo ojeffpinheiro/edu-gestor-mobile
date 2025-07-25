@@ -70,20 +70,20 @@ interface ColorPalette {
 
 export const lightColors: ColorPalette = {
   primary: {
-    main: '#2563EB', // Azul mais profissional
+    main: '#2563EB',
     light: '#3B82F6',
     dark: '#1D4ED8',
     contrast: '#FFFFFF',
   },
   secondary: {
-    main: '#059669', // Verde educacional
+    main: '#059669',
     light: '#10B981',
     dark: '#047857',
     contrast: '#FFFFFF',
   },
   accent: ['#8B5CF6', '#EC4899', '#F59E0B'], // Roxo, Rosa, Amarelo
   background: {
-    primary: '#F9FAFB', // Fundo claro principal
+    primary: '#EEEEEE', // Fundo claro principal
     secondary: '#FFFFFF', // Branco puro
     tertiary: '#F3F4F6', // Cinza muito claro
   },

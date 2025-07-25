@@ -1,8 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Camera, BarChart3, Settings } from 'lucide-react-native';
-import styles from './NavigationStyles';
+import { useTheme } from '../../context/ThemeContext';
+import createNavigationStyles from './NavigationStyles';
 
 const Navigation = ({ currentScreen, onNavigate }) => {
+  const { colors } = useTheme();
+  const styles = createNavigationStyles(colors);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>CorreçãoAuto</Text>

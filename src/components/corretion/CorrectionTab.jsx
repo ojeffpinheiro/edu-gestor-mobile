@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import ExamItem from './ExamItem';
 import createCorrectionTabStyles from './CorrectionTabStyles';
+import { useTheme } from '../../context/ThemeContext';
 
 const CorrectionTab = ({ exams = [], answerKey = [], onExamPress = () => {}, onProcessAll = () => {} }) => {
   const { colors } = useTheme();

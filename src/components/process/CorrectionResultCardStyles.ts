@@ -1,17 +1,15 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from '../../styles/colors';
+import { Spacing, BorderRadius, Shadow, Typography } from '../../styles/designTokens';
 
-const styles = StyleSheet.create({
+export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSheet.create({
   card: {
-    backgroundColor: 'white',
+    backgroundColor: colors.card,
     borderWidth: 1,
-    borderColor: '#e5e7eb',
-    borderRadius: 8,
-    padding: 16,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 2,
+    borderColor: colors.border,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.lg,
+    ...Shadow(colors).default,
   },
   cardContent: {
     flexDirection: 'row',
@@ -19,29 +17,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   studentName: {
-    fontWeight: '600',
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.textPrimary,
   },
   date: {
-    fontSize: 12,
-    color: '#6b7280',
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
   },
   results: {
     alignItems: 'flex-end',
   },
   score: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: Typography.fontSize.xl,
+    fontWeight: Typography.fontWeight.bold,
   },
   success: {
-    color: '#16a34a',
+    color: colors.success,
   },
   error: {
-    color: '#dc2626',
+    color: colors.error,
   },
   answers: {
-    fontSize: 12,
-    color: '#6b7280',
+    fontSize: Typography.fontSize.sm,
+    color: colors.textSecondary,
   },
 });
-
-export default styles;

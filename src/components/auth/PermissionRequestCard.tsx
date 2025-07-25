@@ -2,7 +2,6 @@ import React from 'react';
 import { View, Text, TouchableOpacity, Alert, Linking } from 'react-native';
 import { CameraIcon, X } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { ButtonStyles, CardStyles } from '../../styles/sharedComponents';
 import { Spacing } from '../../styles/designTokens';
 
 interface PermissionRequestCardProps {

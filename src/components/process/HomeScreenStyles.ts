@@ -1,4 +1,55 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from "../../styles/colors";
+import { Spacing, BorderRadius, Typography } from "../../styles/designTokens";
+
+export const createHomeScreenStyles = (colors: ColorScheme) => StyleSheet.create({
+  container: {
+    padding: Spacing.lg,
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  title: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    textAlign: 'center',
+    marginBottom: Spacing.xl,
+    color: colors.textPrimary,
+  },
+  examInfo: {
+    backgroundColor: colors.gray[100],
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.lg,
+  },
+  examTitle: {
+    fontWeight: Typography.fontWeight.semibold,
+    marginBottom: Spacing.xs,
+    color: colors.textPrimary,
+  },
+  captureArea: {
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderStyle: 'dashed',
+    borderRadius: BorderRadius.md,
+    padding: Spacing.xl,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.lg,
+  },
+  selectButton: {
+    backgroundColor: colors.primary,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
+    borderRadius: BorderRadius.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  selectButtonText: {
+    color: colors.card,
+    fontWeight: Typography.fontWeight.medium,
+  },
+});
 
 const styles = StyleSheet.create({
   container: {
@@ -21,10 +72,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     marginBottom: 4,
   },
-  examText: {
-    color: '#6b7280',
-    fontSize: 14,
-  },
   captureArea: {
     borderWidth: 2,
     borderColor: '#d1d5db',
@@ -34,14 +81,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
-  },
-  emptyCapture: {
-    alignItems: 'center',
-    gap: 16,
-  },
-  captureText: {
-    color: '#6b7280',
-    textAlign: 'center',
   },
   selectButton: {
     backgroundColor: '#2563eb',
@@ -141,6 +180,18 @@ const styles = StyleSheet.create({
   actionButtonText: {
     color: 'white',
     fontWeight: '500',
+  },
+  examText: {
+    color: '#6b7280',
+    fontSize: 14,
+  },
+  emptyCapture: {
+    alignItems: 'center',
+    gap: 16,
+  },
+  captureText: {
+    color: '#6b7280',
+    textAlign: 'center',
   },
 });
 

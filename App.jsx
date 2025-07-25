@@ -72,7 +72,7 @@ const AppContent = () => {
     <SafeAreaProvider>
       <NavigationContainer>
         <Stack.Navigator
-          initialRouteName="Cam"
+          initialRouteName="Home"
           screenOptions={{
             headerStyle: { backgroundColor: '#2196F3' },
             headerTintColor: '#fff',

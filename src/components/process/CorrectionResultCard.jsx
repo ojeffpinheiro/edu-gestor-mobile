@@ -1,8 +1,11 @@
 import { View, Text } from 'react-native';
-import styles from './CorrectionResultCardStyles';
+import { useTheme } from '../../context/ThemeContext';
+import { createCorrectionResultCardStyles } from './CorrectionResultCardStyles';
 
 const CorrectionResultCard = ({ correction }) => {
   const formattedDate = new Date(correction.savedAt).toLocaleString('pt-BR');
+    const { colors } = useTheme();
+    const styles = createCorrectionResultCardStyles(colors);
   
   return (
     <View style={styles.card}>

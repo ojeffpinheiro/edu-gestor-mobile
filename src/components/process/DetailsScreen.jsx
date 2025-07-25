@@ -1,8 +1,11 @@
 import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
 import QuestionItem from './QuestionItem';
-import styles from './DetailsScreenStyles';
+import { createDetailsScreenStyles } from './DetailsScreenStyles';
+import { useTheme } from '../../context/ThemeContext';
 
 const DetailsScreen = ({ correctionResults, onBack }) => {
+    const { colors } = useTheme();
+    const styles = createDetailsScreenStyles(colors);
   return (
     <View style={styles.container}>
       <View style={styles.header}>

@@ -1,9 +1,12 @@
 import { View, Text, ScrollView } from 'react-native';
 import { BarChart3 } from 'lucide-react-native';
 import CorrectionResultCard from './CorrectionResultCard';
-import styles from './ResultsScreenStyles';
+import { useTheme } from '../../context/ThemeContext';
+import createResultsScreenStyles from './ResultsScreenStyles';
 
 const ResultsScreen = ({ corrections }) => {
+  const { colors } = useTheme();
+  const styles = createResultsScreenStyles(colors);
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Correções Realizadas</Text>

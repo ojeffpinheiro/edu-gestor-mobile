@@ -1,71 +1,77 @@
 import { StyleSheet } from "react-native";
+import { ColorScheme } from "../../styles/colors";
+import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 
-const styles = StyleSheet.create({
+
+const createSettingsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    gap: 24,
+    padding: Spacing.lg,
+    gap: Spacing.xl,
+    backgroundColor: colors.background,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    color: colors.textPrimary,
   },
   section: {
-    gap: 16,
+    gap: Spacing.md,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    gap: Spacing.xs,
   },
   sectionTitle: {
-    fontWeight: '600',
-    color: '#2563eb',
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.primary,
+    fontSize: Typography.fontSize.lg,
   },
   form: {
-    gap: 16,
+    gap: Spacing.md,
   },
   formGroup: {
-    gap: 8,
+    gap: Spacing.xs,
   },
   label: {
-    fontSize: 14,
-    fontWeight: '500',
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
   },
   input: {
     borderWidth: 1,
-    borderColor: '#d1d5db',
-    borderRadius: 8,
-    padding: 12,
-    backgroundColor: 'white',
+    borderColor: colors.border,
+    borderRadius: BorderRadius.md,
+    padding: Spacing.md,
+    backgroundColor: colors.card,
   },
   switchGroup: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: Spacing.sm,
   },
   switchLabel: {
     flex: 1,
   },
   systemButton: {
-    backgroundColor: '#2563eb',
-    padding: 16,
-    borderRadius: 8,
+    backgroundColor: colors.primary,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
   },
   systemButtonText: {
-    color: 'white',
-    fontWeight: '500',
+    color: colors.card,
+    fontWeight: Typography.fontWeight.medium,
   },
   downloadButton: {
     flexDirection: 'row',
-    gap: 8,
+    gap: Spacing.xs,
     backgroundColor: '#4b5563',
   },
   downloadButtonText: {
-    color: 'white',
+    color: colors.card,
   },
 });
 
-export default styles;
+export default createSettingsScreenStyles;

@@ -1,8 +1,11 @@
 import { View, Text } from 'react-native';
 import { CheckCircle, AlertCircle } from 'lucide-react-native';
-import styles from './QuestionItemStyles';
+import { useTheme } from '../../context/ThemeContext';
+import createQuestionItemStyles from './QuestionItemStyles';
 
 const QuestionItem = ({ result }) => {
+  const { colors } = useTheme();
+  const styles = createQuestionItemStyles(colors);
   return (
     <View style={[
       styles.container,

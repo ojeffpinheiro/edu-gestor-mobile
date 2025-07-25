@@ -1,8 +1,11 @@
 import { View, Text, TextInput, TouchableOpacity, Switch, ScrollView } from 'react-native';
 import { FileText, Scan, Settings, Download } from 'lucide-react-native';
-import styles from './SettingsScreenStyles';
+import { useTheme } from '../../context/ThemeContext';
+import createSettingsScreenStyles from './SettingsScreenStyles';
 
 const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
+  const { colors } = useTheme();
+  const styles = createSettingsScreenStyles(colors);
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>Configurações</Text>

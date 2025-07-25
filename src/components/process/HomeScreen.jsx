@@ -1,7 +1,8 @@
 import { View, Text, TouchableOpacity, Image, ActivityIndicator, Alert } from 'react-native';
 import { Camera, Upload, CheckCircle, FileText, Save, Eye } from 'lucide-react-native';
 import * as ImagePicker from 'expo-image-picker';
-import styles from './HomeScreenStyles';
+import { useTheme } from '../../context/ThemeContext';
+import { createHomeScreenStyles } from './HomeScreenStyles';
 
 const HomeScreen = ({
   examTemplate,
@@ -12,6 +13,9 @@ const HomeScreen = ({
   onSaveCorrection,
   onViewDetails,
 }) => {
+    const { colors } = useTheme();
+    const styles = createHomeScreenStyles(colors);
+
   const pickImage = async () => {
     // Verificar permissões
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();

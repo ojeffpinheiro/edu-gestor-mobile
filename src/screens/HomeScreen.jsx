@@ -1,10 +1,12 @@
 import React from 'react';
 import { View, ScrollView } from 'react-native';
-import { styles } from '../styles/commun';
 import Button from '../components/common/Button';
 import SectionHeader from '../components/common/SectionHeader';
+import { styles } from '../styles/commun';
+import { createDesignSystem } from '../styles/mainStyles';
 
 export default function HomeScreen({ navigation }) {
+  
   const menuItems = [
     { title: 'Autenticação', screen: 'Auth' },
     { title: 'Identificação', screen: 'Identification' },
@@ -29,8 +31,6 @@ export default function HomeScreen({ navigation }) {
             title={item.title}
             onPress={() => navigation.navigate(item.screen)}
             variant="primary"
-            style={styles.menuButton}
-            textStyle={styles.buttonText}
           />
         ))}
       </ScrollView>

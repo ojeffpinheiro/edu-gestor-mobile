@@ -165,7 +165,7 @@ export const createCameraStyles = (colors: ColorScheme) => StyleSheet.create({
   previewButtonText: {
     color: colors.text.onPrimary,
     marginLeft: Spacing.xs,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight,
   },
 
   // Elementos adicionais

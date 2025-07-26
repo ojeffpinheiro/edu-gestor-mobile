@@ -1,36 +1,37 @@
 import { StyleSheet } from "react-native";
+import { Spacing, BorderRadius, Typography } from "./designTokens";
 
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 20,
+    padding: Spacing.xl,
     backgroundColor: '#f5f5f5',
   },
   title: {
-    fontSize: 32,
-    fontWeight: 'bold',
-    marginBottom: 10,
+    fontSize: Typography.fontSize.xxxl,
+    fontWeight: Typography.fontWeight.bold,
+    marginBottom: Spacing.sm,
     color: '#333',
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: Typography.fontSize.lg,
     color: '#666',
-    marginBottom: 30,
+    marginBottom: Spacing.xxl,
     textAlign: 'center',
   },
   buttonContainer: {
     width: '100%',
-    gap: 15,
+    gap: Spacing.md,
   },
   button: {
     backgroundColor: '#2196F3',
-    paddingVertical: 15,
-    paddingHorizontal: 30,
-    borderRadius: 10,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.xxl,
+    borderRadius: BorderRadius.md,
     alignItems: 'center',
-    marginVertical: 5,
+    marginVertical: Spacing.xs,
   },
   disabledButton: {
     opacity: 0.6,
@@ -40,7 +41,7 @@ export const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.bold,
   },
 });

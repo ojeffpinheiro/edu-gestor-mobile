@@ -1,48 +1,84 @@
 import { StyleSheet } from "react-native";
 import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 import { ColorScheme } from "../../styles/colors";
+import { createTabBaseStyles } from "../../styles/componentStyles";
+import { createButtonStyles, createCardStyles, createTextStyles } from "../../styles/globalStyles";
 
-const createReportsTabStyles = (colors: ColorScheme) => StyleSheet.create({
-  tabContent: {
-    flex: 1,
-    padding: Spacing.lg,
-    backgroundColor: colors.background.primary,
-  },
-  sectionTitle: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.lg,
-  },
-  statsGrid: {
-    gap: Spacing.md,
-    marginBottom: Spacing.xxl,
-  },
-  primaryButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary.main,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    gap: Spacing.sm,
-  },
-  buttonText: {
-    color: colors.text.onPrimary,
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.semibold,
-  },
-  reportActions: {
-    alignItems: 'center',
-    marginTop: Spacing.lg,
-  },
-  loadingText: {
-    fontSize: Typography.fontSize.md,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginTop: Spacing.xl,
-  },
-});
+export const createReportsTabStyles = (colors: ColorScheme) => {
+  const tabs = createTabBaseStyles(colors);
+  const buttons = createButtonStyles(colors);
+  const text = createTextStyles(colors);
+  const cards = createCardStyles(colors);
+
+  return StyleSheet.create({
+    // Base container
+    tabContent: {
+      ...tabs.tabContainer,
+    },
+
+    // Section title
+    sectionTitle: {
+      ...text.heading2,
+      ...tabs.sectionHeader,
+    },
+
+    // Stats grid layout
+    statsGrid: {
+      ...tabs.gridContainer,
+    },
+
+    // Report cards
+    statCard: {
+      ...cards.base,
+      padding: Spacing.lg,
+      alignItems: 'center',
+    },
+    statValue: {
+      ...text.heading1,
+      marginVertical: Spacing.sm,
+    },
+    statLabel: {
+      ...text.caption,
+      textAlign: 'center',
+    },
+
+    // Primary action button
+    primaryButton: {
+      ...buttons.primary,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      gap: Spacing.sm,
+    },
+
+    // Button text
+    buttonText: {
+      ...buttons.text,
+    },
+
+    // Report actions container
+    reportActions: {
+      alignItems: 'center',
+      marginTop: Spacing.lg,
+    },
+
+    // Loading state
+    loadingText: {
+      ...text.body,
+      textAlign: 'center',
+      marginTop: Spacing.xl,
+    },
+
+    // Status indicators
+    successIndicator: {
+      color: colors.feedback.success,
+    },
+    warningIndicator: {
+      color: colors.feedback.warning,
+    }
+  });
+}
 
 export default createReportsTabStyles;

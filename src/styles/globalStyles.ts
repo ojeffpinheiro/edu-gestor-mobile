@@ -7,6 +7,8 @@ export const createCardStyles = (colors: ColorScheme) => {
     base: {
       backgroundColor: colors.component.card,
       borderRadius: BorderRadius.xl,
+      borderWidth: 1,
+      borderColor: colors.border.medium,
       padding: Spacing.lg,
       margin: Spacing.md,
       ...Shadow(colors).sm,
@@ -30,6 +32,17 @@ export const createCardStyles = (colors: ColorScheme) => {
       padding: Spacing.md,
       borderRadius: BorderRadius.sm,
     },
+    stats: {
+      borderLeftWidth: 4,
+      padding: Spacing.lg,
+    },
+    examItem: {
+      padding: Spacing.lg,
+      marginBottom: Spacing.sm,
+    },
+    correctionResult: {
+      padding: Spacing.lg,
+    }
   });
 };
 
@@ -43,7 +56,7 @@ export const getListStyles = (colors: ColorScheme) => ({
 });
 
 export const createButtonStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
+  const base = StyleSheet.create({
     primary: {
       backgroundColor: colors.primary.main,
       paddingVertical: Spacing.md,
@@ -51,10 +64,12 @@ export const createButtonStyles = (colors: ColorScheme) => {
       borderRadius: BorderRadius.md,
       alignItems: 'center',
       justifyContent: 'center',
+      flexDirection: 'row',
+      gap: Spacing.sm,
       ...Shadow(colors).xs,
     },
     secondary: {
-      backgroundColor: colors.background.secondary,
+      backgroundColor: 'transparent',
       borderWidth: 1,
       borderColor: colors.border.medium,
       paddingVertical: Spacing.md,
@@ -62,7 +77,16 @@ export const createButtonStyles = (colors: ColorScheme) => {
       borderRadius: BorderRadius.md,
       alignItems: 'center',
       justifyContent: 'center',
+      flexDirection: 'row',
+      gap: Spacing.sm,
     },
+    round: {
+      borderRadius: BorderRadius.round,
+      padding: Spacing.sm,
+    }
+  });
+  return {
+    ...base,
     text: {
       color: colors.text.onPrimary,
       fontSize: Typography.fontSize.md,
@@ -77,7 +101,20 @@ export const createButtonStyles = (colors: ColorScheme) => {
     disabled: {
       opacity: 0.6,
     },
-  });
+    danger: {
+      ...base.primary,
+      backgroundColor: colors.feedback.error,
+    },
+    success: {
+      ...base.primary,
+      backgroundColor: colors.feedback.success,
+    },
+    small: {
+      ...base.primary,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+    }
+  };
 };
 
 export const createBaseStyles = (colors: ColorScheme) => {
@@ -124,3 +161,94 @@ export const createBaseStyles = (colors: ColorScheme) => {
     },
   });
 };
+
+export const createTextStyles = (colors: ColorScheme) => StyleSheet.create({
+  heading1: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    color: colors.text.primary,
+    marginBottom: Spacing.md,
+  },
+  heading2: {
+    fontSize: Typography.fontSize.xl,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.text.primary,
+    marginBottom: Spacing.sm,
+  },
+  heading3: {
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  body: {
+    fontSize: Typography.fontSize.md,
+    color: colors.text.secondary,
+    lineHeight: Typography.lineHeight.md,
+  },
+  caption: {
+    fontSize: Typography.fontSize.sm,
+    color: colors.text.secondary,
+  },
+  label: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+    color: colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  // Variantes
+  centered: {
+    textAlign: 'center',
+  },
+  uppercase: {
+    textTransform: 'uppercase',
+  },
+  success: {
+    color: colors.feedback.success,
+  },
+  error: {
+    color: colors.feedback.error,
+  },
+  bold: {
+    fontWeight: Typography.fontWeight.bold,
+  },
+  semibold: {
+    fontWeight: Typography.fontWeight.semibold,
+  }
+
+});
+
+export const createListStyles = (colors: ColorScheme) => StyleSheet.create({
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.sm,
+    backgroundColor: colors.background.secondary,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  selected: {
+    borderColor: colors.primary.main,
+    backgroundColor: colors.primary.main + '10',
+  }
+});
+
+export const createNavigationBaseStyles = (colors: ColorScheme) => StyleSheet.create({
+  tabBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    paddingVertical: Spacing.sm,
+    borderTopWidth: StyleSheet.hairlineWidth,
+    backgroundColor: colors.background.secondary,
+  },
+  tabItem: {
+    alignItems: 'center',
+    padding: Spacing.sm,
+  },
+  tabLabel: {
+    marginTop: Spacing.xs,
+  }
+});

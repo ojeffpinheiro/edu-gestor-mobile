@@ -1,10 +1,9 @@
 import React from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import { View, Text, Animated } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 import StatusCard from '../common/StatusCard';
-import { Spacing } from '../../styles/designTokens';
 import { createScanResultCardStyles } from './styles';
 
 interface ScanResultCardProps {

@@ -1,49 +1,83 @@
+// CorrectionTabStyles.ts
 import { StyleSheet } from "react-native";
-import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { BorderRadius, Spacing } from "../../styles/designTokens";
 import { ColorScheme } from "../../styles/colors";
+import { createTabBaseStyles } from "../../styles/componentStyles";
+import { createButtonStyles, createListStyles, createTextStyles } from "../../styles/globalStyles";
 
-const createCorrectionTabStyles = (colors: ColorScheme) => StyleSheet.create({
-  tabContent: {
-    flex: 1,
-    padding: Spacing.lg,
-    backgroundColor: colors.background.primary,
-  },
-  sectionTitle: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.lg,
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    gap: Spacing.sm,
-    marginBottom: Spacing.lg,
-  },
-  primaryButton: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: colors.primary.main,
-    paddingVertical: Spacing.md,
-    paddingHorizontal: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    gap: Spacing.sm,
-  },
-  buttonText: {
-    color: colors.text.onPrimary,
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.semibold,
-  },
-  examList: {
-    gap: Spacing.sm,
-  },
-  loadingText: {
-    fontSize: Typography.fontSize.md,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginTop: Spacing.xl,
-  },
-});
 
-export default createCorrectionTabStyles;
+export const createCorrectionTabStyles = (colors: ColorScheme) => {
+  const tabs = createTabBaseStyles(colors);
+  const buttons = createButtonStyles(colors);
+  const text = createTextStyles(colors);
+  const lists = createListStyles(colors);
+
+  return StyleSheet.create({
+    // Base container
+    tabContent: {
+      ...tabs.tabContainer,
+    },
+
+    // Section title
+    sectionTitle: {
+      ...text.heading2,
+      ...tabs.sectionHeader,
+    },
+
+    // Action buttons container
+    actionButtons: {
+      flexDirection: 'row',
+      gap: Spacing.sm,
+      marginBottom: Spacing.lg,
+    },
+
+    // Primary action button
+    primaryButton: {
+      ...buttons.primary,
+      flex: 1,
+      flexDirection: 'row',
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      gap: Spacing.sm,
+    },
+
+    // Button text
+    buttonText: {
+      ...buttons.text,
+    },
+
+    // Exam list container
+    examList: {
+      gap: Spacing.sm,
+    },
+
+    // Loading state text
+    loadingText: {
+      ...text.body,
+      textAlign: 'center',
+      marginTop: Spacing.xl,
+    },
+
+    // Custom styles for correction items
+    correctionItem: {
+      ...lists.item,
+      padding: Spacing.lg,
+    },
+
+    // Status indicator
+    statusIndicator: {
+      width: Spacing.sm,
+      height: Spacing.sm,
+      borderRadius: BorderRadius.round,
+      marginRight: Spacing.sm,
+    },
+    pendingStatus: {
+      backgroundColor: colors.feedback.warning,
+    },
+    completedStatus: {
+      backgroundColor: colors.feedback.success,
+    }
+  });
+};

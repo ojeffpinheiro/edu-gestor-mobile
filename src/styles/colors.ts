@@ -29,6 +29,10 @@ interface ColorPalette {
     primary: string;
     secondary: string;
     tertiary: string;
+    overlay: {
+      main: string;
+      light: string;
+    }
   };
   text: {
     primary: string;
@@ -86,6 +90,10 @@ export const lightColors: ColorPalette = {
     primary: '#EEEEEE', // Fundo claro principal
     secondary: '#FFFFFF', // Branco puro
     tertiary: '#F3F4F6', // Cinza muito claro
+    overlay: {
+      main: 'rgba(255, 255, 255, 0.7)',
+      light: 'rgba(0, 0, 0, 0.8)'
+    }
   },
   text: {
     primary: '#111827', // Preto suave
@@ -154,6 +162,10 @@ export const darkColors: ColorPalette = {
     primary: '#121212', // Fundo escuro principal
     secondary: '#1E1E1E', // Preto mais claro
     tertiary: '#2D2D2D', // Cinza escuro
+    overlay: {
+      main: 'rgba(255, 255, 255, 0.7)',
+      light: 'rgba(0, 0, 0, 0.8)'
+    }
   },
   text: {
     primary: '#E5E7EB', // Branco suave

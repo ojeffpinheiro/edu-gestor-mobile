@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Animated } from 'react-native';
-import { CheckCircle, ChevronLeft } from 'lucide-react-native';
+import { CheckCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
 import Button from '../common/Button';

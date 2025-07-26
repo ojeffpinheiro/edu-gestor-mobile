@@ -389,6 +389,7 @@ export const createAuthFormStyles = (colors: ColorScheme) => {
     },
   });
 };
+
 export const createStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
     // Containers

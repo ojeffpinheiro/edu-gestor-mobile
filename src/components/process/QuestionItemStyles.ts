@@ -1,55 +1,55 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
 import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { createListStyles, createTextStyles } from "../../styles/globalStyles";
 
-export const createQuestionItemStyles = (colors: ColorScheme) => StyleSheet.create({
-  card: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: Spacing.md,
-    borderRadius: BorderRadius.md,
-    marginBottom: Spacing.sm,
-    backgroundColor: colors.background.secondary,
-    borderWidth: 1,
-    borderColor: colors.border.light
-  },
-  correct: {
-    backgroundColor: colors.feedback.success + '20',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.feedback.success,
-  },
-  incorrect: {
-    backgroundColor: colors.feedback.error + '20',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.feedback.error,
-  },
-  questionNumber: {
-    fontWeight: Typography.fontWeight.medium,
-    color: colors.text.primary,
-    fontSize: Typography.fontSize.md,
-  },
-  answers: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  answerText: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.secondary,
-  },
-  answerValue: {
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-  }, 
-  successBox: {
-    backgroundColor: colors.feedback.success + '20',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.feedback.success,
-  },
-  errorBox: {
-    backgroundColor: colors.feedback.error + '20',
-    borderLeftWidth: 4,
-    borderLeftColor: colors.feedback.error,
-  },
-});
+
+export const createQuestionItemStyles = (colors: ColorScheme) => {
+  const lists = createListStyles(colors);
+  const text = createTextStyles(colors);
+
+  return StyleSheet.create({
+    card: {
+      ...lists.item
+    },
+    correct: {
+      ...lists.item,
+      backgroundColor: colors.feedback.success + '20',
+      borderLeftWidth: 4,
+      borderLeftColor: colors.feedback.success,
+    },
+    incorrect: {
+      ...lists.item,
+      backgroundColor: colors.feedback.error + '20',
+      borderLeftWidth: 4,
+      borderLeftColor: colors.feedback.error,
+    },
+    questionNumber: {
+      ...text.body,
+      ...text.semibold,
+      minWidth: Spacing.lg,
+    },
+    answers: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: Spacing.md,
+    },
+    answerText: {
+      ...text.caption,
+    },
+    answerValue: {
+      ...text.caption,
+      ...text.semibold,
+    },
+    successBox: {
+      backgroundColor: colors.feedback.success + '20',
+      borderLeftWidth: 4,
+      borderLeftColor: colors.feedback.success,
+    },
+    errorBox: {
+      backgroundColor: colors.feedback.error + '20',
+      borderLeftWidth: 4,
+      borderLeftColor: colors.feedback.error,
+    },
+  });
+}

@@ -1,26 +1,34 @@
 import React from 'react';
 import { View, Text, StyleProp, ViewStyle, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { BorderRadius, Spacing } from '../../styles/designTokens';
+import { BorderRadius, Spacing, Typography } from '../../styles/designTokens';
 
 interface InfoBoxProps {
   title?: string;
   items: string[];
-  variant?: 'primary' | 'success' | 'error';
+  variant?: 'primary' | 'success' | 'error' | 'info' | 'warning';
   style?: StyleProp<ViewStyle>;
 }
 
 const InfoBox = ({ title, items, variant = 'primary', style }: InfoBoxProps) => {
   const { colors } = useTheme();
-  const color = colors[variant];
+  const color = colors.feedback[variant] || colors.primary.main;
 
   return (
-    <View style={[styles.container, { backgroundColor: color + '10' }, style]}>
+    <View style={[
+      styles.container, 
+      { 
+        backgroundColor: color + '10',
+        borderLeftWidth: 4,
+        borderLeftColor: color,
+      }, 
+      style
+    ]}>
       {title && (
         <Text style={[styles.title, { color }]}>{title}</Text>
       )}
       {items.map((item, i) => (
-        <Text key={i} style={[styles.item, { color }]}>
+        <Text key={i} style={[styles.item, { color: colors.text.primary }]}>
           • {item}
         </Text>
       ))}
@@ -30,18 +38,19 @@ const InfoBox = ({ title, items, variant = 'primary', style }: InfoBoxProps) => 
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: BorderRadius.lg,
+    borderRadius: BorderRadius.md,
     padding: Spacing.md,
-    marginBottom: Spacing.xl,
+    marginBottom: Spacing.lg,
   },
   title: {
-    fontWeight: '600',
+    fontWeight: Typography.fontWeight.semibold,
     marginBottom: Spacing.sm,
-    fontSize: 16,
+    fontSize: Typography.fontSize.md,
   },
   item: {
-    fontSize: 14,
+    fontSize: Typography.fontSize.sm,
     marginBottom: Spacing.xs,
+    lineHeight: Typography.lineHeight.sm,
   },
 });
 

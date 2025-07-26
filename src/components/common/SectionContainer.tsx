@@ -1,6 +1,7 @@
-// src/components/common/SectionContainer.tsx
 import React from 'react';
 import { View, StyleSheet, ViewStyle, Text } from 'react-native';
+import { useTheme } from '../../context/ThemeContext';
+import { Spacing, Typography } from '../../styles/designTokens';
 
 interface SectionContainerProps {
   children: React.ReactNode;
@@ -13,9 +14,15 @@ const SectionContainer: React.FC<SectionContainerProps> = ({
   title,
   style 
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={[styles.container, style]}>
-      {title && <Text style={styles.title}>{title}</Text>}
+      {title && (
+        <Text style={[styles.title, { color: colors.text.primary }]}>
+          {title}
+        </Text>
+      )}
       {children}
     </View>
   );
@@ -23,13 +30,12 @@ const SectionContainer: React.FC<SectionContainerProps> = ({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: Spacing.xl,
   },
   title: {
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 12,
-    color: '#333333',
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    marginBottom: Spacing.md,
   },
 });
 

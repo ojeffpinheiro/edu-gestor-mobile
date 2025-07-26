@@ -3,6 +3,7 @@ import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
 import chroma from 'chroma-js';
 import { useTheme } from '../../context/ThemeContext';
 import { BorderRadius } from '../../styles/designTokens';
+import { ColorScheme } from '../../styles/colors';
 
 interface ReferencePointsProps {
   pointsStatus: { [key: number]: boolean };
@@ -27,6 +28,7 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
   totalPoints = 6
 }) => {
   const { colors } = useTheme();
+  const styles = createReferencePointsStyles(colors);
 
   const scanAnim = useRef(new Animated.Value(0)).current;
   const pulseAnims = useRef<{ [key: number]: Animated.Value }>({}).current;
@@ -100,12 +102,12 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 
   return (
     <>
-      <View style={[styles.guideFrame, { borderColor: colors.border }]}>
+      <View style={styles.guideFrame}>
         {/* Cantos da moldura */}
-        <View style={[styles.corner, styles.cornerTL, { backgroundColor: colors.success }]} />
-        <View style={[styles.corner, styles.cornerTR, { backgroundColor: colors.success }]} />
-        <View style={[styles.corner, styles.cornerBL, { backgroundColor: colors.success }]} />
-        <View style={[styles.corner, styles.cornerBR, { backgroundColor: colors.success }]} />
+        <View style={[styles.corner, styles.cornerTL, { backgroundColor: colors.feedback.success }]} />
+        <View style={[styles.corner, styles.cornerTR, { backgroundColor: colors.feedback.success }]} />
+        <View style={[styles.corner, styles.cornerBL, { backgroundColor: colors.feedback.success }]} />
+        <View style={[styles.corner, styles.cornerBR, { backgroundColor: colors.feedback.success }]} />
       </View>
 
       {/* Feedback de pontos corretos */}
@@ -128,7 +130,7 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
             left: `${point.x * 100}%`,
             top: `${point.y * 100}%`,
           }]}>
-            <View style={[styles.point, { backgroundColor: color, borderColor: colors.border }]}>
+            <View style={[styles.point]}>
               <Text style={styles.pointText}>{point.id}</Text>
             </View>
           </View>
@@ -153,12 +155,13 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createReferencePointsStyles = (colors: ColorScheme) => StyleSheet.create({
   guideFrame: {
     width: '95%',
     height: '65%',
     borderWidth: 1,
     position: 'relative',
+    borderColor: colors.border.medium,
   },
   corner: {
     position: 'absolute',
@@ -196,7 +199,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.round,
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 2,
+    borderColor: colors.border.medium,
     transform: [{ translateX: -15 }, { translateY: -15 }]
   },
   pointText: {

@@ -17,7 +17,12 @@ export const createThemeStyles = (colors: ColorScheme) => {
       padding: Spacing.md,
       backgroundColor: colors.background.primary,
     },
-    
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+
     // Cards
     card: {
       backgroundColor: colors.component.card,
@@ -31,7 +36,7 @@ export const createThemeStyles = (colors: ColorScheme) => {
       borderWidth: 1,
       borderColor: colors.border.light,
     },
-    
+
     // Textos
     heading1: {
       fontSize: Typography.fontSize.xxl,
@@ -52,7 +57,7 @@ export const createThemeStyles = (colors: ColorScheme) => {
       color: colors.text.secondary,
       lineHeight: Typography.lineHeight.md,
     },
-    
+
     // Botões
     primaryButton: {
       backgroundColor: colors.primary.main,
@@ -73,7 +78,7 @@ export const createThemeStyles = (colors: ColorScheme) => {
       alignItems: 'center',
       justifyContent: 'center',
     },
-    
+
     // Inputs
     inputContainer: {
       borderWidth: 1,
@@ -86,7 +91,7 @@ export const createThemeStyles = (colors: ColorScheme) => {
       borderColor: colors.primary.main,
       ...Shadow(colors).xs,
     },
-    
+
     // Feedback
     successBox: {
       backgroundColor: colors.feedback.success + '20',

@@ -2,11 +2,16 @@ import React from 'react';
 import { View, Text, StyleSheet, StyleProp, ViewStyle } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { BorderRadius, Spacing, Typography } from '../../styles/designTokens';
-import { ColorScheme } from '../../styles/colors';
+
+// Interface para as props do ícone
+interface IconProps {
+  color?: string;
+  size?: number;
+}
 
 interface StatusCardProps {
   variant: 'success' | 'error' | 'warning' | 'info';
-  icon: React.ReactNode;
+  icon: React.ReactElement<IconProps>; // Agora especificamos que o ícone aceita color
   title: string;
   children?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
@@ -14,19 +19,32 @@ interface StatusCardProps {
 
 const StatusCard = ({ variant, icon, title, children, style }: StatusCardProps) => {
   const { colors } = useTheme();
-  const styles = createStyles(colors, variant);
+  const variantColor = colors.feedback[variant];
+
+  // Clonamos o ícone com a cor apropriada
+  const coloredIcon = React.cloneElement(icon, {
+    color: variantColor,
+    size: icon.props.size || 24, // Tamanho padrão se não especificado
+  });
 
   return (
-    <View style={[styles.statusCardContainer, style]}>
-      <View style={styles.statusCardHeader}>
-        <View style={styles.statusCardIconContainer}>
-          {icon}
+    <View style={[
+      styles.container, 
+      { 
+        backgroundColor: variantColor + '10',
+        borderLeftColor: variantColor 
+      },
+      style
+    ]}>
+      <View style={styles.header}>
+        <View style={styles.iconContainer}>
+          {coloredIcon}
         </View>
-        <Text style={styles.statusCardTitle}>{title}</Text>
+        <Text style={[styles.title, { color: variantColor }]}>{title}</Text>
       </View>
       
       {children && (
-        <View style={styles.statusCardContent}>
+        <View style={styles.content}>
           {children}
         </View>
       )}
@@ -34,39 +52,28 @@ const StatusCard = ({ variant, icon, title, children, style }: StatusCardProps) 
   );
 };
 
-export const createStyles = (colors: ColorScheme, variant?: string) => {
-  const variantColors = {
-    success: colors.feedback.success,
-    error: colors.feedback.error,
-    warning: colors.feedback.warning,
-    info: colors.feedback.info,
-  };
-
-  return StyleSheet.create({
-    statusCardContainer: {
-      borderRadius: BorderRadius.lg,
-      padding: Spacing.md,
-      backgroundColor: variant ? variantColors[variant] + '20' : colors.background.secondary,
-      borderLeftWidth: 4,
-      borderLeftColor: variant ? variantColors[variant] : colors.primary.main,
-    },
-    statusCardHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: Spacing.sm,
-    },
-    statusCardIconContainer: {
-      marginRight: Spacing.sm,
-    },
-    statusCardTitle: {
-      fontSize: Typography.fontSize.md,
-      fontWeight: Typography.fontWeight.semibold,
-      color: variant ? variantColors[variant] : colors.text.primary,
-    },
-    statusCardContent: {
-      marginTop: Spacing.xs,
-    },
-  });
-};
+const styles = StyleSheet.create({
+  container: {
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.md,
+    borderLeftWidth: 4,
+    marginVertical: Spacing.sm,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.sm,
+  },
+  iconContainer: {
+    marginRight: Spacing.sm,
+  },
+  title: {
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  content: {
+    marginTop: Spacing.xs,
+  },
+});
 
 export default StatusCard;

@@ -10,6 +10,7 @@ import {
   TextInputProps,
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
 
 interface InputFieldProps extends TextInputProps {
   label?: string;
@@ -58,39 +59,39 @@ const InputField: React.FC<InputFieldProps> = ({
 
   const dynamicStyles = StyleSheet.create({
     container: {
-      marginBottom: 16,
+      marginBottom: Spacing.md,
     },
     inputContainer: {
       flexDirection: 'row',
       alignItems: 'center',
       borderWidth: 1,
-      borderColor: isFocused ? colors.primary : colors.border,
-      borderRadius: 8,
-      paddingHorizontal: 12,
-      backgroundColor: colors.background,
+      borderColor: isFocused ? colors.primary.main : colors.border.medium,
+      borderRadius: BorderRadius.md,
+      paddingHorizontal: Spacing.md,
+      backgroundColor: colors.background.secondary,
     },
     label: {
-      marginBottom: 8,
-      color: colors.textPrimary,
-      fontSize: 14,
-      fontWeight: '500',
+      marginBottom: Spacing.sm,
+      color: colors.text.primary,
+      fontSize: Typography.fontSize.sm,
+      fontWeight: Typography.fontWeight.medium,
     },
     input: {
       flex: 1,
       height: 48,
-      color: colors.textPrimary,
-      paddingVertical: 12,
+      color: colors.text.primary,
+      paddingVertical: Spacing.sm,
     },
     iconContainer: {
-      marginRight: 8,
+      marginRight: Spacing.sm,
     },
     actionButton: {
-      padding: 8,
+      padding: Spacing.xs,
     },
     errorText: {
-      marginTop: 4,
-      color: colors.error,
-      fontSize: 12,
+      marginTop: Spacing.xs,
+      color: colors.feedback.error,
+      fontSize: Typography.fontSize.xs,
     },
   });
 
@@ -107,7 +108,7 @@ const InputField: React.FC<InputFieldProps> = ({
           value={value}
           onChangeText={onChangeText}
           placeholder={placeholder}
-          placeholderTextColor={colors.textSecondary}
+          placeholderTextColor={colors.text.secondary}
           secureTextEntry={secureTextEntry}
           keyboardType={keyboardType}
           autoFocus={autoFocus}
@@ -118,13 +119,13 @@ const InputField: React.FC<InputFieldProps> = ({
 
         {value && onClear && (
           <TouchableOpacity onPress={handleClear} style={dynamicStyles.actionButton}>
-            <Text style={{ color: colors.textPrimary }}>×</Text>
+            <Text style={{ color: colors.text.primary }}>×</Text>
           </TouchableOpacity>
         )}
 
         {secureTextEntry && onToggleVisibility && (
           <TouchableOpacity onPress={onToggleVisibility} style={dynamicStyles.actionButton}>
-            <Text style={{ color: colors.textPrimary }}>{secureTextEntry ? '👁️' : '🔒'}</Text>
+            <Text style={{ color: colors.text.primary }}>{secureTextEntry ? '👁️' : '🔒'}</Text>
           </TouchableOpacity>
         )}
       </View>

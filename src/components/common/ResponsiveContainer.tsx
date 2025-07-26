@@ -1,7 +1,8 @@
-// components/ResponsiveContainer.tsx
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { isTablet, scaleHeight, scaleWidth } from '../../utils/responsiveUtils';
+import { useTheme } from '../../context/ThemeContext';
+import { Spacing } from '../../styles/designTokens';
 
 interface ResponsiveContainerProps {
   children: React.ReactNode;
@@ -14,7 +15,8 @@ export const ResponsiveContainer = ({
   style, 
   paddingMultiplier = 1 
 }: ResponsiveContainerProps) => {
-  const basePadding = isTablet() ? 24 : 16;
+  const { colors } = useTheme();
+  const basePadding = isTablet() ? Spacing.lg : Spacing.md;
   const scaledPadding = basePadding * paddingMultiplier;
 
   return (
@@ -22,7 +24,8 @@ export const ResponsiveContainer = ({
       styles.container,
       { 
         paddingHorizontal: scaleWidth(scaledPadding),
-        paddingVertical: scaleHeight(scaledPadding * 0.8) 
+        paddingVertical: scaleHeight(scaledPadding * 0.8),
+        backgroundColor: colors.background.primary,
       },
       style
     ]}>

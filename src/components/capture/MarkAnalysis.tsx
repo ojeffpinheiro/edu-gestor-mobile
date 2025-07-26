@@ -2,6 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, Dimensions } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import { calculateCentroids, detectShapes, loadAndProcessImage } from '../../utils/markUtils';
+import { ColorScheme } from '../../styles/colors';
+import { useTheme } from '../../context/ThemeContext';
+import chroma from 'chroma-js';
 
 interface Point {
   x: number;
@@ -31,6 +34,8 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
 }) => {
   const [marks, setMarks] = useState<Mark[]>([]);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
+  const { colors } = useTheme();
+  const styles = createMarkAnalysisstyles(colors);
 
   useEffect(() => {
     const analyzeImage = async () => {
@@ -109,7 +114,7 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createMarkAnalysisstyles= (colors: ColorScheme) => StyleSheet.create({
   container: {
     flex: 1,
     position: 'relative',
@@ -131,8 +136,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   markedCell: {
-    backgroundColor: 'rgba(0,255,0,0.3)',
-    borderColor: '#00FF00',
+  backgroundColor: chroma(colors.feedback.success).alpha(0.3).css(),
+  borderColor: colors.feedback.success,
   },
   tooltip: {
     position: 'absolute',

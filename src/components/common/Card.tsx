@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, StyleSheet, ViewStyle } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing, BorderRadius } from '../../styles/designTokens';
+import { Spacing, BorderRadius, Shadow } from '../../styles/designTokens';
 
-export type CardVariant = 'base' | 'elevated' | 'success' | 'error' | 'info';
+export type CardVariant = 'base' | 'elevated' | 'outlined' | 'success' | 'error' | 'info';
 
 interface CardProps {
   children: React.ReactNode;
@@ -20,7 +20,6 @@ const Card: React.FC<CardProps> = ({
 }) => {
   const { colors } = useTheme();
 
-  // Mapeamento de padding
   const paddingMap = {
     sm: Spacing.sm,
     md: Spacing.md,
@@ -28,10 +27,9 @@ const Card: React.FC<CardProps> = ({
     xl: Spacing.xl,
   };
 
-  // Estilos dinâmicos baseados na variant
   const getVariantStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
-      backgroundColor: colors.card,
+      backgroundColor: colors.component.card,
       borderRadius: BorderRadius.md,
       padding: paddingMap[padding],
     };
@@ -40,32 +38,34 @@ const Card: React.FC<CardProps> = ({
       case 'elevated':
         return {
           ...baseStyle,
-          elevation: 3,
-          shadowColor: colors.shadow,
-          shadowOffset: { width: 0, height: 2 },
-          shadowOpacity: 0.2,
-          shadowRadius: 4,
+          ...Shadow(colors).md,
+        };
+      case 'outlined':
+        return {
+          ...baseStyle,
+          borderWidth: 1,
+          borderColor: colors.border.medium,
         };
       case 'success':
         return {
           ...baseStyle,
-          backgroundColor: colors.success + '10',
+          backgroundColor: colors.feedback.success + '10',
           borderLeftWidth: 4,
-          borderLeftColor: colors.success,
+          borderLeftColor: colors.feedback.success,
         };
       case 'error':
         return {
           ...baseStyle,
-          backgroundColor: colors.error + '10',
+          backgroundColor: colors.feedback.error + '10',
           borderLeftWidth: 4,
-          borderLeftColor: colors.error,
+          borderLeftColor: colors.feedback.error,
         };
       case 'info':
         return {
           ...baseStyle,
-          backgroundColor: colors.info + '10',
+          backgroundColor: colors.feedback.info + '10',
           borderLeftWidth: 4,
-          borderLeftColor: colors.info,
+          borderLeftColor: colors.feedback.info,
         };
       default: // 'base'
         return baseStyle;
@@ -79,7 +79,6 @@ const Card: React.FC<CardProps> = ({
   );
 };
 
-// Estilos base compartilhados
 const styles = StyleSheet.create({
   cardContainer: {
     marginVertical: Spacing.sm,

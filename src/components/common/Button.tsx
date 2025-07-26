@@ -10,9 +10,9 @@ import {
   StyleProp
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { ColorScheme } from '../../styles/colors';
+import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
 
-type ButtonVariant = 'primary' | 'secondary' | 'success' | 'danger' | 'warning' | 'info' | 'outline' | 'ghost' | 'floating' | 'text';
+type ButtonVariant = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'outline' | 'ghost' | 'floating' | 'text';
 type ButtonSize = 'sm' | 'md' | 'lg';
 
 interface IconProps {
@@ -57,39 +57,40 @@ const Button: React.FC<ButtonProps> = ({
   const styles = createButtonStyles(colors);
 
   const buttonStyles: StyleProp<ViewStyle> = [
-    styles.button,
-    styles[variant],
-    styles[size],
-    disabled && styles.disabled,
-    fullWidth && styles.fullWidth,
-    rounded && styles.rounded,
-    style,
-  ];
+  styles.button,
+  variant === 'text' ? styles.textVariant : styles[variant], // Ajuste aqui
+  styles[size],
+  disabled && styles.disabled,
+  fullWidth && styles.fullWidth,
+  rounded && styles.rounded,
+  style,
+];
 
   const textStyles: StyleProp<TextStyle> = [
-    styles.textStyle,
-    styles[`text_${variant}`],
-    styles[`text_${size}`],
-    textStyle,
-  ];
+  styles.textStyle,
+  styles[`${variant}Text`],
+  styles[`${size}Text`],
+  textStyle,
+];
 
   const iconColor = {
-    primary: colors.textPrimary,
-    secondary: colors.card,
-    success: colors.card,
-    danger: colors.card,
-    warning: colors.warning,
-    info: colors.card,
-    outline: colors.primary,
-    ghost: colors.primary,
-    text: colors.textPrimary,
+    primary: colors.text.onPrimary,
+    secondary: colors.text.onPrimary,
+    success: colors.text.onPrimary,
+    error: colors.text.onPrimary,
+    warning: colors.text.primary,
+    info: colors.text.onPrimary,
+    outline: colors.primary.main,
+    ghost: colors.primary.main,
+    text: colors.text.primary,
+    floating: colors.text.onPrimary,
   }[variant];
 
   const renderIcon = () => {
     if (!icon || loading) return null;
     return React.cloneElement(icon, {
       color: icon.props.color || iconColor,
-      size: icon.props.size || 18,
+      size: icon.props.size || Typography.fontSize.md,
     });
   };
 
@@ -121,175 +122,155 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-const createButtonStyles = (colors: ColorScheme) => {
-  const baseStyles = {
+const createButtonStyles = (colors: any) => {
+  return StyleSheet.create({
     // Base styles
     button: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
-      borderRadius: 8,
+      borderRadius: BorderRadius.md,
       borderWidth: 1,
       borderColor: 'transparent',
-    } as ViewStyle,
+    },
+    
+    textStyle: {
+      fontWeight: Typography.fontWeight.semibold,
+    },
     
     fullWidth: {
       width: '100%',
-    } as ViewStyle,
+    },
     
     rounded: {
-      borderRadius: 24,
-    } as ViewStyle,
+      borderRadius: BorderRadius.xxl,
+    },
     
-    textStyle: {
-      fontWeight: '600',
-    } as TextStyle,
-
+    disabled: {
+      opacity: 0.6,
+    },
+    
     // Variants
     primary: {
-      backgroundColor: colors.primary,
-      borderColor: colors.primary,
-    } as ViewStyle,
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    primaryText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_primary: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
     secondary: {
-      backgroundColor: colors.secondary,
-      borderColor: colors.secondary,
-    } as ViewStyle,
+      backgroundColor: colors.secondary.main,
+      borderColor: colors.secondary.main,
+    },
+    secondaryText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_secondary: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
     success: {
-      backgroundColor: colors.success,
-      borderColor: colors.success,
-    } as ViewStyle,
+      backgroundColor: colors.feedback.success,
+      borderColor: colors.feedback.success,
+    },
+    successText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_success: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
-    danger: {
-      backgroundColor: colors.error,
-      borderColor: colors.error,
-    } as ViewStyle,
+    error: {
+      backgroundColor: colors.feedback.error,
+      borderColor: colors.feedback.error,
+    },
+    errorText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_danger: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
     warning: {
-      backgroundColor: colors.warning,
-      borderColor: colors.warning,
-    } as ViewStyle,
+      backgroundColor: colors.feedback.warning,
+      borderColor: colors.feedback.warning,
+    },
+    warningText: {
+      color: colors.text.primary,
+    },
     
-    text_warning: {
-      color: colors.warning,
-    } as TextStyle,
-
     info: {
-      backgroundColor: colors.info,
-      borderColor: colors.info,
-    } as ViewStyle,
+      backgroundColor: colors.feedback.info,
+      borderColor: colors.feedback.info,
+    },
+    infoText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_info: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
     outline: {
       backgroundColor: 'transparent',
-      borderColor: colors.primary,
-    } as ViewStyle,
+      borderColor: colors.primary.main,
+    },
+    outlineText: {
+      color: colors.primary.main,
+    },
     
-    text_outline: {
-      color: colors.primary,
-    } as TextStyle,
-
     ghost: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
-    } as ViewStyle,
+    },
+    ghostText: {
+      color: colors.primary.main,
+    },
     
-    text_ghost: {
-      color: colors.primary,
-    } as TextStyle,
-
     floating: {
-      backgroundColor: 'rgba(0, 0, 0, 0.7)',
-      width: 48,
-      height: 48,
-      borderRadius: 24,
+      backgroundColor: colors.gray[900] + 'CC',
+      width: 56,
+      height: 56,
+      borderRadius: 28,
       justifyContent: 'center',
       alignItems: 'center',
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 2 },
-      shadowOpacity: 0.25,
-      shadowRadius: 4,
-      elevation: 5,
-    } as ViewStyle,
+      ...Shadow(colors).md,
+    },
+    floatingText: {
+      color: colors.text.onPrimary,
+    },
     
-    text_floating: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
-    text: {
+    textVariant: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
       padding: 0,
-    } as ViewStyle,
+    },
+    textVariantText: {
+      color: colors.text.primary,
+    },
     
-    text_text: {
-      color: colors.textPrimary,
-    } as TextStyle,
-
     // Sizes
     sm: {
-      paddingVertical: 8,
-      paddingHorizontal: 12,
-    } as ViewStyle,
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.sm,
+    },
+    smText: {
+      fontSize: Typography.fontSize.sm,
+    },
     
-    text_sm: {
-      fontSize: 12,
-    } as TextStyle,
-
     md: {
-      paddingVertical: 12,
-      paddingHorizontal: 16,
-    } as ViewStyle,
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+    },
+    mdText: {
+      fontSize: Typography.fontSize.md,
+    },
     
-    text_md: {
-      fontSize: 14,
-    } as TextStyle,
-
     lg: {
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-    } as ViewStyle,
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+    },
+    lgText: {
+      fontSize: Typography.fontSize.lg,
+    },
     
-    text_lg: {
-      fontSize: 16,
-    } as TextStyle,
-
-    // States
-    disabled: {
-      opacity: 0.6,
-    } as ViewStyle,
-
     // Icon positioning
     iconLeft: {
-      marginRight: 8,
-    } as ViewStyle,
+      marginRight: Spacing.sm,
+    },
     
     iconRight: {
-      marginLeft: 8,
-    } as ViewStyle,
-  };
-
-  return StyleSheet.create(baseStyles);
+      marginLeft: Spacing.sm,
+    },
+  });
 };
 
 export default Button;

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { View, Alert, Dimensions, StyleSheet } from 'react-native';
+import { View, Alert, Dimensions, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { CameraCapturedPicture, CameraView } from 'expo-camera';
 import chroma from 'chroma-js';
 import { Buffer } from 'buffer';
@@ -13,10 +13,9 @@ import ImagePreview from './ImagePreview';
 import ReferencePoints from './ReferencePoints';
 import CaptureControls from './CaptureControls';
 
-import styles from '../../screens/Camera';
 import MarkAnalysis from './MarkAnalysis';
 import { useTheme } from '../../context/ThemeContext';
-import { createCameraStyles } from './CameraStyles';
+import { createThemeStyles } from '../../styles/themeStyles';
 
 interface PointsStatus {
   [key: number]: boolean;
@@ -42,10 +41,9 @@ const BLACK_THRESHOLD = 80; // Distância máxima para considerar como preto
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const { colors } = useTheme();
-  const cameraStyles = createCameraStyles(colors);
+  const cameraStyles = createThemeStyles(colors);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [autoCapture, setAutoCapture] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
   const [analysisMode, setAnalysisMode] = useState(false);
   const [autoCaptureMode, setAutoCaptureMode] = useState<keyof typeof AUTO_CAPTURE_MODES>('OFF');
@@ -361,7 +359,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   }
 
   return (
-    <View style={cameraStyles.container}>
+    <View style={[cameraStyles.screenContainer, isLandscape && { flexDirection: 'row' }]}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
 
       <View style={cameraStyles.overlay}>
@@ -373,6 +371,15 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
           totalPoints={analysisResult?.totalPoints || 6} // 6 é o número fixo de pontos
         />
       </View>
+
+      {isProcessing && (
+        <View style={[cameraStyles.centeredContainer, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+          <ActivityIndicator size="large" color={colors.primary.main} />
+          <Text style={[cameraStyles.bodyText, { color: colors.text.onPrimary }]}>
+            Processando imagem...
+          </Text>
+        </View>
+      )}
 
       <CaptureControls
         onCapture={handleCapture}

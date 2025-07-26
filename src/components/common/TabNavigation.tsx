@@ -1,12 +1,18 @@
-// src/components/common/TabNavigation.tsx
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import { Spacing, Typography } from '../../styles/designTokens';
+
+// Interface para as props do ícone
+interface IconProps {
+  color?: string;
+  size?: number;
+}
 
 interface Tab {
   id: string;
   label: string;
-  icon: React.ReactNode;
+  icon: React.ReactElement<IconProps>; // Especificamos que o ícone deve aceitar color e size
 }
 
 interface TabNavigationProps {
@@ -30,18 +36,50 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const defaultActiveStyle: ViewStyle = {
+    borderTopWidth: 2,
+    borderTopColor: colors.primary.main,
+  };
+
+  const renderIcon = (icon: React.ReactElement<IconProps>, isActive: boolean) => {
+    return React.cloneElement(icon, {
+      color: isActive ? colors.primary.main : colors.text.secondary,
+      size: icon.props.size || 24, // Tamanho padrão 24 se não especificado
+    });
+  };
+
   return (
-    <View style={[styles.container, containerStyle]}>
-      {tabs.map((tab) => (
-        <TouchableOpacity
-          key={tab.id}
-          style={[styles.tab, tabStyle, activeTab === tab.id && activeTabStyle]}
-          onPress={() => onTabPress(tab.id)}
-        >
-          {tab.icon}
-          <Text style={[styles.label, labelStyle]}>{tab.label}</Text>
-        </TouchableOpacity>
-      ))}
+    <View style={[
+      styles.container, 
+      { backgroundColor: colors.background.secondary },
+      containerStyle
+    ]}>
+      {tabs.map((tab) => {
+        const isActive = activeTab === tab.id;
+        return (
+          <TouchableOpacity
+            key={tab.id}
+            style={[
+              styles.tab, 
+              tabStyle, 
+              isActive && [defaultActiveStyle, activeTabStyle]
+            ]}
+            onPress={() => onTabPress(tab.id)}
+            activeOpacity={0.7}
+          >
+            {renderIcon(tab.icon, isActive)}
+            <Text style={[
+              styles.label, 
+              { 
+                color: isActive ? colors.primary.main : colors.text.secondary 
+              },
+              labelStyle
+            ]}>
+              {tab.label}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
@@ -49,18 +87,18 @@ const TabNavigation: React.FC<TabNavigationProps> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    backgroundColor: '#f8f8f8',
-    borderTopWidth: 1,
-    borderTopColor: '#e0e0e0',
+    borderTopWidth: StyleSheet.hairlineWidth,
   },
   tab: {
     flex: 1,
     alignItems: 'center',
-    paddingVertical: 12,
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.xs,
   },
   label: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+    marginTop: Spacing.xxs,
   },
 });
 

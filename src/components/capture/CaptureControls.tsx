@@ -2,8 +2,9 @@ import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-import { BorderRadius, Spacing } from '../../styles/designTokens';
+import { BorderRadius, Shadow, Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
+import { ColorScheme } from '../../styles/colors';
 
 interface CaptureControlsProps {
   onCapture: () => void;
@@ -21,12 +22,13 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
   isProcessing
 }) => {
   const { colors } = useTheme();
+  const styles = createStyles(colors);
 
   const getAutoCaptureColor = () => {
     switch (autoCaptureMode) {
-      case 'FAST': return colors.success;
-      case 'SLOW': return colors.warning;
-      default: return colors.card;
+      case 'FAST': return colors.feedback.success;
+      case 'SLOW': return colors.feedback.warning;
+      default: return colors.text.secondary;
     }
   };
 
@@ -36,8 +38,8 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
       <Button
         onPress={onGalleryOpen}
         variant="floating"
-        icon={<Ionicons name="images" size={24} color={colors.card} />}
-        style={[styles.button, { backgroundColor: `${colors.success}30` }]}
+        icon={<Ionicons name="images" size={24} color={colors.text.onPrimary} />}
+        style={[styles.button, styles.galleryButton]}
         rounded
         disabled={isProcessing}
       />
@@ -47,11 +49,11 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
         onPress={onCapture}
         variant="floating"
         size="lg"
-        icon={<Ionicons name="camera" size={32} color={colors.card} />}
+        icon={<Ionicons name="camera" size={32} color={colors.text.onPrimary} />}
         style={[
           styles.captureButton, 
           isProcessing && styles.disabledButton,
-          { borderColor: colors.border }
+          { borderColor: colors.border.medium }
         ]}
         rounded
         disabled={isProcessing}
@@ -68,7 +70,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
               size={24}
               color={getAutoCaptureColor()}
             />
-            <Text style={[styles.autoCaptureText, { color: colors.card }]}>
+            <Text style={styles.autoCaptureText}>
               {autoCaptureMode === 'FAST' ? '1.5s' :
                autoCaptureMode === 'SLOW' ? '3s' : 'Auto'}
             </Text>
@@ -77,7 +79,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
                 styles.indicator,
                 { 
                   backgroundColor: autoCaptureMode === 'FAST' ? 
-                    colors.success : colors.warning 
+                    colors.feedback.success : colors.feedback.warning 
                 }
               ]} />
             )}
@@ -90,7 +92,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ColorScheme) => StyleSheet.create({
   container: {
     position: 'absolute',
     bottom: Spacing.xl,
@@ -99,20 +101,26 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: BorderRadius.round
+    paddingHorizontal: Spacing.lg,
   },
   button: {
     width: 50,
     height: 50,
     padding: 0,
+    ...Shadow(colors).xs,
+  },
+  galleryButton: {
+    backgroundColor: colors.primary.main,
   },
   captureButton: {
     width: 70,
     height: 70,
+    backgroundColor: colors.feedback.error,
     borderWidth: 2,
   },
   disabledButton: {
-    opacity: 0.5,
+    opacity: 0.6,
+    backgroundColor: colors.gray[400],
   },
   autoCaptureContainer: {
     alignItems: 'center',
@@ -121,7 +129,8 @@ const styles = StyleSheet.create({
   },
   autoCaptureText: {
     fontSize: 12,
-    marginTop: 4,
+    marginTop: Spacing.xxs,
+    color: colors.text.primary,
   },
   indicator: {
     position: 'absolute',
@@ -129,7 +138,7 @@ const styles = StyleSheet.create({
     right: 4,
     width: 8,
     height: 8,
-    borderRadius: 4,
+    borderRadius: BorderRadius.round,
   },
 });
 

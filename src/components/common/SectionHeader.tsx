@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { ChevronLeft } from 'lucide-react-native';
-import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
+import { Spacing, Typography } from '../../styles/designTokens';
 
 interface SectionHeaderProps {
   title: string;
@@ -35,7 +35,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
         >
           <ChevronLeft 
             size={Typography.fontSize.xl} 
-            color={colors.text.secondary} 
+            color={colors.text.primary} 
           />
         </TouchableOpacity>
       )}
@@ -43,7 +43,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       <View style={styles.textContainer}>
         <Text style={[
           styles.title, 
-          { color: colors.primary.main }, 
+          { color: colors.text.primary }, 
           titleStyle
         ]}>
           {title}
@@ -51,7 +51,7 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
         {subtitle && (
           <Text style={[
             styles.subtitle, 
-            { color: colors.secondary.main }, 
+            { color: colors.text.secondary }, 
             subtitleStyle
           ]}>
             {subtitle}
@@ -68,30 +68,26 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: Spacing.md,
     paddingHorizontal: Spacing.lg,
-    backgroundColor: 'transparent',
   },
   backButton: {
     marginRight: Spacing.md,
-    padding: Spacing.xs,
-    borderRadius: BorderRadius.round,
   },
   iconContainer: {
     marginRight: Spacing.md,
-    padding: Spacing.xs,
   },
   textContainer: {
     flex: 1,
   },
   title: {
-    fontSize: Typography.fontSize.xxl,
+    fontSize: Typography.fontSize.xl,
     fontWeight: Typography.fontWeight.bold,
-    lineHeight: Typography.fontSize.xxl * 1.3,
+    lineHeight: Typography.lineHeight.xl,
   },
   subtitle: {
     fontSize: Typography.fontSize.sm,
     fontWeight: Typography.fontWeight.regular,
     marginTop: Spacing.xxs,
-    lineHeight: Typography.fontSize.sm * 1.5,
+    lineHeight: Typography.lineHeight.sm,
   },
 });
 

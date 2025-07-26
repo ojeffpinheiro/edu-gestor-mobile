@@ -8,14 +8,15 @@ import * as ImagePicker from 'expo-image-picker';
 import * as jpeg from 'jpeg-js';
 import * as tf from '@tensorflow/tfjs';
 import * as FileSystem from 'expo-file-system';
+import { useTheme } from '../../context/ThemeContext';
 
 import ImagePreview from './ImagePreview';
 import ReferencePoints from './ReferencePoints';
 import CaptureControls from './CaptureControls';
-
 import MarkAnalysis from './MarkAnalysis';
-import { useTheme } from '../../context/ThemeContext';
-import { createThemeStyles } from '../../styles/themeStyles';
+import { createCameraBaseStyles } from '../../styles/componentStyles';
+import { createContainerStyles, createTextStyles } from '../../styles/globalStyles';
+import { Spacing } from '../../styles/designTokens';
 
 interface PointsStatus {
   [key: number]: boolean;
@@ -41,7 +42,10 @@ const BLACK_THRESHOLD = 80; // Distância máxima para considerar como preto
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const { colors } = useTheme();
-  const cameraStyles = createThemeStyles(colors);
+  const cameraStyles = createCameraBaseStyles(colors);
+  const containers = createContainerStyles(colors);
+  const text = createTextStyles(colors);
+
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
@@ -343,6 +347,21 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
     console.error(`${title}: ${message}`);
   }, []);
 
+  const styles = StyleSheet.create({
+    processingOverlay: {
+      ...containers.centeredContainer,
+      backgroundColor: 'rgba(0,0,0,0.7)',
+    },
+    processingText: {
+      ...text.body,
+      color: colors.text.onPrimary,
+      marginTop: Spacing.md,
+    },
+    landscapeContainer: {
+      flexDirection: 'row',
+    },
+  });
+
   if (capturedImage) {
     return analysisMode ? (
       <MarkAnalysis
@@ -359,7 +378,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   }
 
   return (
-    <View style={[cameraStyles.screenContainer, isLandscape && { flexDirection: 'row' }]}>
+    <View style={[cameraStyles.container, isLandscape && styles.landscapeContainer]}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
 
       <View style={cameraStyles.overlay}>
@@ -368,14 +387,14 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
           pointsColors={pointsColors}
           isLandscape={isLandscape}
           correctPoints={analysisResult?.correctPoints || 0}
-          totalPoints={analysisResult?.totalPoints || 6} // 6 é o número fixo de pontos
+          totalPoints={analysisResult?.totalPoints || 6}
         />
       </View>
 
       {isProcessing && (
-        <View style={[cameraStyles.centeredContainer, { backgroundColor: 'rgba(0,0,0,0.7)' }]}>
+        <View style={styles.processingOverlay}>
           <ActivityIndicator size="large" color={colors.primary.main} />
-          <Text style={[cameraStyles.bodyText, { color: colors.text.onPrimary }]}>
+          <Text style={styles.processingText}>
             Processando imagem...
           </Text>
         </View>

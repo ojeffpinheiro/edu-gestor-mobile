@@ -11,8 +11,9 @@ import {
   Animated
 } from 'react-native';
 import { Shield } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTheme } from '../../context/ThemeContext';
-import { createStyles } from './styles';
+import { createAuthFormStyles as createStyles } from './styles';
 import InputField from '../common/InputField';
 import Button from '../common/Button';
 import { Spacing } from '../../styles/designTokens';
@@ -26,7 +27,7 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(30));
   const passwordInputRef = useRef(null);
-  
+
   const validatePassword = () => {
     if (password === 'admin123') {
       setIsAuthenticated(true);
@@ -78,9 +79,12 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
           >
             <View style={styles.header}>
               <View style={styles.iconContainer}>
-                <View style={styles.iconGradient}>
+                <LinearGradient
+                  colors={[colors.primary.main, colors.primary.dark]}
+                  style={styles.iconGradient}
+                >
                   <Shield size={28} color={colors.text.onPrimary} />
-                </View>
+                </LinearGradient>
               </View>
               <Text style={styles.title}>Bem-vindo de volta</Text>
               <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>

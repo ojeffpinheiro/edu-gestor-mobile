@@ -1,4 +1,4 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, TextStyle } from 'react-native';
 import { ColorScheme } from './colors';
 import { Spacing, BorderRadius, Shadow, Typography } from './designTokens';
 
@@ -157,15 +157,30 @@ export const createContainerStyles = (colors: ColorScheme) => StyleSheet.create(
   },
 });
 
-
-export const createTextStyles = (colors: ColorScheme) => {
+export const createTextStyles = (colors: ColorScheme): {
+  heading1: TextStyle;
+  heading2: TextStyle;
+  heading3: TextStyle;
+  body: TextStyle;
+  caption: TextStyle;
+  label: TextStyle;
+  centered: TextStyle;
+  uppercase: TextStyle;
+  bold: TextStyle;
+  semibold: TextStyle;
+  success: TextStyle;
+  error: TextStyle;
+  warning: TextStyle;
+  info: TextStyle;
+  onPrimary: TextStyle;
+} => {
   const base = StyleSheet.create({
     heading1: {
       fontSize: Typography.fontSize.xxl,
       fontWeight: Typography.fontWeight.bold,
       color: colors.text.primary,
       marginBottom: Spacing.md,
-    },
+    } as TextStyle,
     heading2: {
       fontSize: Typography.fontSize.xl,
       fontWeight: Typography.fontWeight.semibold,
@@ -187,14 +202,19 @@ export const createTextStyles = (colors: ColorScheme) => {
       fontSize: Typography.fontSize.sm,
       color: colors.text.secondary,
     },
+    label: {
+      fontSize: Typography.fontSize.sm,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
+    },
+    centered: {
+      textAlign: 'center' as const,
+    } as TextStyle,
   });
 
   return {
     ...base,
-    // Modifiers
-    centered: {
-      textAlign: 'center',
-    },
     uppercase: {
       textTransform: 'uppercase',
     },

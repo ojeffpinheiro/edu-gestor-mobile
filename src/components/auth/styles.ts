@@ -1,7 +1,10 @@
-// styles.ts
 import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native';
+
+// Design tokens e cores
 import { ColorScheme } from '../../styles/colors';
-import { Spacing, BorderRadius, Shadow } from '../../styles/designTokens';
+import { Spacing, BorderRadius, Shadow, Typography } from '../../styles/designTokens';
+
+// Estilos globais
 import { 
   createContainerStyles,
   createCardStyles,
@@ -11,7 +14,6 @@ import {
 } from '../../styles/globalStyles';
 import { createHeaderBaseStyles } from '../../styles/componentStyles';
 
-// Definir tipos para nossos estilos
 type BaseStyles = {
   iconContainer: ViewStyle;
   demoBox: ViewStyle;
@@ -19,9 +21,10 @@ type BaseStyles = {
   demoBadge: ViewStyle;
   demoBadgeText: TextStyle;
   demoText: TextStyle;
+  label: TextStyle;
+  centered: TextStyle;
   [key: string]: ViewStyle | TextStyle | ImageStyle;
 };
-
 // Função para criar estilos base com tipagem adequada
 export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
   const containerStyles = createContainerStyles(colors);
@@ -48,7 +51,7 @@ export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
       justifyContent: 'center' as const,
       alignItems: 'center' as const,
       marginBottom: Spacing.lg,
-    },
+    } as ViewStyle,
     demoBox: {
       backgroundColor: `${colors.feedback.warning}20`,
       borderRadius: BorderRadius.lg,
@@ -80,6 +83,13 @@ export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
       fontSize: 14,
       lineHeight: 20,
       fontWeight: '500' as const,
+    },
+    // Adicione o estilo label que está faltando
+    label: {
+      fontSize: Typography.fontSize.sm,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
     }
   };
 };
@@ -262,8 +272,37 @@ export const createAuthFormStyles = (colors: ColorScheme) => {
       ...baseStyles.base,
       padding: Spacing.xxl,
       margin: Spacing.lg,
-      ...baseStyles.md, // Usando a shadow do designTokens
+      ...baseStyles.md,
     },
+    header: {
+      alignItems: 'center' as const,
+      marginBottom: Spacing.xxl,
+    },
+    title: {
+      ...baseStyles.heading2,
+      textAlign: 'center' as const,
+      marginTop: Spacing.lg,
+      marginBottom: Spacing.sm,
+    },
+    subtitle: {
+      ...baseStyles.body,
+      textAlign: 'center' as const,
+      color: colors.text.secondary,
+    },
+    buttonSection: {
+      width: '100%',
+    },
+    iconGradient: {
+      // Estilo para o gradiente do ícone
+      // (substitua por um LinearGradient real se estiver usando expo-linear-gradient)
+      backgroundColor: colors.primary.main,
+      borderRadius: BorderRadius.round,
+      padding: Spacing.md,
+    },
+    demoPassword: {
+      fontWeight: 'bold' as const,
+    },
+    // Os demos estilos já estão definidos em baseStyles
   });
 };
 

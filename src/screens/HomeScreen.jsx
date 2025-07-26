@@ -3,11 +3,18 @@ import { View, ScrollView } from 'react-native';
 import Button from '../components/common/Button';
 import SectionHeader from '../components/common/SectionHeader';
 import { useTheme } from '../context/ThemeContext';
-import { createDesignSystem } from '../styles/mainStyles';
+import { createContainerStyles, createButtonStyles, createTextStyles } from '../styles/globalStyles';
+import { createSectionHeaderStyles } from '../styles/componentStyles';
+import { Spacing } from '../styles/designTokens';
 
 export default function HomeScreen({ navigation }) {
   const { colors } = useTheme();
-  const { buttons, containers } = createDesignSystem(colors);
+  
+  // Criar estilos usando os mixins globais
+  const containers = createContainerStyles(colors);
+  const buttons = createButtonStyles(colors);
+  const sectionHeader = createSectionHeaderStyles(colors);
+
   const menuItems = [
     { title: 'Autenticação', screen: 'Auth' },
     { title: 'Identificação', screen: 'Identification' },
@@ -18,21 +25,25 @@ export default function HomeScreen({ navigation }) {
   ];
 
   return (
-    <View style={containers.centered}>
+    <View style={containers.centeredContainer}>
       <SectionHeader
         title="Bem-vindo ao App"
         subtitle="Aqui estão suas opções"
         onBack={() => console.log('Voltar')}
+        style={sectionHeader.header}
+        titleStyle={sectionHeader.title}
+        subtitleStyle={sectionHeader.subtitle}
       />
 
-      <ScrollView contentContainerStyle={containers.screen}>
+      <ScrollView 
+        contentContainerStyle={[containers.screenContainer, { paddingBottom: Spacing.xxl }]}
+      >
         {menuItems.map((item, index) => (
           <Button
             key={index}
             title={item.title}
             onPress={() => navigation.navigate(item.screen)}
-            variant="primary"
-            style={buttons.primary}
+            style={[buttons.primary, { marginBottom: Spacing.md }]}
             textStyle={buttons.text}
           />
         ))}

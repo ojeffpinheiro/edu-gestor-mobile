@@ -12,11 +12,14 @@ import {
 } from 'react-native';
 import { Shield } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+
 import { useTheme } from '../../context/ThemeContext';
-import { createAuthFormStyles as createStyles } from './styles';
+
 import InputField from '../common/InputField';
 import Button from '../common/Button';
+
 import { Spacing } from '../../styles/designTokens';
+import { createAuthFormStyles as createStyles } from './styles';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const { colors } = useTheme();

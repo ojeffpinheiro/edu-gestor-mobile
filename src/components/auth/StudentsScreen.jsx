@@ -1,12 +1,15 @@
 import React from 'react';
 import { View, Text, Animated } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
 import { useNavigation } from '@react-navigation/native';
+
+import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 import Card from '../common/Card';
-import SelectableListItem from '../SelectableListItem';
 import SectionHeader from '../common/SectionHeader';
+
+import SelectableListItem from '../SelectableListItem';
+
 import { AnimationHelpers } from '../../styles/animations';
 import { createStudentsScreenStyles } from './styles';
 

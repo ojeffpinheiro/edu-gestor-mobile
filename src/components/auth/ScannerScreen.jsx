@@ -1,15 +1,19 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { View, ScrollView, Alert, Linking, Animated } from 'react-native';
 import { CameraView, Camera } from 'expo-camera';
+import { ScanLine } from 'lucide-react-native';
+
 import { useTheme } from '../../context/ThemeContext';
+
 import PermissionRequestCard from './PermissionRequestCard';
 import ScanResultCard from './ScanResultCard';
 import ScannerControls from './ScannerControls';
 import ScannerOverlay from './ScannerOverlay';
+
 import SectionHeader from '../common/SectionHeader';
 import Card from '../common/Card';
+
 import { createScannerScreenStyles } from './styles';
-import { ScanLine } from 'lucide-react-native';
 
 const ScannerScreen = ({ setCurrentView, scannedCode, setScannedCode }) => {
   const { colors } = useTheme();

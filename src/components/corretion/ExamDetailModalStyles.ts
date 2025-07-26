@@ -1,5 +1,5 @@
 import { StyleSheet } from "react-native";
-import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { Spacing, Typography } from "../../styles/designTokens";
 import { ColorScheme } from "../../styles/colors";
 import { createModalBaseStyles } from "../../styles/componentStyles";
 import { createCardStyles, createListStyles, createTextStyles } from "../../styles/globalStyles";

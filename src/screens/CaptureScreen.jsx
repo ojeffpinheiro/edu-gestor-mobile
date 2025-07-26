@@ -15,7 +15,7 @@ import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@e
 import CameraCapture from '../components/capture/CameraCapture';
 import BlueColorDetector from '../components/capture/BlueColorDetector';
 import AppButton from '../components/capture/AppButton';
-import { Spacing } from '../styles/designTokens';
+import { BorderRadius, Shadow, Spacing, Typography } from '../styles/designTokens';
 import { useTheme } from '../context/ThemeContext';
 import { createContainerStyles, createButtonStyles, createTextStyles, createCardStyles } from '../styles/globalStyles';
 

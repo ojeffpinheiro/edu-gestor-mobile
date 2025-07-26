@@ -1,62 +1,57 @@
-import { StyleSheet } from "react-native";
-import { ColorScheme } from "./colors";
-import { BorderRadius, Shadow, Spacing, Typography } from "./designTokens";
+import { StyleSheet } from 'react-native';
+import { ColorScheme } from './colors';
+import { Spacing, BorderRadius, Shadow, Typography } from './designTokens';
 
-export const createCardStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    base: {
-      backgroundColor: colors.component.card,
-      borderRadius: BorderRadius.xl,
-      borderWidth: 1,
-      borderColor: colors.border.medium,
-      padding: Spacing.lg,
-      margin: Spacing.md,
-      ...Shadow(colors).sm,
-    },
-    elevated: {
-      ...Shadow(colors).md,
-      borderWidth: 1,
-      borderColor: colors.border.light,
-    },
-    success: {
-      backgroundColor: colors.feedback.success + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.success,
-      padding: Spacing.md,
-      borderRadius: BorderRadius.sm,
-    },
-    error: {
-      backgroundColor: colors.feedback.error + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.error,
-      padding: Spacing.md,
-      borderRadius: BorderRadius.sm,
-    },
-    stats: {
-      borderLeftWidth: 4,
-      padding: Spacing.lg,
-    },
-    examItem: {
-      padding: Spacing.lg,
-      marginBottom: Spacing.sm,
-    },
-    correctionResult: {
-      padding: Spacing.lg,
-    }
-  });
-};
-
-export const getListStyles = (colors: ColorScheme) => ({
-  borderWidth: 1,
-  borderRadius: BorderRadius.lg,
-  padding: Spacing.md,
-  marginBottom: Spacing.sm,
-  borderColor: colors.border,
-  backgroundColor: colors.component.card,
+export const createCardStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Base card
+  base: {
+    backgroundColor: colors.component.card,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.lg,
+    margin: Spacing.md,
+    ...Shadow(colors).sm,
+    borderWidth: 1,
+    borderColor: colors.border.medium,
+  },
+  elevated: {
+    ...Shadow(colors).md,
+    borderWidth: 1,
+    borderColor: colors.border.light,
+  },
+  // Variantes de feedback
+  success: {
+    backgroundColor: colors.feedback.success + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.success,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+  },
+  error: {
+    backgroundColor: colors.feedback.error + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.error,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.sm,
+  },
+  // Variante para estatísticas
+  stats: {
+    borderLeftWidth: 4,
+    padding: Spacing.lg,
+  },
+  // Variante para exames
+  examItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: Spacing.md,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.sm,
+  },
 });
 
 export const createButtonStyles = (colors: ColorScheme) => {
   const base = StyleSheet.create({
+    // Base button styles
     primary: {
       backgroundColor: colors.primary.main,
       paddingVertical: Spacing.md,
@@ -83,10 +78,25 @@ export const createButtonStyles = (colors: ColorScheme) => {
     round: {
       borderRadius: BorderRadius.round,
       padding: Spacing.sm,
-    }
+    },
+    // Sizes
+    sm: {
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+    },
+    md: {
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+    },
+    lg: {
+      paddingVertical: Spacing.lg,
+      paddingHorizontal: Spacing.xl,
+    },
   });
+
   return {
     ...base,
+    // Text styles
     text: {
       color: colors.text.onPrimary,
       fontSize: Typography.fontSize.md,
@@ -95,6 +105,7 @@ export const createButtonStyles = (colors: ColorScheme) => {
     secondaryText: {
       color: colors.text.primary,
     },
+    // Variants
     icon: {
       marginRight: Spacing.sm,
     },
@@ -117,52 +128,37 @@ export const createButtonStyles = (colors: ColorScheme) => {
   };
 };
 
-export const createBaseStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    // Containers
-    screenContainer: {
-      flex: 1,
-      padding: Spacing.md,
-      backgroundColor: colors.background.primary,
-    },
-    centeredContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
-      padding: Spacing.md,
-      backgroundColor: colors.background.primary,
-    },
-    fullScreenOverlay: {
-      ...StyleSheet.absoluteFillObject,
-      justifyContent: 'center',
-      alignItems: 'center',
-      backgroundColor: 'rgba(0,0,0,0.5)',
-    },
-
-    // Text styles
-    heading1: {
-      fontSize: Typography.fontSize.xxl,
-      fontWeight: Typography.fontWeight.bold,
-      color: colors.text.primary,
-      lineHeight: Typography.lineHeight.xxl,
-      marginBottom: Spacing.sm,
-    },
-    heading2: {
-      fontSize: Typography.fontSize.xl,
-      fontWeight: Typography.fontWeight.semibold,
-      color: colors.text.primary,
-      lineHeight: Typography.lineHeight.xl,
-      marginBottom: Spacing.xs,
-    },
-    bodyText: {
-      fontSize: Typography.fontSize.md,
-      color: colors.text.secondary,
-      lineHeight: Typography.lineHeight.md,
-    },
-  });
-};
+export const createContainerStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Containers base
+  screenContainer: {
+    flex: 1,
+    padding: Spacing.md,
+    backgroundColor: colors.background.primary,
+  },
+  centeredContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: Spacing.md,
+    backgroundColor: colors.background.primary,
+  },
+  fullScreenOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  scrollContainer: {
+    flex: 1,
+  },
+  buttonContainer: {
+    width: '100%',
+    gap: Spacing.md,
+  },
+});
 
 export const createTextStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Headings
   heading1: {
     fontSize: Typography.fontSize.xxl,
     fontWeight: Typography.fontWeight.bold,
@@ -181,11 +177,13 @@ export const createTextStyles = (colors: ColorScheme) => StyleSheet.create({
     color: colors.text.primary,
     marginBottom: Spacing.xs,
   },
+  // Body text
   body: {
     fontSize: Typography.fontSize.md,
     color: colors.text.secondary,
     lineHeight: Typography.lineHeight.md,
   },
+  // Captions and labels
   caption: {
     fontSize: Typography.fontSize.sm,
     color: colors.text.secondary,
@@ -196,29 +194,30 @@ export const createTextStyles = (colors: ColorScheme) => StyleSheet.create({
     color: colors.text.primary,
     marginBottom: Spacing.xs,
   },
-  // Variantes
+  // Modifiers
   centered: {
     textAlign: 'center',
   },
   uppercase: {
     textTransform: 'uppercase',
   },
+  bold: {
+    fontWeight: Typography.fontWeight.bold,
+  },
+  semibold: {
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  // Feedback variants
   success: {
     color: colors.feedback.success,
   },
   error: {
     color: colors.feedback.error,
   },
-  bold: {
-    fontWeight: Typography.fontWeight.bold,
-  },
-  semibold: {
-    fontWeight: Typography.fontWeight.semibold,
-  }
-
 });
 
 export const createListStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Base list item
   item: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -230,25 +229,83 @@ export const createListStyles = (colors: ColorScheme) => StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border.light,
   },
+  // States
   selected: {
     borderColor: colors.primary.main,
     backgroundColor: colors.primary.main + '10',
-  }
+  },
+  correct: {
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.success,
+    backgroundColor: colors.feedback.success + '20',
+  },
+  incorrect: {
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.error,
+    backgroundColor: colors.feedback.error + '20',
+  },
 });
 
 export const createNavigationBaseStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Tab bar
   tabBar: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     paddingVertical: Spacing.sm,
     borderTopWidth: StyleSheet.hairlineWidth,
     backgroundColor: colors.background.secondary,
+    borderTopColor: colors.border.light,
   },
+  // Tab item
   tabItem: {
     alignItems: 'center',
     padding: Spacing.sm,
   },
   tabLabel: {
     marginTop: Spacing.xs,
-  }
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+  },
+  // States
+  activeTabLabel: {
+    color: colors.primary.main,
+  },
+  inactiveTabLabel: {
+    color: colors.text.secondary,
+    opacity: 0.6,
+  },
+});
+
+export const createInputStyles = (colors: ColorScheme) => StyleSheet.create({
+  // Input container
+  container: {
+    position: 'relative',
+    marginBottom: Spacing.lg,
+  },
+  label: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border.light,
+    borderRadius: BorderRadius.md,
+    backgroundColor: colors.background.secondary,
+    paddingHorizontal: Spacing.md,
+  },
+  input: {
+    flex: 1,
+    fontSize: Typography.fontSize.md,
+    color: colors.text.primary,
+    paddingVertical: Spacing.md,
+    fontWeight: Typography.fontWeight.medium,
+  },
+  focused: {
+    borderColor: colors.primary.main,
+    ...Shadow(colors).xs,
+  },
 });

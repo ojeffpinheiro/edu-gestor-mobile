@@ -2,9 +2,10 @@
 import { Dimensions, PixelRatio, Platform, ScaledSize } from 'react-native';
 
 const { width, height }: ScaledSize = Dimensions.get('window');
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
-// Base de referência (iPhone 11)
-const BASE_WIDTH = 414;
+// Base width for scaling (design was made for this width)
+const BASE_WIDTH = 375;
 const BASE_HEIGHT = 896;
 
 // Verificar se é tablet
@@ -47,6 +48,11 @@ export const scaleFont = (size: number) => {
 // Gerar proporções para Grid Layout
 export const gridUnits = (units: number) => {
   return (width / 12) * units;
+};
+
+export const scaleSize = (size: number) => {
+  const scaleFactor = SCREEN_WIDTH / BASE_WIDTH;
+  return Math.round(PixelRatio.roundToNearestPixel(size * scaleFactor));
 };
 
 // Verificar orientação

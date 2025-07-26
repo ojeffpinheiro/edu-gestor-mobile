@@ -1,5 +1,6 @@
 import { Platform } from 'react-native';
 import { ColorScheme } from './colors';
+import { scaleFont } from '../utils/responsiveUtils';
 
 export const Spacing = {
   none: 0,
@@ -63,6 +64,7 @@ export const Shadow = (colors: ColorScheme) => ({
   }),
 });
 
+
 export const Typography = {
   fontFamily: Platform.select({
     ios: 'System',
@@ -70,13 +72,13 @@ export const Typography = {
     default: 'System',
   }),
   fontSize: {
-    xs: 12,
-    sm: 14,
-    md: 16,
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 32,
+    xs: scaleFont(12),
+    sm: scaleFont(14),
+    md: scaleFont(16),
+    lg: scaleFont(18),
+    xl: scaleFont(20),
+    xxl: scaleFont(24),
+    xxxl: scaleFont(32),
   },
   fontWeight: {
     light: '300' as '300',
@@ -87,12 +89,12 @@ export const Typography = {
     extrabold: '800' as '800',
   },
   lineHeight: {
-    xs: 16,
-    sm: 20,
-    md: 24,
-    lg: 28,
-    xl: 32,
-    xxl: 36,
+    xs: scaleFont(16),
+    sm: scaleFont(20),
+    md: scaleFont(24),
+    lg: scaleFont(28),
+    xl: scaleFont(32),
+    xxl: scaleFont(36),
   },
   button: {
     fontSize: 16,

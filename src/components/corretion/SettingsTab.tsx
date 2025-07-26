@@ -5,7 +5,11 @@ import { useTheme } from '../../context/ThemeContext';
 import createSettingsTabStyles from './SettingsTabStyles';
 import Button from '../common/Button';
 
-const SettingsTab = ({ answerKey }) => {
+interface SettingsTabProps {
+  answerKey?: string[];
+}
+
+const SettingsTab: React.FC<SettingsTabProps> = ({ answerKey = [] }) => {
   const { colors } = useTheme();
   const styles = createSettingsTabStyles(colors);
 
@@ -15,12 +19,14 @@ const SettingsTab = ({ answerKey }) => {
 
       <View style={styles.settingsSection}>
         <Text style={styles.settingsLabel}>Gabarito Atual</Text>
-        <Text style={styles.answerKeyText}>{answerKey.join(', ')}</Text>
+        <Text style={styles.answerKeyText}>
+          {answerKey.length > 0 ? answerKey.join(', ') : 'Nenhum gabarito definido'}
+        </Text>
 
         <Button
           variant="outline"
-          onPress={() => { }}
-          icon={<Settings size={20} color={colors.gray[500]} />}
+          onPress={() => {}}
+          icon={<Settings size={20} color={colors.text.secondary} />}
           title="Editar Gabarito"
           style={styles.settingsButton}
           textStyle={styles.settingsButtonText}
@@ -31,8 +37,8 @@ const SettingsTab = ({ answerKey }) => {
         <Text style={styles.settingsLabel}>Configurações da Prova</Text>
         <Button
           variant="outline"
-          onPress={() => { }}
-          icon={<Plus size={20} color={colors.gray[500]} />}
+          onPress={() => {}}
+          icon={<Plus size={20} color={colors.text.secondary} />}
           title="Nova Prova"
           style={styles.settingsButton}
           textStyle={styles.settingsButtonText}

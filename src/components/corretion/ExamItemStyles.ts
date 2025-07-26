@@ -4,46 +4,50 @@ import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 
 export const createExamItemStyles = (colors: ColorScheme) => StyleSheet.create({
   examItem: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.background.secondary,
     padding: Spacing.lg,
     borderRadius: BorderRadius.md,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border.light,
     marginBottom: Spacing.sm,
   },
   examHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: Spacing.xs,
+    marginBottom: Spacing.sm,
   },
   studentName: {
     fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.semibold,
-    color: colors.textPrimary,
+    color: colors.text.primary,
   },
   studentId: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
+    lineHeight: Typography.lineHeight.sm,
   },
   examDetails: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    gap: Spacing.md
+    gap: Spacing.md,
+    marginTop: Spacing.xs,
   },
   examSubject: {
     fontSize: Typography.fontSize.sm,
-    color: colors.border,
+    color: colors.text.secondary,
   },
   examDate: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
   examScore: {
-    fontSize: Typography.fontSize.sm,
+    fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.semibold,
+    marginLeft: 'auto',
   },
   examStatus: {
-    marginLeft: Spacing.xs,
+    marginLeft: Spacing.sm,
   },
 });

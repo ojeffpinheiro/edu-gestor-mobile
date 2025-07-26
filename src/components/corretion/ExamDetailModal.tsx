@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text, Modal, ScrollView } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
@@ -5,14 +6,30 @@ import { createExamDetailModalStyles } from './ExamDetailModalStyles';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 
-const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
+interface ExamDetailModalProps {
+  visible: boolean;
+  exam: {
+    answers: any[];
+    score: number | null;
+    studentName: string;
+    studentId: string;
+    subject: string;
+  };
+  answerKey: any[];
+  onClose: () => void;
+}
+
+const ExamDetailModal: React.FC<ExamDetailModalProps> = ({ 
+  visible, 
+  exam, 
+  answerKey, 
+  onClose 
+}) => {
   const { colors } = useTheme();
   const styles = createExamDetailModalStyles(colors);
 
-  // Retorno early se não estiver visível ou dados faltando
   if (!visible || !exam || !answerKey) return null;
 
-  // Validação robusta dos dados de entrada
   const safeExam = {
     ...exam,
     answers: Array.isArray(exam.answers) ? exam.answers : [],
@@ -21,16 +38,15 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
 
   const safeAnswerKey = Array.isArray(answerKey) ? answerKey : [];
 
-  // Calcula correções de forma segura
   const calculateCorrections = () => {
     try {
       const result = correctExam(safeExam.answers, safeAnswerKey);
       return {
-        score: safeExam.score !== null ? safeExam.score : result.score, // Mantém o score existente se disponível
+        score: safeExam.score !== null ? safeExam.score : result.score,
         corrections: result.corrections || []
       };
     } catch (error) {
-      console.error("Erro ao calcular correções:", error);
+      console.error("Error calculating corrections:", error);
       return { score: 0, corrections: [] };
     }
   };
@@ -46,22 +62,26 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
     >
       <View style={styles.modalOverlay}>
         <View style={styles.modalContent}>
-          {/* Cabeçalho */}
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Detalhes da Prova</Text>
             <Button
               variant="text"
               onPress={onClose}
-              icon={<XCircle size={24} color={colors.text} />} />
+              icon={<XCircle size={24} color={colors.text.primary} />}
+            />
           </View>
 
-          {/* Corpo */}
           <ScrollView style={styles.modalBody}>
             <View style={styles.studentInfo}>
               <Text style={styles.studentNameModal}>{safeExam.studentName}</Text>
               <Text style={styles.studentIdModal}>ID: {safeExam.studentId}</Text>
               <Text style={styles.examSubjectModal}>{safeExam.subject}</Text>
-              <Text style={[styles.scoreModal, { color: score >= 6 ? colors.secondary : colors.error }]}>
+              <Text style={[
+                styles.scoreModal, 
+                { 
+                  color: score >= 6 ? colors.feedback.success : colors.feedback.error 
+                }
+              ]}>
                 Nota: {score.toFixed(1)}
               </Text>
             </View>
@@ -74,9 +94,9 @@ const ExamDetailModal = ({ visible, exam, answerKey, onClose }) => {
                   <Text style={styles.studentAnswerText}>Resposta: {item.studentAnswer}</Text>
                   <Text style={styles.correctAnswerText}>Gabarito: {item.correctAnswer}</Text>
                   {item.isCorrect ? (
-                    <CheckCircle size={16} color={colors.secondary} />
+                    <CheckCircle size={16} color={colors.feedback.success} />
                   ) : (
-                    <XCircle size={16} color={colors.error} />
+                    <XCircle size={16} color={colors.feedback.error} />
                   )}
                 </View>
               ))}

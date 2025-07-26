@@ -6,12 +6,27 @@ import { useTheme } from '../../context/ThemeContext';
 import createReportsTabStyles from './ReportsTabStyles';
 import Button from '../common/Button';
 
-const ReportsTab = ({ report }) => {
+interface ReportData {
+  totalExams: number;
+  averageScore: number;
+  passedStudents: number;
+  passRate: number;
+}
+
+interface ReportsTabProps {
+  report?: ReportData | null;
+}
+
+const ReportsTab: React.FC<ReportsTabProps> = ({ report = null }) => {
   const { colors } = useTheme();
   const styles = createReportsTabStyles(colors);
 
   if (!report) {
-    return <Text>Carregando relatório...</Text>;
+    return (
+      <View style={styles.tabContent}>
+        <Text style={styles.loadingText}>Carregando relatório...</Text>
+      </View>
+    );
   }
 
   return (
@@ -23,33 +38,33 @@ const ReportsTab = ({ report }) => {
           title="Total de Provas"
           value={report.totalExams}
           icon={FileText}
-          color={colors.primary}
+          color={colors.primary.main}
         />
         <StatsCard
           title="Média Geral"
-          value={report.averageScore}
+          value={report.averageScore.toFixed(1)}
           icon={Target}
-          color={colors.secondary}
+          color={colors.feedback.info}
         />
         <StatsCard
           title="Aprovados"
           value={report.passedStudents}
           icon={Trophy}
-          color={colors.warning}
+          color={colors.feedback.success}
         />
         <StatsCard
           title="Taxa de Aprovação"
           value={`${report.passRate}%`}
           icon={TrendingUp}
-          color={colors.accent}
+          color={colors.secondary.main}
         />
       </View>
 
       <View style={styles.reportActions}>
         <Button
           variant="primary"
-          onPress={() => { }}
-          icon={<Download size={20} color={colors.card} />}
+          onPress={() => {}}
+          icon={<Download size={20} color={colors.text.onPrimary} />}
           title="Exportar Relatório"
           style={styles.primaryButton}
           textStyle={styles.buttonText}

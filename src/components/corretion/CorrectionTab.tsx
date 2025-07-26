@@ -6,7 +6,26 @@ import createCorrectionTabStyles from './CorrectionTabStyles';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 
-const CorrectionTab = ({ exams = [], answerKey = [], onExamPress = () => { }, onProcessAll = () => { } }) => {
+interface CorrectionTabProps {
+  exams?: Array<{
+    id: string;
+    studentName: string;
+    studentId: string;
+    subject: string;
+    score?: number;
+    status?: string;
+  }>;
+  answerKey?: any[];
+  onExamPress?: (exam: any) => void;
+  onProcessAll?: () => void;
+}
+
+const CorrectionTab: React.FC<CorrectionTabProps> = ({ 
+  exams = [], 
+  answerKey = [], 
+  onExamPress = () => {}, 
+  onProcessAll = () => {} 
+}) => {
   const { colors } = useTheme();
   const styles = createCorrectionTabStyles(colors);
 
@@ -18,7 +37,7 @@ const CorrectionTab = ({ exams = [], answerKey = [], onExamPress = () => { }, on
         <Button
           variant="primary"
           onPress={onProcessAll}
-          icon={<CheckCircle size={20} color={colors.textPrimary} />}
+          icon={<CheckCircle size={20} color={colors.text.onPrimary} />}
           title="Corrigir Todas"
           style={styles.primaryButton}
           textStyle={styles.buttonText}
@@ -35,5 +54,4 @@ const CorrectionTab = ({ exams = [], answerKey = [], onExamPress = () => { }, on
   );
 };
 
-
-export default CorrectionTab
+export default CorrectionTab;

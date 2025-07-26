@@ -4,35 +4,44 @@ import { ColorScheme } from "../../styles/colors";
 
 const createReportsTabStyles = (colors: ColorScheme) => StyleSheet.create({
   tabContent: {
-    padding: Spacing.md,
+    flex: 1,
+    padding: Spacing.lg,
+    backgroundColor: colors.background.primary,
   },
   sectionTitle: {
     fontSize: Typography.fontSize.lg,
     fontWeight: Typography.fontWeight.semibold,
-    color: colors.textPrimary,
-    marginBottom: Spacing.md,
+    color: colors.text.primary,
+    marginBottom: Spacing.lg,
   },
   statsGrid: {
-    gap: Spacing.xs,
+    gap: Spacing.md,
     marginBottom: Spacing.xxl,
   },
   primaryButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: colors.primary,
-    paddingVertical: Spacing.sm,
-    paddingHorizontal: Spacing.md,
+    backgroundColor: colors.primary.main,
+    paddingVertical: Spacing.md,
+    paddingHorizontal: Spacing.lg,
     borderRadius: BorderRadius.md,
-    gap: Spacing.xs,
+    gap: Spacing.sm,
   },
   buttonText: {
-    color: colors.gray[100],
+    color: colors.text.onPrimary,
     fontSize: Typography.fontSize.md,
     fontWeight: Typography.fontWeight.semibold,
   },
   reportActions: {
     alignItems: 'center',
+    marginTop: Spacing.lg,
+  },
+  loadingText: {
+    fontSize: Typography.fontSize.md,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginTop: Spacing.xl,
   },
 });
 

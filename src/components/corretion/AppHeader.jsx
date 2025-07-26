@@ -1,3 +1,4 @@
+import React from 'react';
 import { View, Text } from 'react-native';
 import { User } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
@@ -14,9 +15,10 @@ const AppHeader = () => {
       <View style={styles.headerRight}>
         <Button
           variant="text"
-          onPress={() => { }}
+          onPress={() => {}}
           style={styles.headerButton}
-          icon={<User size={24} color={colors.gray[500]} />} />
+          icon={<User size={24} color={colors.text.secondary} />}
+        />
       </View>
     </View>
   );

@@ -5,6 +5,11 @@ import { useTheme } from '../../context/ThemeContext';
 import createTabNavigationStyles from './TabNavigationStyles';
 import Button from '../common/Button';
 
+interface TabNavigationProps {
+  activeTab: string;
+  setActiveTab: (tabId: string) => void;
+}
+
 const tabs = [
   {
     id: 'correction',
@@ -23,7 +28,7 @@ const tabs = [
   }
 ];
 
-const TabNavigation = ({ activeTab, setActiveTab }) => {
+const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }) => {
   const { colors } = useTheme();
   const styles = createTabNavigationStyles(colors);
 
@@ -37,18 +42,15 @@ const TabNavigation = ({ activeTab, setActiveTab }) => {
           icon={
             <tab.icon
               size={24}
-              color={activeTab === tab.id ? colors.textPrimary : colors.gray[500]}
+              color={activeTab === tab.id ? colors.primary.main : colors.text.secondary}
             />
           }
           title={tab.label}
           textStyle={[
             styles.navText,
-            activeTab === tab.id && styles.navTextActive
+            activeTab === tab.id && { color: colors.primary.main }
           ]}
-          style={[
-            styles.navItem,
-            activeTab === tab.id && styles.navItemActive
-          ]}
+          style={styles.navItem}
           iconPosition="top"
         />
       ))}

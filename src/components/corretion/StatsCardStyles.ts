@@ -4,12 +4,12 @@ import { ColorScheme } from "../../styles/colors";
 
 export const createStatsCardStyles = (colors: ColorScheme) => StyleSheet.create({
   statsCard: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.background.secondary,
     padding: Spacing.lg,
     borderRadius: BorderRadius.md,
     borderLeftWidth: 4,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: StyleSheet.hairlineWidth,
+    borderColor: colors.border.light,
   },
   statsCardContent: {
     flexDirection: 'row',
@@ -18,12 +18,13 @@ export const createStatsCardStyles = (colors: ColorScheme) => StyleSheet.create(
   },
   statsTitle: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
     marginBottom: Spacing.xs,
+    lineHeight: Typography.lineHeight.sm,
   },
   statsValue: {
     fontSize: Typography.fontSize.xxl,
     fontWeight: Typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.text.primary,
   },
 });

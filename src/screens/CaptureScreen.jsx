@@ -8,7 +8,6 @@ import {
   ActivityIndicator, 
   Alert,
   Dimensions,
-  useColorScheme
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
@@ -16,13 +15,17 @@ import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@e
 import CameraCapture from '../components/capture/CameraCapture';
 import BlueColorDetector from '../components/capture/BlueColorDetector';
 import AppButton from '../components/capture/AppButton';
+import { BorderRadius, Shadow, Spacing, Typography } from '../styles/designTokens';
+import { useTheme } from '../context/ThemeContext';
 
 const CaptureScreen = () => {
   const [currentScreen, setCurrentScreen] = useState('main'); // 'main', 'camera', 'colorDetector'
   const [selectedImage, setSelectedImage] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orientation, setOrientation] = useState('PORTRAIT');
-  const colorScheme = useColorScheme();
+  const { colors } = useTheme()
+
+  const styles = createCaptureScreenStyles(colors)
   
   // Monitorar orientação do dispositivo
   useEffect(() => {
@@ -131,23 +134,14 @@ const CaptureScreen = () => {
   // Tela Principal
   // Tela Principal
   return (
-    <View style={[
-      styles.container, 
-      colorScheme === 'dark' && styles.darkContainer
-    ]}>
-      <Text style={[
-        styles.title,
-        colorScheme === 'dark' && styles.darkTitle
-      ]}>
+    <View style={styles.screenContainer}>
+      <Text style={styles.title}>
         Selecione uma imagem
       </Text>
 
       {!selectedImage && !isProcessing && (
-        <View style={[
-          styles.imagePlaceholder, 
-          colorScheme === 'dark' && styles.darkImagePlaceholder
-        ]}>
-          <Text style={colorScheme === 'dark' && styles.darkText}>
+        <View style={styles.imagePlaceholder}>
+          <Text>
             Nenhuma imagem selecionada
           </Text>
         </View>
@@ -156,10 +150,7 @@ const CaptureScreen = () => {
       {isProcessing ? (
         <View style={styles.processingContainer}>
           <ActivityIndicator size="large" color="#4285F4" />
-          <Text style={[
-            styles.processingText,
-            colorScheme === 'dark' && styles.darkText
-          ]}>
+          <Text style={styles.processingText}>
             Processando...
           </Text>
         </View>
@@ -231,28 +222,18 @@ const CaptureScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
+export const createCaptureScreenStyles = (colors) => StyleSheet.create({
+  screenContainer: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-    backgroundColor: '#f5f5f5',
-  },
-  darkContainer: {
-    backgroundColor: '#121212',
+    padding: Spacing.lg,
+    backgroundColor: colors.background.primary,
   },
   title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 20,
-    color: '#333',
-  },
-  darkTitle: {
-    color: '#fff',
-  },
-  darkText: {
-    color: '#fff',
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+    color: colors.text.primary,
+    marginBottom: Spacing.xl,
+    textAlign: 'center',
   },
   imagePlaceholder: {
     width: '100%',
@@ -260,102 +241,94 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#ddd',
-    borderRadius: 10,
-    marginVertical: 20,
-    backgroundColor: '#f0f0f0',
-  },
-  darkImagePlaceholder: {
-    backgroundColor: '#1e1e1e',
-    borderColor: '#444',
+    borderColor: colors.border.light,
+    borderRadius: BorderRadius.md,
+    marginVertical: Spacing.lg,
+    backgroundColor: colors.background.secondary,
   },
   buttonContainer: {
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
-    marginTop: 20,
+    marginTop: Spacing.lg,
   },
   button: {
-    padding: 15,
-    borderRadius: 10,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
     width: '100%',
     alignItems: 'center',
-    marginBottom: 10,
-  },
-  disabledButton: {
-    opacity: 0.6,
+    marginBottom: Spacing.md,
+    ...Shadow(colors).xs,
   },
   cameraButton: {
-    backgroundColor: '#4285F4',
+    backgroundColor: colors.primary.main,
   },
   galleryButton: {
-    backgroundColor: '#34A853',
+    backgroundColor: colors.secondary.main,
   },
   colorDetectorButton: {
-    backgroundColor: '#1a73e8',
-    marginTop: 10,
+    backgroundColor: colors.primary.light,
+    marginTop: Spacing.md,
   },
   buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+    color: colors.text.onPrimary,
+    fontWeight: Typography.fontWeight.bold,
+    fontSize: Typography.fontSize.md,
   },
   imageContainer: {
     width: '100%',
     height: 300,
-    marginVertical: 20,
-    borderRadius: 10,
+    marginVertical: Spacing.lg,
+    borderRadius: BorderRadius.md,
     overflow: 'hidden',
     borderWidth: 1,
-    borderColor: '#ddd',
-  },
-  darkImageContainer: {
-    borderColor: '#444',
+    borderColor: colors.border.light,
   },
   image: {
     width: '100%',
     height: '100%',
   },
   processingContainer: {
-    marginTop: 30,
+    marginTop: Spacing.xl,
     alignItems: 'center',
   },
   processingText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: '#555',
+    marginTop: Spacing.md,
+    fontSize: Typography.fontSize.md,
+    color: colors.text.secondary,
   },
   navigationButtons: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '100%',
-    marginTop: 30,
+    marginTop: Spacing.xl,
   },
   navButton: {
-    padding: 15,
-    borderRadius: 10,
+    padding: Spacing.lg,
+    borderRadius: BorderRadius.md,
     width: '45%',
     alignItems: 'center',
+    ...Shadow(colors).xs,
   },
   backButtonNav: {
-    backgroundColor: '#EA4335',
+    backgroundColor: colors.feedback.error,
   },
   nextButton: {
-    backgroundColor: '#FBBC05',
+    backgroundColor: colors.feedback.warning,
   },
   navButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 16,
+    color: colors.text.onPrimary,
+    fontWeight: Typography.fontWeight.bold,
+    fontSize: Typography.fontSize.md,
   },
   backButton: {
     position: 'absolute',
-    top: Platform.OS === 'ios' ? 50 : 20,
-    left: 20,
-    padding: 10,
-    backgroundColor: 'rgba(234, 67, 53, 0.8)',
-    borderRadius: 5,
+    top: Spacing.xxl,
+    left: Spacing.lg,
+    padding: Spacing.md,
+    backgroundColor: colors.feedback.error + 'CC',
+    borderRadius: BorderRadius.sm,
     zIndex: 10,
   },
 });

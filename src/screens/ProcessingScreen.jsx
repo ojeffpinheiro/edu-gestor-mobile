@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 
@@ -10,8 +10,12 @@ import DetailsScreen from '../components/process/DetailsScreen';
 import ResultsScreen from '../components/process/ResultsScreen';
 import SettingsScreen from '../components/process/SettingsScreen';
 import Navigation from '../components/process/Navigation';
+import { useTheme } from '../context/ThemeContext';
 
 const ProcessingScreen = () => {
+  const { colors } = useTheme();
+  const styles = createProcessingScreenStyles(colors);
+
   const [currentScreen, setCurrentScreen] = useState('home');
   const [capturedImage, setCapturedImage] = useState(null);
   const [processingStatus, setProcessingStatus] = useState('idle');
@@ -116,6 +120,13 @@ const ProcessingScreen = () => {
     }
   };
 
+  const resetProcessing = () => {
+    setCapturedImage(null);
+    setCorrectionResults(null);
+    setProcessingStatus('idle');
+    setCurrentScreen('home');
+  };
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'home':
@@ -152,11 +163,18 @@ const ProcessingScreen = () => {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#f5f5f5' }}>
+    <View style={styles.screenContainer}>
       <Navigation currentScreen={currentScreen} onNavigate={setCurrentScreen} />
       {renderScreen()}
     </View>
   );
 };
+
+const createProcessingScreenStyles = (colors) => StyleSheet.create({
+  screenContainer: {
+    flex: 1,
+    backgroundColor: colors.background.primary,
+  },
+});
 
 export default ProcessingScreen;

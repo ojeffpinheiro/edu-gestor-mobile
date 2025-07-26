@@ -8,6 +8,8 @@ import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import CorrectionTab from '../components/corretion/CorrectionTab';
+import { useTheme } from '../context/ThemeContext';
+import { Spacing } from '../styles/designTokens';
 
 const CorrectionScreen = () => {
   const [activeTab, setActiveTab] = useState('correction');
@@ -46,6 +48,9 @@ const CorrectionScreen = () => {
       totalQuestions: 10
     }
   ]);
+
+  const { colors } = useTheme();
+  const styles = createCorrectionScreenStyles(colors);
 
   const [answerKey, setAnswerKey] = useState(['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B']);
   const [modalVisible, setModalVisible] = useState(false);
@@ -120,13 +125,14 @@ const CorrectionScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
+const createCorrectionScreenStyles = (colors) => StyleSheet.create({
+  screenContainer: {
     flex: 1,
-    backgroundColor: '#F9FAFB',
+    backgroundColor: colors.background.primary,
   },
   content: {
     flex: 1,
+    padding: Spacing.lg,
   },
 });
 

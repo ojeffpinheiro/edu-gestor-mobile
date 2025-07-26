@@ -1,10 +1,19 @@
 import React from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, ScrollView } from 'react-native';
 import { styles } from '../styles/commun';
 import Button from '../components/common/Button';
 import SectionHeader from '../components/common/SectionHeader';
 
 export default function HomeScreen({ navigation }) {
+  const menuItems = [
+    { title: 'Autenticação', screen: 'Auth' },
+    { title: 'Identificação', screen: 'Identification' },
+    { title: 'Captura', screen: 'Capture' },
+    { title: 'Processamento', screen: 'Processing' },
+    { title: 'Relatórios', screen: 'Report' },
+    { title: 'Correção', screen: 'Correction' }
+  ];
+
   return (
     <View style={styles.container}>
       <SectionHeader
@@ -14,46 +23,16 @@ export default function HomeScreen({ navigation }) {
       />
 
       <ScrollView contentContainerStyle={styles.buttonContainer}>
-        <Button
-          title="Autenticação"
-          onPress={() => navigation.navigate('Auth')}
-          variant="primary"
-          style={{ marginBottom: 10 }}
-        />
-
-        <Button
-          title="Identificação"
-          onPress={() => navigation.navigate('Identification')}
-          variant="primary"
-          style={{ marginBottom: 10 }}
-        />
-
-        <Button
-          title="Captura"
-          onPress={() => navigation.navigate('Capture')}
-          variant="primary"
-          style={{ marginBottom: 10 }}
-        />
-
-        <Button
-          title="Processamento"
-          onPress={() => navigation.navigate('Processing')}
-          variant="primary"
-          style={{ marginBottom: 10 }}
-        />
-
-        <Button
-          title="Relatórios"
-          onPress={() => navigation.navigate('Report')}
-          variant="primary"
-          style={{ marginBottom: 10 }}
-        />
-
-        <Button
-          title="Correção"
-          onPress={() => navigation.navigate('Correction')}
-          variant="primary"
-        />
+        {menuItems.map((item, index) => (
+          <Button
+            key={index}
+            title={item.title}
+            onPress={() => navigation.navigate(item.screen)}
+            variant="primary"
+            style={styles.menuButton}
+            textStyle={styles.buttonText}
+          />
+        ))}
       </ScrollView>
     </View>
   );

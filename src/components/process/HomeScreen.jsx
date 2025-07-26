@@ -70,7 +70,7 @@ const HomeScreen = ({
             {processingStatus === 'completed' && (
               <View style={styles.successIndicator}>
                 <CheckCircle size={20} color={colors.feedback.success} />
-                <Text style={styles.successText}>Processamento concluído!</Text>
+                <Text style={styles.successStatusText}>Processamento concluído!</Text>
               </View>
             )}
           </View>
@@ -111,7 +111,7 @@ const HomeScreen = ({
               <Text style={styles.bodyText}>Nota:</Text>
               <Text style={[
                 styles.resultValue, 
-                correctionResults.score >= 70 ? styles.successText : styles.errorText
+                correctionResults.score >= 70 ? styles.successStatusText : styles.errorText
               ]}>
                 {correctionResults.score}%
               </Text>

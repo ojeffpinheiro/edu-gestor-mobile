@@ -41,5 +41,15 @@ export const createQuestionItemStyles = (colors: ColorScheme) => StyleSheet.crea
   answerValue: {
     fontWeight: Typography.fontWeight.semibold,
     color: colors.text.primary,
+  }, 
+  successBox: {
+    backgroundColor: colors.feedback.success + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.success,
+  },
+  errorBox: {
+    backgroundColor: colors.feedback.error + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.error,
   },
 });

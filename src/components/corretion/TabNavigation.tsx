@@ -2,8 +2,8 @@ import React from 'react';
 import { View } from 'react-native';
 import { CheckCircle, BarChart3, Settings } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import createTabNavigationStyles from './TabNavigationStyles';
 import Button from '../common/Button';
+import { createTabNavigationStyles } from './TabNavigationStyles';
 
 interface TabNavigationProps {
   activeTab: string;
@@ -51,7 +51,6 @@ const TabNavigation: React.FC<TabNavigationProps> = ({ activeTab, setActiveTab }
             activeTab === tab.id && { color: colors.primary.main }
           ]}
           style={styles.navItem}
-          iconPosition="top"
         />
       ))}
     </View>

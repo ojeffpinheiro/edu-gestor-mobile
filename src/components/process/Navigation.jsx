@@ -1,8 +1,8 @@
 import { View, Text } from 'react-native';
 import { Camera, BarChart3, Settings } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import createNavigationStyles from './NavigationStyles';
 import NavButton from './NavButton';
+import { createNavigationStyles } from './NavigationStyles';
 
 const Navigation = ({ currentScreen, onNavigate }) => {
   const { colors } = useTheme();

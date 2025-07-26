@@ -1,8 +1,8 @@
 import { View, Text, TextInput, Switch, ScrollView } from 'react-native';
 import { FileText, Scan, Settings, Download } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import createSettingsScreenStyles from './SettingsScreenStyles';
 import Button from '../common/Button';
+import { createSettingsScreenStyles } from './SettingsScreenStyles';
 
 const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
   const { colors } = useTheme();

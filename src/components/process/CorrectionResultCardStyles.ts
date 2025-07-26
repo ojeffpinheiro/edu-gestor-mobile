@@ -44,4 +44,12 @@ export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSh
     fontSize: Typography.fontSize.sm,
     color: colors.text.secondary,
   },
+  heading1: {
+    fontSize: Typography.fontSize.xxl,
+    fontWeight: Typography.fontWeight.bold,
+  },
+  heading2: {
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+  },
 });

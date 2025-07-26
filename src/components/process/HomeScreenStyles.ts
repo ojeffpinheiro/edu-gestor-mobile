@@ -8,6 +8,9 @@ export const createHomeScreenStyles = (colors: ColorScheme) => StyleSheet.create
     padding: Spacing.lg,
     backgroundColor: colors.background.primary,
   },
+  resultsCard: {
+    marginTop: Spacing.lg,
+  },
   heading1: {
     fontSize: Typography.fontSize.xxl,
     fontWeight: Typography.fontWeight.bold,
@@ -54,7 +57,7 @@ export const createHomeScreenStyles = (colors: ColorScheme) => StyleSheet.create
     alignItems: 'center',
     gap: Spacing.sm,
   },
-  successStatusText: {  // Renomeado de successText para evitar duplicação
+  successStatusText: {
     color: colors.feedback.success,
     fontSize: Typography.fontSize.sm,
   },

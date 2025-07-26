@@ -1,9 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
-import chroma from 'chroma-js';
 import { useTheme } from '../../context/ThemeContext';
-import { BorderRadius } from '../../styles/designTokens';
-import { ColorScheme } from '../../styles/colors';
+import { createReferencePointsStyles } from './CameraStyles';
 
 interface ReferencePointsProps {
   pointsStatus: { [key: number]: boolean };
@@ -154,94 +152,5 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
     </>
   );
 };
-
-const createReferencePointsStyles = (colors: ColorScheme) => StyleSheet.create({
-  guideFrame: {
-    width: '95%',
-    height: '65%',
-    borderWidth: 1,
-    position: 'relative',
-    borderColor: colors.border.medium,
-  },
-  corner: {
-    position: 'absolute',
-    width: 25,
-    height: 25,
-  },
-  cornerTL: {
-    top: -1,
-    left: -1,
-    borderRightWidth: 0,
-    borderBottomWidth: 0,
-  },
-  cornerTR: {
-    top: -1,
-    right: -1,
-    borderLeftWidth: 0,
-    borderBottomWidth: 0,
-  },
-  cornerBL: {
-    bottom: -1,
-    left: -1,
-    borderRightWidth: 0,
-    borderTopWidth: 0,
-  },
-  cornerBR: {
-    bottom: -1,
-    right: -1,
-    borderLeftWidth: 0,
-    borderTopWidth: 0,
-  },
-  point: {
-    position: 'absolute',
-    width: 30,
-    height: 30,
-    borderRadius: BorderRadius.round,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderColor: colors.border.medium,
-    transform: [{ translateX: -15 }, { translateY: -15 }]
-  },
-  pointText: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 12,
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-  scanLine: {
-    position: 'absolute',
-    width: '80%',
-    height: 2,
-    backgroundColor: 'rgba(0, 255, 0, 0.7)',
-  },
-  pointsFeedback: {
-    position: 'absolute',
-    top: 20,
-    alignSelf: 'center',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 10,
-    borderRadius: 20,
-  },
-  pointsText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  pointContainer: {
-    position: 'absolute',
-    alignItems: 'center',
-    transform: [{ translateX: -20 }, { translateY: -25 }],
-  },
-  percentageText: {
-    color: 'white',
-    fontSize: 10,
-    marginTop: 2,
-    fontWeight: 'bold',
-    textShadowColor: 'rgba(0,0,0,0.8)',
-    textShadowOffset: { width: 1, height: 1 },
-    textShadowRadius: 2,
-  },
-});
 
 export default ReferencePoints;

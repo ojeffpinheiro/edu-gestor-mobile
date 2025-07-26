@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { View, Image, StyleSheet, Text, Dimensions } from 'react-native';
 import * as tf from '@tensorflow/tfjs';
 import { calculateCentroids, detectShapes, loadAndProcessImage } from '../../utils/markUtils';
-import { ColorScheme } from '../../styles/colors';
+
 import { useTheme } from '../../context/ThemeContext';
-import chroma from 'chroma-js';
+import { createMarkAnalysisStyles } from './CameraStyles';
 
 interface Point {
   x: number;
@@ -35,7 +35,7 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
   const [marks, setMarks] = useState<Mark[]>([]);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const { colors } = useTheme();
-  const styles = createMarkAnalysisstyles(colors);
+  const styles = createMarkAnalysisStyles(colors);
 
   useEffect(() => {
     const analyzeImage = async () => {
@@ -113,43 +113,5 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
     </View>
   );
 };
-
-const createMarkAnalysisstyles= (colors: ColorScheme) => StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-  },
-  image: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
-  },
-  overlay: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-  },
-  cell: {
-    position: 'absolute',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.2)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  markedCell: {
-  backgroundColor: chroma(colors.feedback.success).alpha(0.3).css(),
-  borderColor: colors.feedback.success,
-  },
-  tooltip: {
-    position: 'absolute',
-    bottom: '100%',
-    backgroundColor: 'rgba(0,0,0,0.7)',
-    padding: 5,
-    borderRadius: 5,
-  },
-  tooltipText: {
-    color: 'white',
-    fontSize: 12,
-  },
-});
 
 export default MarkAnalysis;

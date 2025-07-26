@@ -2,9 +2,8 @@ import React from 'react';
 import { View, StyleSheet, Text } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-import { BorderRadius, Shadow, Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
-import { ColorScheme } from '../../styles/colors';
+import { createCaptureControlsStyles } from './CameraStyles';
 
 interface CaptureControlsProps {
   onCapture: () => void;
@@ -22,7 +21,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
   isProcessing
 }) => {
   const { colors } = useTheme();
-  const styles = createStyles(colors);
+  const styles = createCaptureControlsStyles(colors);
 
   const getAutoCaptureColor = () => {
     switch (autoCaptureMode) {
@@ -91,55 +90,5 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
     </View>
   );
 };
-
-const createStyles = (colors: ColorScheme) => StyleSheet.create({
-  container: {
-    position: 'absolute',
-    bottom: Spacing.xl,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.lg,
-  },
-  button: {
-    width: 50,
-    height: 50,
-    padding: 0,
-    ...Shadow(colors).xs,
-  },
-  galleryButton: {
-    backgroundColor: colors.primary.main,
-  },
-  captureButton: {
-    width: 70,
-    height: 70,
-    backgroundColor: colors.feedback.error,
-    borderWidth: 2,
-  },
-  disabledButton: {
-    opacity: 0.6,
-    backgroundColor: colors.gray[400],
-  },
-  autoCaptureContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    position: 'relative',
-  },
-  autoCaptureText: {
-    fontSize: 12,
-    marginTop: Spacing.xxs,
-    color: colors.text.primary,
-  },
-  indicator: {
-    position: 'absolute',
-    top: 4,
-    right: 4,
-    width: 8,
-    height: 8,
-    borderRadius: BorderRadius.round,
-  },
-});
 
 export default CaptureControls;

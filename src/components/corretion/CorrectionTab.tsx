@@ -12,6 +12,7 @@ interface CorrectionTabProps {
     studentName: string;
     studentId: string;
     subject: string;
+    examDate: string;
     score?: number;
     status?: string;
   }>;

@@ -19,8 +19,6 @@ const InfoBox = ({ title, items, variant = 'primary', style }: InfoBoxProps) => 
       styles.container, 
       { 
         backgroundColor: color + '10',
-        borderLeftWidth: 4,
-        borderLeftColor: color,
       }, 
       style
     ]}>

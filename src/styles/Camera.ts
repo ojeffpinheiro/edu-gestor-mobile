@@ -1,6 +1,6 @@
 import { StyleSheet } from "react-native";
-import { ColorScheme } from "../styles/colors";
-import { BorderRadius, Shadow, Spacing } from "../styles/designTokens";
+import { ColorScheme } from "./colors";
+import { BorderRadius, Shadow, Spacing } from "./designTokens";
 
 export const createCameraStyles = (colors: ColorScheme) => StyleSheet.create({
   container: {

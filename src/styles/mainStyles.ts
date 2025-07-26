@@ -23,6 +23,10 @@ export const createDesignSystem = (colors: ColorScheme) => {
         justifyContent: 'center',
         alignItems: 'center',
       },
+      buttonContainer: {
+        width: '100%',
+        gap: Spacing.md,
+      },
     }),
 
     // Cards
@@ -69,8 +73,9 @@ export const createDesignSystem = (colors: ColorScheme) => {
       primary: {
         backgroundColor: colors.primary.main,
         paddingVertical: Spacing.md,
-        paddingHorizontal: Spacing.lg,
+        paddingHorizontal: Spacing.xxl,
         borderRadius: BorderRadius.md,
+        marginVertical: Spacing.xs,
         alignItems: 'center',
         justifyContent: 'center',
         ...Shadow(colors).xs,

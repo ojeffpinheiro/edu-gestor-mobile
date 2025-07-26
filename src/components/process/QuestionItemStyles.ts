@@ -1,8 +1,7 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
-import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 import { createListStyles, createTextStyles } from "../../styles/globalStyles";
-
+import { Spacing } from "../../styles/designTokens";
 
 export const createQuestionItemStyles = (colors: ColorScheme) => {
   const lists = createListStyles(colors);
@@ -10,19 +9,13 @@ export const createQuestionItemStyles = (colors: ColorScheme) => {
 
   return StyleSheet.create({
     card: {
-      ...lists.item
+      ...lists.item,
     },
     correct: {
-      ...lists.item,
-      backgroundColor: colors.feedback.success + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.success,
+      ...lists.correct,
     },
     incorrect: {
-      ...lists.item,
-      backgroundColor: colors.feedback.error + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.error,
+      ...lists.incorrect,
     },
     questionNumber: {
       ...text.body,
@@ -37,19 +30,5 @@ export const createQuestionItemStyles = (colors: ColorScheme) => {
     answerText: {
       ...text.caption,
     },
-    answerValue: {
-      ...text.caption,
-      ...text.semibold,
-    },
-    successBox: {
-      backgroundColor: colors.feedback.success + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.success,
-    },
-    errorBox: {
-      backgroundColor: colors.feedback.error + '20',
-      borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.error,
-    },
   });
-}
+};

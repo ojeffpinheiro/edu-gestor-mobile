@@ -1,169 +1,66 @@
 import { StyleSheet } from "react-native";
-import { BorderRadius, Spacing, Typography, Shadow } from "../../styles/designTokens";
-import { ColorScheme } from "../../styles/colors";
 import chroma from 'chroma-js';
-import { createAnalysisStyles, createCameraBaseStyles, createReferenceBaseStyles } from "../../styles/componentStyles";
+import { ColorScheme } from "../../styles/colors";
+import { BorderRadius, Shadow, Spacing, Typography } from "../../styles/designTokens";
 import { createButtonStyles, createTextStyles } from "../../styles/globalStyles";
 
-export const createCameraStyles = (colors: ColorScheme) => {
-  const base = createCameraBaseStyles(colors);
-  const text = createTextStyles(colors);
-
+// Estilos base que podem ser reutilizados em outros componentes de câmera
+export const createCameraBaseStyles = (colors: ColorScheme) => {
+  const POINT_RADIUS = 10;
+  
   return StyleSheet.create({
-    // Herda o container base
     container: {
-      ...base.container,
+      flex: 1,
+      position: 'relative',
+      backgroundColor: colors.background.primary,
     },
-
-    // Container para mensagem de permissão
     permissionContainer: {
-      ...base.container,
+      flex: 1,
       justifyContent: 'center',
-      padding: Spacing.lg,
+      alignItems: 'center',
+      backgroundColor: colors.background.primary,
+      padding: Spacing.xl,
     },
     permissionText: {
-      ...text.heading2,
-      color: colors.text.onPrimary,
+      ...createTextStyles(colors).heading2,
       textAlign: 'center',
     },
-
-    // Visualização da câmera
     cameraContainer: {
-      ...base.container,
+      flex: 1,
+      position: 'relative'
     },
     camera: {
-      flex: 1,
+      flex: 1
     },
-
-    // Overlays
     overlay: {
-      ...base.overlay,
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center'
+    },
+    frame: {
+      position: 'absolute',
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      backgroundColor: 'transparent',
     },
     dashedBorder: {
-      ...base.frame,
-      borderColor: colors.text.onPrimary + 'B3',
       borderStyle: 'dashed',
       width: '80%',
       height: '80%',
       borderRadius: BorderRadius.lg,
     },
-
-    // Pontos de referência
-    point: {
-      ...base.referencePoint,
-      transform: [{ translateX: -10 }, { translateY: -10 }],
+    referencePoint: {
+      position: 'absolute',
+      width: POINT_RADIUS * 2,
+      height: POINT_RADIUS * 2,
+      borderRadius: POINT_RADIUS,
+      transform: [{ translateX: -POINT_RADIUS }, { translateY: -POINT_RADIUS }]
     },
-
-    // Linha de varredura
     scanLine: {
-      ...base.scanLine,
+      position: 'absolute',
       width: '80%',
-    },
-
-    // Barra de status
-    statusBar: {
-      position: 'absolute',
-      top: Spacing.xl,
-      left: 0,
-      right: 0,
-      flexDirection: 'row',
-      justifyContent: 'center',
-      paddingVertical: Spacing.sm,
-      backgroundColor: colors.background.primary + 'B3',
-    },
-    statusDot: {
-      width: 12,
-      height: 12,
-      borderRadius: BorderRadius.round,
-      marginHorizontal: Spacing.xs,
-      borderWidth: 1,
-      borderColor: colors.text.onPrimary,
-    },
-
-    // Controles da câmera
-    controls: {
-      position: 'absolute',
-      bottom: Spacing.lg,
-      left: 0,
-      right: 0,
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-      alignItems: 'center',
-      paddingHorizontal: Spacing.lg,
-    },
-    galleryButton: {
-      ...base.controlButton,
-      backgroundColor: colors.primary.main,
-    },
-    autoButton: {
-      ...base.controlButton,
-      backgroundColor: colors.text.onPrimary + '33',
-      borderWidth: 1,
-      borderColor: colors.text.onPrimary,
-    },
-    autoButtonActive: {
-      backgroundColor: colors.feedback.success + '80',
-      borderColor: colors.feedback.success,
-    },
-    captureButton: {
-      ...base.controlButton,
-      backgroundColor: colors.feedback.error,
-      width: 70,
-      height: 70,
-    },
-
-    // Overlay de processamento
-    processingOverlay: {
-      ...base.overlay,
-      backgroundColor: colors.background.primary + '80',
-    },
-
-    // Pré-visualização da imagem
-    previewImage: {
-      flex: 1,
-      resizeMode: 'contain',
-      backgroundColor: colors.background.primary,
-    },
-    previewControls: {
-      position: 'absolute',
-      bottom: Spacing.xl,
-      left: 0,
-      right: 0,
-      flexDirection: 'row',
-      justifyContent: 'space-around',
-    },
-    previewButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      paddingVertical: Spacing.sm,
-      paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.xxl,
-      ...Shadow(colors).sm,
-    },
-    retryButton: {
-      backgroundColor: colors.feedback.error,
-    },
-    confirmButton: {
-      backgroundColor: colors.feedback.success,
-    },
-    previewButtonText: {
-      color: colors.text.onPrimary,
-      marginLeft: Spacing.xs,
-      fontWeight: Typography.fontWeight.semibold,
-    },
-
-    // Elementos adicionais
-    guideFrame: {
-      width: '95%',
-      height: '65%',
-      borderWidth: 1,
-      position: 'relative',
-      borderColor: colors.border.medium,
-    },
-    corner: {
-      position: 'absolute',
-      width: 25,
-      height: 25,
+      height: 2,
+      backgroundColor: colors.feedback.success + 'B3',
     },
     controlButton: {
       justifyContent: 'center',
@@ -174,37 +71,10 @@ export const createCameraStyles = (colors: ColorScheme) => {
       marginHorizontal: Spacing.sm,
       ...Shadow(colors).xs,
     },
-    cornerTL: {
-      top: -1,
-      left: -1,
-      borderRightWidth: 0,
-      borderBottomWidth: 0,
-      borderColor: colors.feedback.success,
-    },
-    cornerTR: {
-      top: -1,
-      right: -1,
-      borderLeftWidth: 0,
-      borderBottomWidth: 0,
-      borderColor: colors.feedback.success,
-    },
-    cornerBL: {
-      bottom: -1,
-      left: -1,
-      borderRightWidth: 0,
-      borderTopWidth: 0,
-      borderColor: colors.feedback.success,
-    },
-    cornerBR: {
-      bottom: -1,
-      right: -1,
-      borderLeftWidth: 0,
-      borderTopWidth: 0,
-      borderColor: colors.feedback.success,
-    },
   });
 };
 
+// Estilos específicos para controles de captura
 export const createCaptureControlsStyles = (colors: ColorScheme) => {
   const buttons = createButtonStyles(colors);
   const text = createTextStyles(colors);
@@ -257,40 +127,50 @@ export const createCaptureControlsStyles = (colors: ColorScheme) => {
       justifyContent: 'center',
       position: 'relative',
     },
-  })
+  });
 };
 
+// Estilos para análise de marcação
 export const createMarkAnalysisStyles = (colors: ColorScheme) => {
-  const analysis = createAnalysisStyles(colors);
   const text = createTextStyles(colors);
 
   return StyleSheet.create({
     container: {
-      ...analysis.analysisContainer,
+      flex: 1,
+      position: 'relative',
     },
     image: {
-      ...analysis.analysisImage,
+      width: '100%',
+      height: '100%',
+      resizeMode: 'contain',
     },
     overlay: {
-      ...analysis.analysisOverlay,
+      ...StyleSheet.absoluteFillObject,
+      flexDirection: 'row',
+      flexWrap: 'wrap',
     },
     cell: {
-      ...analysis.analysisCell,
+      position: 'absolute',
+      borderWidth: 1,
+      borderColor: 'rgba(255,255,255,0.2)',
+      justifyContent: 'center',
+      alignItems: 'center',
     },
     markedCell: {
-      ...analysis.analysisCell,
       backgroundColor: chroma(colors.feedback.success).alpha(0.3).css(),
       borderColor: colors.feedback.success,
     },
     tooltip: {
-      ...analysis.analysisTooltip,
+      position: 'absolute',
+      bottom: '100%',
+      backgroundColor: 'rgba(0,0,0,0.7)',
+      padding: Spacing.xs,
+      borderRadius: BorderRadius.sm,
     },
     tooltipText: {
-      ...analysis.analysisTooltipText,
       ...text.caption,
       color: colors.text.onPrimary,
     },
-    // Estilos específicos que não são reutilizáveis
     pointContainer: {
       position: 'absolute',
       alignItems: 'center',
@@ -318,56 +198,74 @@ export const createMarkAnalysisStyles = (colors: ColorScheme) => {
       color: colors.text.onPrimary,
       fontWeight: Typography.fontWeight.bold,
     }
-});
+  });
 };
 
+// Estilos para pontos de referência
 export const createReferencePointsStyles = (colors: ColorScheme) => {
-  const reference = createReferenceBaseStyles(colors);
   const text = createTextStyles(colors);
 
   return StyleSheet.create({
     guideFrame: {
-      ...reference.guideFrame,
+      width: '95%',
+      height: '65%',
+      borderWidth: 1,
+      position: 'relative',
+      borderColor: colors.border.medium,
     },
     corner: {
-      ...reference.guideCorner,
+      position: 'absolute',
+      width: 25,
+      height: 25,
+      borderColor: colors.feedback.success,
     },
     cornerTL: {
-      ...reference.guideCorner,
       top: -1,
       left: -1,
       borderRightWidth: 0,
       borderBottomWidth: 0,
     },
     cornerTR: {
-      ...reference.guideCorner,
       top: -1,
       right: -1,
       borderLeftWidth: 0,
       borderBottomWidth: 0,
     },
     cornerBL: {
-      ...reference.guideCorner,
       bottom: -1,
       left: -1,
       borderRightWidth: 0,
       borderTopWidth: 0,
     },
     cornerBR: {
-      ...reference.guideCorner,
       bottom: -1,
       right: -1,
       borderLeftWidth: 0,
       borderTopWidth: 0,
     },
     point: {
-      ...reference.referencePoint,
+      position: 'absolute',
+      width: 30,
+      height: 30,
+      borderRadius: BorderRadius.round,
+      justifyContent: 'center',
+      alignItems: 'center',
+      borderColor: colors.border.medium,
+      transform: [{ translateX: -15 }, { translateY: -15 }]
     },
     pointText: {
-      ...reference.pointText,
+      color: colors.text.onPrimary,
+      fontWeight: Typography.fontWeight.bold,
+      fontSize: Typography.fontSize.xs,
+      textShadowColor: 'rgba(0,0,0,0.8)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 2,
     },
     scanLine: {
-      ...reference.scanLine,
+      position: 'absolute',
+      width: '80%',
+      height: 2,
+      backgroundColor: colors.feedback.success + 'B3',
     },
     pointsFeedback: {
       position: 'absolute',
@@ -388,9 +286,9 @@ export const createReferencePointsStyles = (colors: ColorScheme) => {
       transform: [{ translateX: -20 }, { translateY: -25 }],
     },
     percentageText: {
-      ...reference.pointText,
+      ...text.caption,
       fontSize: 10,
       marginTop: 2,
     }
-});
+  });
 };

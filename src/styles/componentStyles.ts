@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import { ColorScheme } from './colors';
 import { Spacing, BorderRadius, Typography, Shadow } from './designTokens';
+import { createTextStyles } from './globalStyles';
 
 // Headers
 export const createHeaderBaseStyles = (colors: ColorScheme) => StyleSheet.create({
@@ -293,3 +294,85 @@ export const createSettingsBaseStyles = (colors: ColorScheme) => StyleSheet.crea
     borderColor: colors.feedback.error,
   },
 });
+
+
+export const createComponentStyles = (colors: ColorScheme) => {
+  const text = createTextStyles(colors);
+
+  return {
+    header: StyleSheet.create({
+      container: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: Spacing.lg,
+        borderBottomWidth: StyleSheet.hairlineWidth,
+        borderBottomColor: colors.border.light,
+      },
+      title: {
+        ...text.heading2,
+      },
+      navVariant: {
+        backgroundColor: colors.primary.main,
+        borderBottomColor: colors.primary.dark,
+        ...Shadow(colors).md,
+      },
+      compact: {
+        paddingVertical: Spacing.sm,
+      }
+    }),
+
+    tab: StyleSheet.create({
+      container: {
+        flex: 1,
+        padding: Spacing.lg,
+        backgroundColor: colors.background.primary,
+      },
+      sectionHeader: {
+        ...text.heading2,
+        marginBottom: Spacing.lg,
+      },
+      grid: {
+        gap: Spacing.md,
+        marginBottom: Spacing.xxl,
+      }
+    }),
+
+    card: StyleSheet.create({
+      base: {
+        backgroundColor: colors.component.card,
+        borderRadius: BorderRadius.xl,
+        padding: Spacing.lg,
+        margin: Spacing.md,
+        ...Shadow(colors).sm,
+        borderWidth: 1,
+        borderColor: colors.border.medium,
+      },
+      elevated: {
+        ...Shadow(colors).md,
+      },
+      stats: {
+        borderLeftWidth: 4,
+        padding: Spacing.lg,
+      }
+    }),
+
+    list: StyleSheet.create({
+      item: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: Spacing.md,
+        borderRadius: BorderRadius.md,
+        marginBottom: Spacing.sm,
+        backgroundColor: colors.background.secondary,
+        borderWidth: 1,
+        borderColor: colors.border.light,
+      },
+      selected: {
+        borderColor: colors.primary.main,
+        backgroundColor: colors.primary.main + '10',
+      }
+    })
+  };
+};

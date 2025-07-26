@@ -1,48 +1,118 @@
-import { StyleSheet } from 'react-native';
+// styles.ts
+import { StyleSheet, ViewStyle, TextStyle, ImageStyle } from 'react-native';
 import { ColorScheme } from '../../styles/colors';
-import { BorderRadius, Shadow, Spacing, Typography } from '../../styles/designTokens';
+import { Spacing, BorderRadius, Shadow } from '../../styles/designTokens';
+import { 
+  createContainerStyles,
+  createCardStyles,
+  createButtonStyles,
+  createTextStyles,
+  createListStyles
+} from '../../styles/globalStyles';
+import { createHeaderBaseStyles } from '../../styles/componentStyles';
 
-export const createHomeScreenStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    ...createStyles,
-    centeredContainer: {
-      flex: 1,
-      justifyContent: 'center',
-      padding: Spacing.lg,
-      backgroundColor: colors.background.primary,
-    },
-    card: {
-      padding: Spacing.xxl,
-    },
-    header: {
-      alignItems: 'center',
-      marginBottom: Spacing.md,
-    },
+// Definir tipos para nossos estilos
+type BaseStyles = {
+  iconContainer: ViewStyle;
+  demoBox: ViewStyle;
+  demoHeader: ViewStyle;
+  demoBadge: ViewStyle;
+  demoBadgeText: TextStyle;
+  demoText: TextStyle;
+  [key: string]: ViewStyle | TextStyle | ImageStyle;
+};
+
+// Função para criar estilos base com tipagem adequada
+export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
+  const containerStyles = createContainerStyles(colors);
+  const cardStyles = createCardStyles(colors);
+  const buttonStyles = createButtonStyles(colors);
+  const textStyles = createTextStyles(colors);
+  const listStyles = createListStyles(colors);
+  const headerStyles = createHeaderBaseStyles(colors);
+  const shadowStyles = Shadow(colors);
+
+  return {
+    ...containerStyles,
+    ...cardStyles,
+    ...buttonStyles,
+    ...textStyles,
+    ...listStyles,
+    ...headerStyles,
+    ...shadowStyles,
     iconContainer: {
-      backgroundColor: colors.primary.main + '20',
+      backgroundColor: `${colors.primary.main}20`,
       borderRadius: BorderRadius.round,
       width: Spacing.xxxl + Spacing.xs,
       height: Spacing.xxxl + Spacing.xs,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
       marginBottom: Spacing.lg,
     },
-    title: {
-      fontSize: Typography.fontSize.xxl,
-      fontWeight: Typography.fontWeight.bold,
-      color: colors.text.primary,
+    demoBox: {
+      backgroundColor: `${colors.feedback.warning}20`,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.lg,
+      borderWidth: 1,
+      borderColor: colors.feedback.warning,
+      marginTop: Spacing.xs,
+    },
+    demoHeader: {
+      flexDirection: 'row' as const,
+      alignItems: 'center' as const,
       marginBottom: Spacing.sm,
-      textAlign: 'center',
+    },
+    demoBadge: {
+      backgroundColor: colors.feedback.warning,
+      paddingHorizontal: Spacing.xs,
+      paddingVertical: Spacing.xxs,
+      borderRadius: BorderRadius.md,
+      marginRight: Spacing.xs,
+    },
+    demoBadgeText: {
+      color: colors.text.onPrimary,
+      fontSize: 12,
+      fontWeight: 'bold' as const,
+      letterSpacing: 0.5,
+    },
+    demoText: {
+      color: colors.feedback.warning,
+      fontSize: 14,
+      lineHeight: 20,
+      fontWeight: '500' as const,
+    }
+  };
+};
+
+// HomeScreen Styles
+export const createHomeScreenStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
+  return StyleSheet.create({
+    centeredContainer: {
+      ...baseStyles.centeredContainer,
+      padding: Spacing.lg,
+    },
+    card: {
+      ...baseStyles.base,
+      padding: Spacing.xxl,
+    },
+    header: {
+      alignItems: 'center' as const,
+      marginBottom: Spacing.md,
+    },
+    title: {
+      ...baseStyles.heading1,
+      textAlign: 'center' as const,
+      marginBottom: Spacing.sm,
     },
     subtitle: {
-      fontSize: Typography.fontSize.md,
-      color: colors.text.secondary,
-      textAlign: 'center',
+      ...baseStyles.body,
+      textAlign: 'center' as const,
       marginBottom: Spacing.xxl,
-      lineHeight: Typography.lineHeight.md,
     },
     infoBox: {
-      backgroundColor: colors.primary.main + '10',
+      backgroundColor: `${colors.primary.main}10`,
       borderRadius: BorderRadius.lg,
       padding: Spacing.sm,
       marginBottom: Spacing.xxl,
@@ -55,12 +125,14 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
   });
 };
 
+// ScannerScreen Styles
 export const createScannerScreenStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
-    ...createStyles,
     screenContainer: {
-      flex: 1,
-      backgroundColor: colors.background.primary,
+      ...baseStyles.screenContainer,
+      padding: 0,
     },
     scrollContainer: {
       flex: 1,
@@ -68,49 +140,51 @@ export const createScannerScreenStyles = (colors: ColorScheme) => {
     scannerContainer: {
       height: 300,
       borderRadius: BorderRadius.lg,
-      overflow: 'hidden',
+      overflow: 'hidden' as const,
       marginBottom: Spacing.xl,
     },
     cameraContainer: {
       flex: 1,
-      position: 'relative',
+      position: 'relative' as const,
     },
     camera: {
       flex: 1,
     },
     scannerPlaceholder: {
       flex: 1,
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
       backgroundColor: colors.background.tertiary,
     },
     scannerIconContainer: {
-      backgroundColor: colors.primary.main + '20',
+      backgroundColor: `${colors.primary.main}20`,
       padding: Spacing.lg,
       borderRadius: BorderRadius.round,
     },
     scannerReadyText: {
+      ...baseStyles.body,
       color: colors.text.primary,
       marginTop: Spacing.md,
-      fontWeight: Typography.fontWeight.semibold,
+      fontWeight: '600' as const,
     },
     scannerHintText: {
+      ...baseStyles.body,
       color: colors.text.secondary,
       marginTop: Spacing.xs,
     },
   });
 };
 
+// StudentsScreen Styles
 export const createStudentsScreenStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
-    ...createStyles,
     screenContainer: {
-      flex: 1,
-      padding: Spacing.md,
-      backgroundColor: colors.background.primary,
+      ...baseStyles.screenContainer,
     },
     infoBox: {
-      backgroundColor: colors.primary.main + '10',
+      backgroundColor: `${colors.primary.main}10`,
       borderRadius: BorderRadius.md,
       padding: Spacing.md,
       marginBottom: Spacing.lg,
@@ -118,18 +192,18 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       borderLeftColor: colors.primary.main,
     },
     infoText: {
-      fontSize: Typography.fontSize.sm,
+      ...baseStyles.body,
+      fontSize: 14,
       color: colors.text.primary,
     },
     boldText: {
-      fontWeight: Typography.fontWeight.bold,
+      fontWeight: 'bold' as const,
     },
     sectionTitle: {
-      fontSize: Typography.fontSize.sm,
-      fontWeight: Typography.fontWeight.semibold,
+      ...baseStyles.label,
       color: colors.text.secondary,
       marginBottom: Spacing.sm,
-      textTransform: 'uppercase',
+      textTransform: 'uppercase' as const,
       letterSpacing: 1,
     },
     listContainer: {
@@ -145,127 +219,92 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
   });
 };
 
+// SelectableListItem Styles
 export const createSelectableListItemStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
-    ...createStyles,
     listItem: {
-      borderWidth: 1,
+      ...baseStyles.item,
       borderRadius: BorderRadius.lg,
-      padding: Spacing.md,
-      marginBottom: Spacing.sm,
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      alignItems: 'center',
       backgroundColor: colors.component.card,
-      borderColor: colors.border.light,
-      ...Shadow(colors).xs,
+      ...baseStyles.xs, // Usando a shadow do designTokens
     },
     selectedListItem: {
-      borderColor: colors.primary.main,
-      backgroundColor: colors.primary.main + '10',
+      ...baseStyles.selected,
     },
     listItemContent: {
       flex: 1,
     },
     listItemPrimaryText: {
-      fontSize: Typography.fontSize.md,
-      fontWeight: Typography.fontWeight.semibold,
-      color: colors.text.primary,
+      ...baseStyles.body,
+      fontWeight: '600' as const,
       marginBottom: Spacing.xxs,
     },
     listItemSecondaryText: {
-      fontSize: Typography.fontSize.sm,
-      color: colors.text.secondary,
-      lineHeight: Typography.lineHeight.sm,
+      ...baseStyles.caption,
+      lineHeight: 20,
     },
   });
 };
 
-export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
+// AuthForm Styles
+export const createAuthFormStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
-    ...createStyles,
-    permissionCard: {
+    container: {
+      ...baseStyles.screenContainer,
       padding: Spacing.xxl,
-      alignItems: 'center',
+      justifyContent: 'center' as const,
     },
-    contentContainer: {
-      width: '100%',
-      alignItems: 'center',
-    },
-    title: {
-      fontSize: Typography.fontSize.xl,
-      fontWeight: Typography.fontWeight.bold,
-      color: colors.text.primary,
-      marginTop: Spacing.lg,
-      marginBottom: Spacing.sm,
-      textAlign: 'center',
-    },
-    message: {
-      fontSize: Typography.fontSize.md,
-      color: colors.text.secondary,
-      textAlign: 'center',
-      marginBottom: Spacing.xl,
-      lineHeight: Typography.lineHeight.md,
-    },
-    buttonsContainer: {
-      width: '100%',
-      gap: Spacing.sm,
-    },
-    mainButton: {
-      marginBottom: Spacing.sm,
+    card: {
+      ...baseStyles.base,
+      padding: Spacing.xxl,
+      margin: Spacing.lg,
+      ...baseStyles.md, // Usando a shadow do designTokens
     },
   });
 };
 
-export const createScannerControlsStyles = (colors: ColorScheme) => {
+export const createScanResultCardStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
-    ...createStyles,
-    scannerControlsContainer: {
-      position: 'relative',
-      marginTop: Spacing.lg,
+    scanResultCard: {
+      ...baseStyles.base,
+      padding: Spacing.lg,
+      marginVertical: Spacing.md,
     },
-    buttonGroup: {
-      gap: Spacing.sm,
+    content: {
+      alignItems: 'center' as const,
+      marginTop: Spacing.md,
     },
-    mainButton: {
-      marginBottom: Spacing.xs,
+    codeText: {
+      ...baseStyles.heading2,
+      marginBottom: Spacing.lg,
+      letterSpacing: 1,
     },
-    secondaryButton: {
-      marginBottom: Spacing.xs,
-    },
-    backButton: {
-      marginTop: Spacing.sm,
-    },
-    closeButton: {
-      position: 'absolute',
-      top: Spacing.md,
-      right: Spacing.md,
-      backgroundColor: colors.feedback.error + 'CC',
-      zIndex: 10,
-    },
-    torchButton: {
-      position: 'absolute',
-      bottom: Spacing.md,
-      right: Spacing.md,
-      backgroundColor: colors.background.secondary + 'CC',
-    },
-    torchButtonActive: {
-      backgroundColor: colors.feedback.warning + 'CC',
+    button: {
+      marginTop: Spacing.md,
+      width: '100%',
     },
   });
 };
 
 export const createScannerOverlayStyles = (colors: ColorScheme, scannerSize: number) => {
+  const baseStyles = createBaseStyles(colors);
+  
   return StyleSheet.create({
     overlay: {
       ...StyleSheet.absoluteFillObject,
       backgroundColor: 'rgba(0, 0, 0, 0.6)',
-      justifyContent: 'center',
-      alignItems: 'center',
+      justifyContent: 'center' as const,
+      alignItems: 'center' as const,
     },
     frameContainer: {
-      alignItems: 'center',
-      justifyContent: 'center',
+      alignItems: 'center' as const,
+      justifyContent: 'center' as const,
     },
     frame: {
       width: scannerSize,
@@ -273,10 +312,10 @@ export const createScannerOverlayStyles = (colors: ColorScheme, scannerSize: num
       borderWidth: 2,
       borderColor: colors.primary.main,
       backgroundColor: 'transparent',
-      position: 'relative',
+      position: 'relative' as const,
     },
     corner: {
-      position: 'absolute',
+      position: 'absolute' as const,
       width: 24,
       height: 24,
       borderWidth: 3,
@@ -307,25 +346,25 @@ export const createScannerOverlayStyles = (colors: ColorScheme, scannerSize: num
       borderTopWidth: 0,
     },
     scanLine: {
-      position: 'absolute',
+      position: 'absolute' as const,
       width: '80%',
       height: 2,
       backgroundColor: colors.primary.main,
-      alignSelf: 'center',
+      alignSelf: 'center' as const,
       left: '10%',
       top: '50%',
       marginTop: -1,
       borderRadius: 1,
     },
     instructionsContainer: {
-      alignItems: 'center',
+      alignItems: 'center' as const,
       marginTop: Spacing.xl,
     },
     instructionText: {
-      fontSize: Typography.fontSize.md,
+      ...baseStyles.body,
       color: colors.text.onPrimary,
-      textAlign: 'center',
-      fontWeight: Typography.fontWeight.medium,
+      textAlign: 'center' as const,
+      fontWeight: '500' as const,
       marginBottom: Spacing.sm,
     },
     statusContainer: {
@@ -335,337 +374,80 @@ export const createScannerOverlayStyles = (colors: ColorScheme, scannerSize: num
       borderRadius: BorderRadius.md,
     },
     statusText: {
-      fontSize: Typography.fontSize.sm,
+      ...baseStyles.caption,
       color: colors.text.onPrimary,
-      textAlign: 'center',
+      textAlign: 'center' as const,
     },
   });
 };
 
-export const createScanResultCardStyles = (colors: ColorScheme) => {
+export const createScannerControlsStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
-    // ... outros estilos existentes ...
-
-    scanResultCard: {
-      padding: Spacing.lg,
-      marginVertical: Spacing.md,
+    scannerControlsContainer: {
+      position: 'relative' as const,
+      marginTop: Spacing.lg,
     },
-    content: {
-      alignItems: 'center',
-      marginTop: Spacing.md,
+    buttonGroup: {
+      gap: Spacing.sm,
     },
-    codeText: {
-      fontSize: Typography.fontSize.xl,
-      fontWeight: Typography.fontWeight.bold,
-      color: colors.text.primary,
-      marginBottom: Spacing.lg,
-      letterSpacing: 1,
-    },
-    button: {
-      marginTop: Spacing.md,
-      width: '100%',
-    },
-
-    // ... outros estilos existentes ...
-  });
-};
-
-export const createAuthFormStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    container: {
-      flex: 1,
-      padding: Spacing.xxl,
-      justifyContent: 'center',
-      backgroundColor: colors.background.primary,
-    },
-    card: {
-      backgroundColor: colors.component.card,
-      borderRadius: BorderRadius.xl,
-      padding: Spacing.xxl,
-      margin: Spacing.lg,
-      ...Shadow(colors).md,
-      borderWidth: 1,
-      borderColor: colors.border.light,
-    },
-  });
-};
-
-export const createStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    // Containers
-    container: {
-      flex: 1,
-      padding: Spacing.md,
-      backgroundColor: colors.background.primary,
-      justifyContent: 'center',
-      width: '100%',
-    },
-
-    // Cards
-    card: {
-      backgroundColor: colors.component.card,
-      borderRadius: BorderRadius.xl,
-      padding: Spacing.xxl,
-      margin: Spacing.lg,
-      ...Shadow(colors).md,
-      borderWidth: 1,
-      borderColor: colors.border.light,
-    },
-
-    // Header
-    header: {
-      alignItems: 'center',
-      marginBottom: Spacing.xxl,
-    },
-
-    iconContainer: {
-      marginBottom: Spacing.lg,
-    },
-
-    iconGradient: {
-      backgroundColor: colors.primary.main,
-      borderRadius: BorderRadius.lg,
-      width: 80,
-      height: 80,
-      justifyContent: 'center',
-      alignItems: 'center',
-      ...Shadow(colors).md,
-    },
-
-    // Typography
-    title: {
-      fontSize: Typography.fontSize.xxl,
-      fontWeight: Typography.fontWeight.bold,
-      color: 'red',
+    mainButton: {
       marginBottom: Spacing.xs,
-      textAlign: 'center',
-      letterSpacing: -0.5,
     },
-
-    subtitle: {
-      fontSize: Typography.fontSize.md,
-      color: colors.text.secondary,
-      textAlign: 'center',
-      lineHeight: Typography.lineHeight.md,
-      fontWeight: Typography.fontWeight.regular,
-    },
-
-    // Inputs
-    inputSection: {
-      marginBottom: Spacing.xxl,
-    },
-
-    inputLabel: {
-      fontSize: Typography.fontSize.sm,
-      fontWeight: Typography.fontWeight.semibold,
-      color: colors.text.primary,
-      marginBottom: Spacing.xs,
-      marginLeft: Spacing.xxs,
-    },
-
-    inputContainer: {
-      position: 'relative',
-    },
-
-    inputWrapper: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      borderWidth: 2,
-      borderColor: colors.border.light,
-      borderRadius: BorderRadius.lg,
-      backgroundColor: colors.background.secondary,
-      paddingHorizontal: Spacing.md,
-      paddingVertical: Spacing.xxs,
-    },
-
-    inputIcon: {
-      marginRight: Spacing.sm,
-    },
-
-    input: {
-      flex: 1,
-      fontSize: Typography.fontSize.md,
-      color: colors.text.primary,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: 0,
-      fontWeight: Typography.fontWeight.medium,
-    },
-
-    inputFocused: {
-      borderColor: colors.primary.main,
-      backgroundColor: colors.background.secondary,
-      ...Shadow(colors).xs,
-    },
-
-    inputActions: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.xs,
-    },
-
-    actionButton: {
-      padding: Spacing.sm,
-      borderRadius: BorderRadius.md,
-      backgroundColor: 'transparent',
-    },
-
-    // Buttons
-    buttonSection: {
-      marginBottom: Spacing.lg,
-    },
-
-    primaryButton: {
-      backgroundColor: colors.primary.main,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.lg,
-      alignItems: 'center',
-      marginBottom: Spacing.md,
-      ...Shadow(colors).md,
-    },
-
-    disabledButton: {
-      backgroundColor: colors.gray[400],
-      opacity: 0.6,
-      shadowOpacity: 0.1,
-    },
-
     secondaryButton: {
-      backgroundColor: 'transparent',
-      borderColor: colors.border.light,
-      borderWidth: 2,
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
-      borderRadius: BorderRadius.lg,
-      alignItems: 'center',
+      marginBottom: Spacing.xs,
     },
-
-    buttonText: {
-      color: colors.text.onPrimary,
-      fontSize: Typography.fontSize.md,
-      fontWeight: Typography.fontWeight.semibold,
-      letterSpacing: 0.5,
+    backButton: {
+      marginTop: Spacing.sm,
     },
-
-    secondaryButtonText: {
-      color: colors.text.secondary,
-      fontSize: Typography.fontSize.md,
-      fontWeight: Typography.fontWeight.semibold,
-      letterSpacing: 0.5,
-    },
-
-    // Feedback/Demo boxes
-    demoBox: {
-      backgroundColor: colors.feedback.warning + '20',
-      borderRadius: BorderRadius.lg,
-      padding: Spacing.lg,
-      borderWidth: 1,
-      borderColor: colors.feedback.warning,
-      marginTop: Spacing.xs,
-    },
-
-    demoHeader: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      marginBottom: Spacing.sm,
-    },
-
-    demoBadge: {
-      backgroundColor: colors.feedback.warning,
-      paddingHorizontal: Spacing.xs,
-      paddingVertical: Spacing.xxs,
-      borderRadius: BorderRadius.md,
-      marginRight: Spacing.xs,
-    },
-
-    demoBadgeText: {
-      color: colors.text.onPrimary,
-      fontSize: Typography.fontSize.xs,
-      fontWeight: Typography.fontWeight.bold,
-      letterSpacing: 0.5,
-    },
-
-    demoText: {
-      color: colors.feedback.warning,
-      fontSize: Typography.fontSize.sm,
-      lineHeight: Typography.lineHeight.sm,
-      fontWeight: Typography.fontWeight.medium,
-    },
-
-    demoPassword: {
-      fontWeight: Typography.fontWeight.bold,
-      backgroundColor: colors.feedback.warning,
-      color: colors.text.onPrimary,
-      paddingHorizontal: Spacing.xs,
-      paddingVertical: 2,
-      borderRadius: BorderRadius.sm,
-      fontSize: 13,
-      letterSpacing: 0.5,
-    },
-
-    // Student list
-    studentsList: {
-      maxHeight: 300,
-      marginBottom: Spacing.lg,
-    },
-
-    studentItem: {
-      borderWidth: 2,
-      borderColor: colors.border.light,
-      borderRadius: BorderRadius.lg,
-      padding: Spacing.md,
-      marginBottom: Spacing.sm,
-      backgroundColor: colors.background.secondary,
-    },
-
-    selectedStudent: {
-      borderColor: colors.primary.main,
-      backgroundColor: colors.primary.main + '10',
-    },
-
-    studentName: {
-      fontWeight: Typography.fontWeight.semibold,
-      color: colors.text.primary,
-      fontSize: Typography.fontSize.md,
-    },
-
-    studentClass: {
-      color: colors.text.secondary,
-      fontSize: Typography.fontSize.sm,
-    },
-
-    studentId: {
-      color: colors.text.tertiary,
-      fontSize: Typography.fontSize.sm,
-    },
-
-    // Info box
-    infoBox: {
-      backgroundColor: colors.primary.main + '10',
-      borderRadius: BorderRadius.lg,
-      padding: Spacing.lg,
-      marginBottom: Spacing.lg,
-      borderWidth: 1,
-      borderColor: colors.primary.main,
-    },
-
-    infoTitle: {
-      fontWeight: Typography.fontWeight.semibold,
-      color: colors.primary.dark,
-      marginBottom: Spacing.sm,
-      fontSize: Typography.fontSize.md,
-    },
-
-    infoText: {
-      color: colors.primary.dark,
-      fontSize: Typography.fontSize.sm,
-      lineHeight: Typography.lineHeight.sm,
-    },
-
-    eyeIcon: {
-      position: 'absolute',
-      right: Spacing.md,
+    closeButton: {
+      position: 'absolute' as const,
       top: Spacing.md,
+      right: Spacing.md,
+      backgroundColor: `${colors.feedback.error}CC`,
+      zIndex: 10,
+    },
+    torchButton: {
+      position: 'absolute' as const,
+      bottom: Spacing.md,
+      right: Spacing.md,
+      backgroundColor: `${colors.background.secondary}CC`,
+    },
+    torchButtonActive: {
+      backgroundColor: `${colors.feedback.warning}CC`,
+    },
+  });
+};
+
+export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
+  const baseStyles = createBaseStyles(colors);
+  
+  return StyleSheet.create({
+    permissionCard: {
+      ...baseStyles.base,
+      padding: Spacing.xxl,
+      alignItems: 'center' as const,
+    },
+    contentContainer: {
+      width: '100%',
+      alignItems: 'center' as const,
+    },
+    title: {
+      ...baseStyles.heading2,
+      marginTop: Spacing.lg,
+      marginBottom: Spacing.sm,
+      textAlign: 'center' as const,
+    },
+    message: {
+      ...baseStyles.body,
+      textAlign: 'center' as const,
+      marginBottom: Spacing.xl,
+    },
+    buttonsContainer: {
+      width: '100%',
+      gap: Spacing.sm,
+    },
+    mainButton: {
+      marginBottom: Spacing.sm,
     },
   });
 };

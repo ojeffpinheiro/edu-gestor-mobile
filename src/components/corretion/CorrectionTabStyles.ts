@@ -5,7 +5,6 @@ import { ColorScheme } from "../../styles/colors";
 import { createTabBaseStyles } from "../../styles/componentStyles";
 import { createButtonStyles, createListStyles, createTextStyles } from "../../styles/globalStyles";
 
-
 export const createCorrectionTabStyles = (colors: ColorScheme) => {
   const tabs = createTabBaseStyles(colors);
   const buttons = createButtonStyles(colors);

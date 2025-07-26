@@ -1,55 +1,50 @@
 import { StyleSheet } from "react-native";
-import { ColorScheme } from '../../styles/colors';
-import { Spacing, BorderRadius, Shadow, Typography } from '../../styles/designTokens';
+import { ColorScheme } from "../../styles/colors";
+import { createCardStyles, createTextStyles } from "../../styles/globalStyles";
+import { Spacing } from "../../styles/designTokens";
 
-export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSheet.create({
-  card: {
-    backgroundColor: colors.component.card,
-    borderWidth: 1,
-    borderColor: colors.border.light,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    marginBottom: Spacing.md,
-    ...Shadow(colors).sm,
-  },
-  cardContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  studentName: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-  date: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.secondary,
-  },
-  results: {
-    alignItems: 'flex-end',
-  },
-  score: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-  },
-  success: {
-    color: colors.feedback.success,
-  },
-  error: {
-    color: colors.feedback.error,
-  },
-  answers: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.secondary,
-  },
-  heading1: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-  },
-  heading2: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-  },
-});
+export const createCorrectionResultCardStyles = (colors: ColorScheme) => {
+  const cards = createCardStyles(colors);
+  const text = createTextStyles(colors);
+
+  return StyleSheet.create({
+    card: {
+      ...cards.base,
+    },
+    header: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: Spacing.sm,
+    },
+    title: {
+      ...text.heading3,
+    },
+    score: {
+      ...text.heading2,
+      ...text.bold,
+    },
+    details: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      alignItems: 'center',
+      gap: Spacing.md,
+    },
+    detailText: {
+      ...text.caption,
+    },
+    statsCardContent: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+    },
+    statsTitle: {
+      ...text.caption,
+      marginBottom: Spacing.xs,
+    },
+    statsValue: {
+      ...text.heading2,
+      ...text.bold,
+    },
+  });
+};

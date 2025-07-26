@@ -157,64 +157,72 @@ export const createContainerStyles = (colors: ColorScheme) => StyleSheet.create(
   },
 });
 
-export const createTextStyles = (colors: ColorScheme) => StyleSheet.create({
-  // Headings
-  heading1: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    color: colors.text.primary,
-    marginBottom: Spacing.md,
-  },
-  heading2: {
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.sm,
-  },
-  heading3: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-  // Body text
-  body: {
-    fontSize: Typography.fontSize.md,
-    color: colors.text.secondary,
-    lineHeight: Typography.lineHeight.md,
-  },
-  // Captions and labels
-  caption: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.secondary,
-  },
-  label: {
-    fontSize: Typography.fontSize.sm,
-    fontWeight: Typography.fontWeight.medium,
-    color: colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-  // Modifiers
-  centered: {
-    textAlign: 'center',
-  },
-  uppercase: {
-    textTransform: 'uppercase',
-  },
-  bold: {
-    fontWeight: Typography.fontWeight.bold,
-  },
-  semibold: {
-    fontWeight: Typography.fontWeight.semibold,
-  },
-  // Feedback variants
-  success: {
-    color: colors.feedback.success,
-  },
-  error: {
-    color: colors.feedback.error,
-  },
-});
+
+export const createTextStyles = (colors: ColorScheme) => {
+  const base = StyleSheet.create({
+    heading1: {
+      fontSize: Typography.fontSize.xxl,
+      fontWeight: Typography.fontWeight.bold,
+      color: colors.text.primary,
+      marginBottom: Spacing.md,
+    },
+    heading2: {
+      fontSize: Typography.fontSize.xl,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.sm,
+    },
+    heading3: {
+      fontSize: Typography.fontSize.lg,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
+    },
+    body: {
+      fontSize: Typography.fontSize.md,
+      color: colors.text.secondary,
+      lineHeight: Typography.lineHeight.md,
+    },
+    caption: {
+      fontSize: Typography.fontSize.sm,
+      color: colors.text.secondary,
+    },
+  });
+
+  return {
+    ...base,
+    // Modifiers
+    centered: {
+      textAlign: 'center',
+    },
+    uppercase: {
+      textTransform: 'uppercase',
+    },
+    bold: {
+      fontWeight: Typography.fontWeight.bold,
+    },
+    semibold: {
+      fontWeight: Typography.fontWeight.semibold,
+    },
+    // Feedback variants
+    success: {
+      color: colors.feedback.success,
+    },
+    error: {
+      color: colors.feedback.error,
+    },
+    warning: {
+      color: colors.feedback.warning,
+    },
+    info: {
+      color: colors.feedback.info,
+    },
+    // On background variants
+    onPrimary: {
+      color: colors.text.onPrimary,
+    },
+  };
+};
 
 export const createListStyles = (colors: ColorScheme) => StyleSheet.create({
   // Base list item
@@ -307,5 +315,32 @@ export const createInputStyles = (colors: ColorScheme) => StyleSheet.create({
   focused: {
     borderColor: colors.primary.main,
     ...Shadow(colors).xs,
+  },
+});
+
+export const createUtilityStyles = (colors: ColorScheme) => StyleSheet.create({
+  flexRow: {
+    flexDirection: 'row',
+  },
+  flexCol: {
+    flexDirection: 'column',
+  },
+  justifyBetween: {
+    justifyContent: 'space-between',
+  },
+  itemsCenter: {
+    alignItems: 'center',
+  },
+  selfEnd: {
+    alignSelf: 'flex-end',
+  },
+  gapSm: {
+    gap: Spacing.sm,
+  },
+  gapMd: {
+    gap: Spacing.md,
+  },
+  fullWidth: {
+    width: '100%',
   },
 });

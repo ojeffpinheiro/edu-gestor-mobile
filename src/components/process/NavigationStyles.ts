@@ -1,32 +1,29 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
-import { BorderRadius, Shadow, Spacing, Typography } from "../../styles/designTokens";
+import { Spacing } from "../../styles/designTokens";
+import { createHeaderBaseStyles } from "../../styles/componentStyles";
+import { createButtonStyles, createTextStyles } from "../../styles/globalStyles";
 
-export const createNavigationStyles = (colors: ColorScheme) => StyleSheet.create({
-  container: {
-    backgroundColor: colors.primary.main,
-    padding: Spacing.md,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    ...Shadow(colors).md,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.primary.dark
-  },
-  title: {
-    color: colors.text.onPrimary,
-    fontSize: Typography.fontSize.xl,
-    fontWeight: Typography.fontWeight.bold,
-  },
-  navButtons: {
-    flexDirection: 'row',
-    gap: Spacing.md,
-  },
-  button: {
-    padding: Spacing.sm,
-    borderRadius: BorderRadius.round,
-  },
-  activeButton: {
-    backgroundColor: colors.primary.dark,
-  },
-});
+export const createNavigationStyles = (colors: ColorScheme) => {
+  const header = createHeaderBaseStyles(colors);
+  const buttons = createButtonStyles(colors);
+  const text = createTextStyles(colors);
+
+  return StyleSheet.create({
+    container: {
+      ...header.navHeader,
+      padding: Spacing.md,
+    },
+    title: {
+      ...text.heading2,
+      color: colors.text.onPrimary,
+    },
+    navButtons: {
+      flexDirection: 'row',
+      gap: Spacing.md,
+    },
+    button: {
+      ...buttons.round,
+    },
+  });
+};

@@ -1,26 +1,27 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
-import { Spacing, Typography } from "../../styles/designTokens";
+import { createContainerStyles, createTextStyles } from "../../styles/globalStyles";
+import { Spacing } from "../../styles/designTokens";
 
-export const createResultsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    padding: Spacing.lg,
-    backgroundColor: colors.background.primary,
-  },
-  emptyState: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: Spacing.md,
-  },
-  resultsList: {
-    gap: Spacing.md,
-    paddingBottom: Spacing.xl,
-  },
-  emptyText: {
-    color: colors.text.secondary,
-    fontSize: Typography.fontSize.md,
-    textAlign: 'center',
-  },
-});
+export const createResultsScreenStyles = (colors: ColorScheme) => {
+  const containers = createContainerStyles(colors);
+  const text = createTextStyles(colors);
+
+  return StyleSheet.create({
+    screenContainer: {
+      ...containers.screenContainer,
+    },
+    emptyState: {
+      ...containers.centeredContainer,
+      gap: Spacing.md,
+    },
+    resultsList: {
+      gap: Spacing.md,
+      paddingBottom: Spacing.xl,
+    },
+    emptyText: {
+      ...text.body,
+      textAlign: 'center',
+    },
+  });
+};

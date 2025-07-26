@@ -1,82 +1,64 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
-import { Spacing, BorderRadius, Typography } from "../../styles/designTokens";
+import { Spacing, BorderRadius, Shadow, Typography } from "../../styles/designTokens";
 
 export const createDetailsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
-  container: {
+  screenContainer: {
     flex: 1,
     padding: Spacing.lg,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.primary,
   },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: Spacing.xl,
   },
-  title: {
+  heading1: {
     fontSize: Typography.fontSize.xxl,
     fontWeight: Typography.fontWeight.bold,
-    color: colors.textPrimary,
+    color: colors.text.primary,
+    marginLeft: Spacing.md,
   },
-  summaryCard: {
-    backgroundColor: colors.gray[100],
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    marginBottom: Spacing.lg,
-  },
-  summaryTitle: {
-    fontWeight: Typography.fontWeight.semibold,
-    marginBottom: Spacing.md,
-    color: colors.textPrimary,
-  },
-  summaryLabel: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
-    marginBottom: Spacing.xs,
-  },
-  summaryValue: {
-    fontWeight: Typography.fontWeight.medium,
-    color: colors.textPrimary,
-  },
-  summaryScore: {
+  heading2: {
     fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.bold,
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.text.primary,
   },
-  questionsCard: {
-    backgroundColor: colors.card,
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: BorderRadius.md,
+  heading3: {
+    fontSize: Typography.fontSize.md,
+    fontWeight: Typography.fontWeight.medium,
+    color: colors.text.primary,
+  },
+  bodyText: {
+    fontSize: Typography.fontSize.sm,
+    color: colors.text.secondary,
+  },
+  card: {
+    backgroundColor: colors.component.card,
+    borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
-  },
-  backButton: {
-    marginRight: Spacing.md,
-    padding: Spacing.xs,
-  },
-  backButtonText: {
-    fontSize: 20,
-  },
-  content: {
-    paddingBottom: Spacing.md,
+    marginBottom: Spacing.lg,
+    ...Shadow(colors).xs,
   },
   summaryGrid: {
     flexDirection: 'row',
-    gap: Spacing.md,
+    gap: Spacing.lg,
+    marginTop: Spacing.md,
   },
   summaryItem: {
     flex: 1,
   },
   success: {
-    color: colors.success,
+    color: colors.feedback.success,
   },
   error: {
-    color: colors.error,
+    color: colors.feedback.error,
   },
-  questionsTitle: {
-    fontWeight: Typography.fontWeight.semibold,
-    marginBottom: Spacing.md,
+  content: {
+    paddingBottom: Spacing.xl,
   },
   questionsList: {
-    gap: Spacing.xs,
+    gap: Spacing.sm,
+    marginTop: Spacing.md,
   },
 });

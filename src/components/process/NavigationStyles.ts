@@ -2,17 +2,19 @@ import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
 import { BorderRadius, Shadow, Spacing, Typography } from "../../styles/designTokens";
 
-const createNavigationStyles = (colors: ColorScheme) => StyleSheet.create({
+export const createNavigationStyles = (colors: ColorScheme) => StyleSheet.create({
   container: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.primary.main,
     padding: Spacing.md,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    ...Shadow(colors).strong
+    ...Shadow(colors).md,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.primary.dark
   },
   title: {
-    color: colors.card,
+    color: colors.text.onPrimary,
     fontSize: Typography.fontSize.xl,
     fontWeight: Typography.fontWeight.bold,
   },
@@ -21,12 +23,10 @@ const createNavigationStyles = (colors: ColorScheme) => StyleSheet.create({
     gap: Spacing.md,
   },
   button: {
-    padding: Spacing.md,
-    borderRadius: 8,
+    padding: Spacing.sm,
+    borderRadius: BorderRadius.round,
   },
   activeButton: {
-    backgroundColor: '#1d4ed8',
+    backgroundColor: colors.primary.dark,
   },
 });
-
-export default createNavigationStyles;

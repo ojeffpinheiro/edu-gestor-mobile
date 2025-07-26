@@ -1,32 +1,34 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import Button from '../common/Button';
+import { useTheme } from '../../context/ThemeContext';
+import { Shadow } from '../../styles/designTokens';
 
 const NavButton = ({ icon, active, ...props }) => {
+  const { colors } = useTheme();
+  
+  const styles = StyleSheet.create({
+    button: {
+      width: 50,
+      height: 50,
+      padding: 0,
+    },
+    activeButton: {
+      ...Shadow(colors).sm,
+      backgroundColor: colors.primary.main,
+    },
+  });
+
   return (
     <Button
-      variant={active ? 'floating' : 'ghost'}
+      variant={active ? 'primary' : 'ghost'}
       icon={icon}
       rounded
       style={[styles.button, active && styles.activeButton]}
+      iconColor={active ? colors.text.onPrimary : colors.text.secondary}
       {...props}
     />
   );
 };
-
-const styles = StyleSheet.create({
-  button: {
-    width: 50,
-    height: 50,
-    padding: 0,
-  },
-  activeButton: {
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-});
 
 export default NavButton;

@@ -7,22 +7,23 @@ import NavButton from './NavButton';
 const Navigation = ({ currentScreen, onNavigate }) => {
   const { colors } = useTheme();
   const styles = createNavigationStyles(colors);
+  
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>CorreçãoAuto</Text>
+      <Text style={styles.heading2}>CorreçãoAuto</Text>
       <View style={styles.navButtons}>
         <NavButton
-          icon={<Camera size={20} color="white" />}
+          icon={<Camera size={20} color={currentScreen === 'home' ? colors.text.onPrimary : colors.text.secondary} />}
           active={currentScreen === 'home'}
           onPress={() => onNavigate('home')}
         />
         <NavButton
-          icon={<BarChart3 size={20} color="white" />}
+          icon={<BarChart3 size={20} color={currentScreen === 'results' ? colors.text.onPrimary : colors.text.secondary} />}
           active={currentScreen === 'results'}
           onPress={() => onNavigate('results')}
         />
         <NavButton
-          icon={<Settings size={20} color="white" />}
+          icon={<Settings size={20} color={currentScreen === 'settings' ? colors.text.onPrimary : colors.text.secondary} />}
           active={currentScreen === 'settings'}
           onPress={() => onNavigate('settings')}
         />

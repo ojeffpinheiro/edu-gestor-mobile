@@ -14,11 +14,10 @@ const HomeScreen = ({
   onSaveCorrection,
   onViewDetails,
 }) => {
-    const { colors } = useTheme();
-    const styles = createHomeScreenStyles(colors);
+  const { colors } = useTheme();
+  const styles = createHomeScreenStyles(colors);
 
   const pickImage = async () => {
-    // Verificar permissões
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       Alert.alert(
@@ -47,71 +46,69 @@ const HomeScreen = ({
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Nova Correção</Text>
+    <View style={styles.screenContainer}>
+      <Text style={styles.heading1}>Nova Correção</Text>
       
       {examTemplate && (
-        <View style={styles.examInfo}>
-          <Text style={styles.examTitle}>Prova Selecionada</Text>
-          <Text style={styles.examText}>{examTemplate.name}</Text>
-          <Text style={styles.examText}>{examTemplate.questions} questões</Text>
+        <View style={styles.card}>
+          <Text style={styles.heading2}>Prova Selecionada</Text>
+          <Text style={styles.bodyText}>{examTemplate.name}</Text>
+          <Text style={styles.bodyText}>{examTemplate.questions} questões</Text>
         </View>
       )}
 
-      <View style={styles.captureArea}>
+      <View style={styles.card}>
         {capturedImage ? (
           <View style={styles.imageContainer}>
             <Image source={{ uri: capturedImage }} style={styles.image} />
             {processingStatus === 'processing' && (
               <View style={styles.processingIndicator}>
-                <ActivityIndicator size="small" color="#2563eb" />
+                <ActivityIndicator size="small" color={colors.primary.main} />
                 <Text style={styles.processingText}>Processando imagem...</Text>
               </View>
             )}
             {processingStatus === 'completed' && (
               <View style={styles.successIndicator}>
-                <CheckCircle size={20} color="#16a34a" />
+                <CheckCircle size={20} color={colors.feedback.success} />
                 <Text style={styles.successText}>Processamento concluído!</Text>
               </View>
             )}
           </View>
         ) : (
           <View style={styles.emptyCapture}>
-            <Camera size={48} color="#9ca3af" />
+            <Camera size={48} color={colors.icons.secondary} />
             <Text style={styles.captureText}>Capture ou selecione uma imagem da folha de resposta</Text>
             <Button
               title="Selecionar Imagem"
               onPress={pickImage}
               variant="primary"
-              icon={<Upload size={20} color="white" />}
+              icon={<Upload size={20} color={colors.text.onPrimary} />}
               iconPosition="left"
-              style={styles.selectButton}
-              textStyle={styles.selectButtonText}
             />
           </View>
         )}
       </View>
 
       {correctionResults && (
-        <View style={styles.resultsCard}>
+        <View style={[styles.card, styles.resultsCard]}>
           <View style={styles.resultsHeader}>
-            <FileText size={20} color="#2563eb" />
-            <Text style={styles.resultsTitle}>Resultado da Correção</Text>
+            <FileText size={20} color={colors.primary.main} />
+            <Text style={styles.heading2}>Resultado da Correção</Text>
           </View>
           
           <View style={styles.resultsContent}>
             <View style={styles.resultRow}>
-              <Text>Estudante:</Text>
+              <Text style={styles.bodyText}>Estudante:</Text>
               <Text style={styles.resultValue}>{correctionResults.studentName}</Text>
             </View>
             <View style={styles.resultRow}>
-              <Text>Acertos:</Text>
+              <Text style={styles.bodyText}>Acertos:</Text>
               <Text style={styles.resultValue}>
                 {correctionResults.correctAnswers}/{correctionResults.totalQuestions}
               </Text>
             </View>
             <View style={styles.resultRow}>
-              <Text>Nota:</Text>
+              <Text style={styles.bodyText}>Nota:</Text>
               <Text style={[
                 styles.resultValue, 
                 correctionResults.score >= 70 ? styles.successText : styles.errorText
@@ -126,19 +123,15 @@ const HomeScreen = ({
               title="Salvar"
               onPress={onSaveCorrection}
               variant="primary"
-              icon={<Save size={16} color="white" />}
+              icon={<Save size={16} color={colors.text.onPrimary} />}
               iconPosition="left"
-              style={[styles.actionButton, styles.saveButton]}
-              textStyle={styles.actionButtonText}
             />
             <Button
               title="Detalhes"
               onPress={onViewDetails}
               variant="secondary"
-              icon={<Eye size={16} color="white" />}
+              icon={<Eye size={16} color={colors.primary.main} />}
               iconPosition="left"
-              style={[styles.actionButton, styles.detailsButton]}
-              textStyle={styles.actionButtonText}
             />
           </View>
         </View>

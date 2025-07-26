@@ -1,35 +1,28 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
-import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
+import { BorderRadius, Spacing, Shadow, Typography } from "../../styles/designTokens";
 
-
-const createSettingsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
-  container: {
+export const createSettingsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
+  screenContainer: {
     flex: 1,
     padding: Spacing.lg,
     gap: Spacing.xl,
-    backgroundColor: colors.background,
+    backgroundColor: colors.background.primary,
   },
-  title: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    color: colors.textPrimary,
-  },
-  section: {
-    gap: Spacing.md,
+  card: {
+    backgroundColor: colors.component.card,
+    borderRadius: BorderRadius.lg,
+    padding: Spacing.lg,
+    ...Shadow(colors).xs,
   },
   sectionHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: Spacing.xs,
-  },
-  sectionTitle: {
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.primary,
-    fontSize: Typography.fontSize.lg,
+    gap: Spacing.sm,
+    marginBottom: Spacing.md,
   },
   form: {
-    gap: Spacing.md,
+    gap: Spacing.lg,
   },
   formGroup: {
     gap: Spacing.xs,
@@ -37,13 +30,14 @@ const createSettingsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
   label: {
     fontSize: Typography.fontSize.sm,
     fontWeight: Typography.fontWeight.medium,
+    color: colors.text.primary,
   },
   input: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.border.light,
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
-    backgroundColor: colors.card,
+    backgroundColor: colors.background.secondary,
   },
   switchGroup: {
     flexDirection: 'row',
@@ -53,25 +47,10 @@ const createSettingsScreenStyles = (colors: ColorScheme) => StyleSheet.create({
   },
   switchLabel: {
     flex: 1,
+    color: colors.text.primary,
+    fontSize: Typography.fontSize.md,
   },
-  systemButton: {
-    backgroundColor: colors.primary,
-    padding: Spacing.lg,
-    borderRadius: BorderRadius.md,
-    alignItems: 'center',
-  },
-  systemButtonText: {
-    color: colors.card,
-    fontWeight: Typography.fontWeight.medium,
-  },
-  downloadButton: {
-    flexDirection: 'row',
-    gap: Spacing.xs,
-    backgroundColor: '#4b5563',
-  },
-  downloadButtonText: {
-    color: colors.card,
+  button: {
+    marginTop: Spacing.md,
   },
 });
-
-export default createSettingsScreenStyles;

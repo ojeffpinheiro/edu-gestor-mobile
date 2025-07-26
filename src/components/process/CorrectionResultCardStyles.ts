@@ -4,12 +4,13 @@ import { Spacing, BorderRadius, Shadow, Typography } from '../../styles/designTo
 
 export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSheet.create({
   card: {
-    backgroundColor: colors.card,
+    backgroundColor: colors.component.card,
     borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: BorderRadius.md,
+    borderColor: colors.border.light,
+    borderRadius: BorderRadius.lg,
     padding: Spacing.lg,
-    ...Shadow(colors).default,
+    marginBottom: Spacing.md,
+    ...Shadow(colors).sm,
   },
   cardContent: {
     flexDirection: 'row',
@@ -17,12 +18,14 @@ export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSh
     alignItems: 'center',
   },
   studentName: {
+    fontSize: Typography.fontSize.lg,
     fontWeight: Typography.fontWeight.semibold,
-    color: colors.textPrimary,
+    color: colors.text.primary,
+    marginBottom: Spacing.xs,
   },
   date: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
   results: {
     alignItems: 'flex-end',
@@ -32,13 +35,13 @@ export const createCorrectionResultCardStyles = (colors: ColorScheme) => StyleSh
     fontWeight: Typography.fontWeight.bold,
   },
   success: {
-    color: colors.success,
+    color: colors.feedback.success,
   },
   error: {
-    color: colors.error,
+    color: colors.feedback.error,
   },
   answers: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textSecondary,
+    color: colors.text.secondary,
   },
 });

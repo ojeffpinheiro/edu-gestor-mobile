@@ -2,66 +2,44 @@ import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
 import { BorderRadius, Spacing, Typography } from "../../styles/designTokens";
 
-const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 8,
-  },
-  correct: {
-    backgroundColor: '#dcfce7',
-  },
-  incorrect: {
-    backgroundColor: '#fee2e2',
-  },
-  questionNumber: {
-    fontWeight: '500',
-  },
-  answers: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
-  },
-  answerText: {
-    fontSize: 12,
-  },
-  answerValue: {
-    fontWeight: 'bold',
-  },
-});
-
-const createQuestionItemStyles = (colors: ColorScheme) => StyleSheet.create({
-  container: {
+export const createQuestionItemStyles = (colors: ColorScheme) => StyleSheet.create({
+  card: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: Spacing.md,
-    borderRadius: BorderRadius.sm,
+    borderRadius: BorderRadius.md,
+    marginBottom: Spacing.sm,
+    backgroundColor: colors.background.secondary,
+    borderWidth: 1,
+    borderColor: colors.border.light
   },
   correct: {
-    backgroundColor: colors.success + '20',
+    backgroundColor: colors.feedback.success + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.success,
   },
   incorrect: {
-    backgroundColor: colors.error + '20',
+    backgroundColor: colors.feedback.error + '20',
+    borderLeftWidth: 4,
+    borderLeftColor: colors.feedback.error,
   },
   questionNumber: {
     fontWeight: Typography.fontWeight.medium,
-    color: colors.textPrimary,
+    color: colors.text.primary,
+    fontSize: Typography.fontSize.md,
   },
   answers: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: Spacing.md,
   },
-  answerValue: {
-    fontWeight: Typography.fontWeight.bold,
-  },
   answerText: {
     fontSize: Typography.fontSize.sm,
-    color: colors.textPrimary,
+    color: colors.text.secondary,
+  },
+  answerValue: {
+    fontWeight: Typography.fontWeight.semibold,
+    color: colors.text.primary,
   },
 });
-
-export default createQuestionItemStyles;

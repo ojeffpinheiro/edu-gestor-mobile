@@ -9,13 +9,13 @@ const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
   const styles = createSettingsScreenStyles(colors);
   
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>Configurações</Text>
+    <ScrollView style={styles.screenContainer}>
+      <Text style={styles.heading1}>Configurações</Text>
       
-      <View style={styles.section}>
+      <View style={styles.card}>
         <View style={styles.sectionHeader}>
-          <FileText size={20} color="#2563eb" />
-          <Text style={styles.sectionTitle}>Configurações da Prova</Text>
+          <FileText size={20} color={colors.primary.main} />
+          <Text style={styles.heading2}>Configurações da Prova</Text>
         </View>
         
         {examTemplate && (
@@ -26,6 +26,7 @@ const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
                 style={styles.input}
                 value={examTemplate.name}
                 onChangeText={(text) => onExamTemplateChange({...examTemplate, name: text})}
+                placeholderTextColor={colors.text.secondary}
               />
             </View>
             
@@ -36,6 +37,7 @@ const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
                 value={String(examTemplate.questions)}
                 onChangeText={(text) => onExamTemplateChange({...examTemplate, questions: parseInt(text) || 0})}
                 keyboardType="numeric"
+                placeholderTextColor={colors.text.secondary}
               />
             </View>
             
@@ -45,56 +47,67 @@ const SettingsScreen = ({ examTemplate, onExamTemplateChange }) => {
                 style={styles.input}
                 value={examTemplate.alternatives.join(', ')}
                 onChangeText={(text) => onExamTemplateChange({...examTemplate, alternatives: text.split(', ')})}
+                placeholderTextColor={colors.text.secondary}
               />
             </View>
           </View>
         )}
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.card}>
         <View style={styles.sectionHeader}>
-          <Scan size={20} color="#2563eb" />
-          <Text style={styles.sectionTitle}>Processamento de Imagem</Text>
+          <Scan size={20} color={colors.primary.main} />
+          <Text style={styles.heading2}>Processamento de Imagem</Text>
         </View>
         
         <View style={styles.switchGroup}>
-          <Text style={styles.switchLabel}>Detecção automática de bordas</Text>
-          <Switch value={true} />
+          <Text style={styles.bodyText}>Detecção automática de bordas</Text>
+          <Switch 
+            value={true}
+            trackColor={{ true: colors.primary.main, false: colors.border.light }}
+            thumbColor={colors.background.secondary}
+          />
         </View>
         
         <View style={styles.switchGroup}>
-          <Text style={styles.switchLabel}>Correção de perspectiva</Text>
-          <Switch value={true} />
+          <Text style={styles.bodyText}>Correção de perspectiva</Text>
+          <Switch 
+            value={true}
+            trackColor={{ true: colors.primary.main, false: colors.border.light }}
+            thumbColor={colors.background.secondary}
+          />
         </View>
         
         <View style={styles.switchGroup}>
-          <Text style={styles.switchLabel}>Validação de confiança</Text>
-          <Switch value={true} />
+          <Text style={styles.bodyText}>Validação de confiança</Text>
+          <Switch 
+            value={true}
+            trackColor={{ true: colors.primary.main, false: colors.border.light }}
+            thumbColor={colors.background.secondary}
+          />
         </View>
       </View>
 
-      <View style={styles.section}>
+      <View style={styles.card}>
         <View style={styles.sectionHeader}>
-          <Settings size={20} color="#2563eb" />
-          <Text style={styles.sectionTitle}>Sistema</Text>
+          <Settings size={20} color={colors.primary.main} />
+          <Text style={styles.heading2}>Sistema</Text>
         </View>
         
         <Button
           title="Sincronizar com Sistema Escolar"
           onPress={() => {}}
-          variant="outline"
-          style={styles.systemButton}
-          textStyle={styles.systemButtonText}
+          variant="secondary"
+          style={styles.button}
         />
         
         <Button
           title="Exportar Dados"
           onPress={() => {}}
           variant="primary"
-          icon={<Download size={16} color="white" />}
+          icon={<Download size={16} color={colors.text.onPrimary} />}
           iconPosition="left"
-          style={[styles.systemButton, styles.downloadButton]}
-          textStyle={[styles.systemButtonText, styles.downloadButtonText]}
+          style={styles.button}
         />
       </View>
     </ScrollView>

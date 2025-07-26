@@ -295,7 +295,6 @@ export const createSettingsBaseStyles = (colors: ColorScheme) => StyleSheet.crea
   },
 });
 
-
 export const createComponentStyles = (colors: ColorScheme) => {
   const text = createTextStyles(colors);
 

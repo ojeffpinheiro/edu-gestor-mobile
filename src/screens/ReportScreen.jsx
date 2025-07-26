@@ -3,6 +3,8 @@ import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
 import Button from '../components/common/Button';
 import { BorderRadius, Shadow, Spacing } from '../styles/designTokens';
+import { createCardStyles, createContainerStyles, createTextStyles } from '../styles/globalStyles';
+
 const ReportScreen = ({ navigation }) => {
   const { colors } = useTheme();
   const styles = createReportScreenStyles(colors);
@@ -45,7 +47,7 @@ const ReportScreen = ({ navigation }) => {
         <View style={styles.section}>
           <Text>Por Matéria</Text>
           {reportData.bySubject.map((item, index) => (
-            <ScoreBar 
+            <ScoreBar
               key={index}
               label={item.subject}
               value={item.average}
@@ -57,7 +59,7 @@ const ReportScreen = ({ navigation }) => {
         <View style={styles.section}>
           <Text>Por Turma</Text>
           {reportData.byClass.map((item, index) => (
-            <ScoreBar 
+            <ScoreBar
               key={index}
               label={item.class}
               value={item.average}
@@ -92,22 +94,22 @@ const StatItem = ({ label, value }) => {
 const ScoreBar = ({ label, value, maxValue }) => {
   const { colors } = useTheme();
   const percentage = (value / maxValue) * 100;
-  
+
   return (
     <View style={{ marginVertical: 8 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
         <Text>{label}</Text>
         <Text>{value}%</Text>
       </View>
-      <View style={{ 
-        height: 8, 
-        backgroundColor: colors.background.secondary, 
+      <View style={{
+        height: 8,
+        backgroundColor: colors.background.secondary,
         borderRadius: 4,
-        marginTop: 4 
+        marginTop: 4
       }}>
-        <View style={{ 
-          width: `${percentage}%`, 
-          height: '100%', 
+        <View style={{
+          width: `${percentage}%`,
+          height: '100%',
           backgroundColor: colors.primary.main,
           borderRadius: 4
         }} />
@@ -116,46 +118,33 @@ const ScoreBar = ({ label, value, maxValue }) => {
   );
 };
 
-const createReportScreenStyles = (colors) => StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    backgroundColor: colors.background.primary,
-  },
-  content: {
-    padding: Spacing.lg,
-    paddingBottom: Spacing.xxl,
-  },
-  title: {
-    marginBottom: Spacing.xs,
-    textAlign: 'center',
-  },
-  subtitle: {
-    marginBottom: Spacing.xl,
-    textAlign: 'center',
-    color: colors.text.secondary,
-  },
-  summaryCard: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    ...Shadow(colors).xs,
-  },
-  statsRow: {
-    flexDirection: 'row',
-    marginTop: Spacing.md,
-  },
-  section: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.lg,
-    marginBottom: Spacing.lg,
-    ...Shadow(colors).xs,
-  },
-  backButton: {
-    marginHorizontal: Spacing.lg,
-    marginBottom: Spacing.lg,
-  },
-});
+// Substituir createReportScreenStyles por:
+export const createReportScreenStyles = (colors) => {
+  const containers = createContainerStyles(colors);
+  const cards = createCardStyles(colors);
+  const text = createTextStyles(colors);
+
+  return StyleSheet.create({
+    screenContainer: {
+      ...containers.screenContainer,
+    },
+    content: {
+      padding: Spacing.lg,
+      paddingBottom: Spacing.xxl,
+    },
+    title: {
+      ...text.heading1,
+      textAlign: 'center',
+    },
+    summaryCard: {
+      ...cards.base,
+      marginBottom: Spacing.lg,
+    },
+    section: {
+      ...cards.base,
+      marginBottom: Spacing.lg,
+    },
+  });
+};
 
 export default ReportScreen;

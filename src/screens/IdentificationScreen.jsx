@@ -16,6 +16,8 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Button from '../components/common/Button';
 import { useTheme } from '../context/ThemeContext';
 import { BorderRadius, Spacing, Typography, Shadow } from '../styles/designTokens';
+import { createCardStyles, createContainerStyles, createInputStyles, createTextStyles } from '../styles/globalStyles';
+import { createCameraBaseStyles } from '../styles/componentStyles';
 
 const { width, height } = Dimensions.get('window');
 
@@ -225,9 +227,9 @@ export default function IdentificationScreen() {
           </View>
 
           <View style={styles.controlesCamera}>
-            <Button style={styles.botaoGaleria} onPress={escolherDaGaleria} 
-              icon={ <MaterialIcons name="photo-library" size={24} color="white" />}  />
-            
+            <Button style={styles.botaoGaleria} onPress={escolherDaGaleria}
+              icon={<MaterialIcons name="photo-library" size={24} color="white" />} />
+
             <Button style={styles.botaoCapturar} onPress={tirarFoto} />
 
             <View style={styles.espaco} />
@@ -240,9 +242,9 @@ export default function IdentificationScreen() {
   const renderizarResultado = () => (
     <ScrollView style={styles.container}>
       <View style={styles.headerResultado}>
-        <Button onPress={reiniciar} 
+        <Button onPress={reiniciar}
           icon={<MaterialIcons name="arrow-back" size={28} color="#333" />} />
-        
+
         <Text style={styles.tituloResultado}>Resultado</Text>
         <Button
           onPress={exportarResultado}
@@ -313,212 +315,233 @@ export default function IdentificationScreen() {
     </View>
   );
 }
+// Substituir createIdentificationScreenStyles por:
+export const createIdentificationScreenStyles = (colors) => {
+  const containers = createContainerStyles(colors);
+  const cards = createCardStyles(colors);
+  const text = createTextStyles(colors);
+  const inputs = createInputStyles(colors);
+  const camera = createCameraBaseStyles(colors);
 
-const createIdentificationScreenStyles = (colors) => StyleSheet.create({
-  screenContainer: {
-    flex: 1,
-    padding: Spacing.lg,
-    backgroundColor: colors.background.primary,
-  },
-  header: {
-    alignItems: 'center',
-    marginBottom: Spacing.xl,
-    marginTop: Spacing.xxl,
-  },
-  titulo: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    color: colors.text.primary,
-    marginTop: Spacing.md,
-  },
-  subtitulo: {
-    fontSize: Typography.fontSize.md,
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginTop: Spacing.xs,
-  },
-  card: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.xl,
-    marginBottom: Spacing.lg,
-    ...Shadow(colors).sm,
-  },
-  label: {
-    fontSize: Typography.fontSize.md,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.md,
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: colors.border.light,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.lg,
-    fontSize: Typography.fontSize.md,
-    marginBottom: Spacing.xl,
-    backgroundColor: colors.background.secondary,
-  },
-  instrucoes: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.xl,
-    ...Shadow(colors).sm,
-  },
-  tituloInstrucoes: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.md,
-  },
-  textoInstrucoes: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.secondary,
-    lineHeight: Typography.lineHeight.md,
-    marginBottom: Spacing.sm,
-  },
-  containerCamera: {
-    flex: 1,
-  },
-  camera: {
-    flex: 1,
-  },
-  overlayCamera: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'transparent',
-    justifyContent: 'space-between',
-  },
-  guiaCaptura: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bordaGuia: {
-    width: '80%',
-    height: '50%',
-    borderWidth: 2,
-    borderColor: colors.text.onPrimary,
-    borderRadius: BorderRadius.lg,
-    borderStyle: 'dashed',
-  },
-  controlesCamera: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: Spacing.xl,
-    paddingBottom: Spacing.xl,
-  },
-  botaoGaleria: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    backgroundColor: colors.gray[600] + '4D',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  erro: {
-    fontSize: Typography.fontSize.md,
-    color: colors.feedback.error,
-    textAlign: 'center',
-    marginBottom: Spacing.lg,
-  },
-  headerResultado: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: Spacing.lg,
-    marginTop: Spacing.xxl,
-  },
-  tituloResultado: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    color: colors.text.primary,
-  },
-  containerImagem: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.md,
-    marginBottom: Spacing.lg,
-    ...Shadow(colors).sm,
-  },
-  imagemProcessada: {
-    width: '100%',
-    height: 200,
-    borderRadius: BorderRadius.md,
-  },
-  containerProcessando: {
-    alignItems: 'center',
-    padding: Spacing.xl,
-  },
-  textoProcessando: {
-    fontSize: Typography.fontSize.md,
-    color: colors.text.secondary,
-    marginTop: Spacing.md,
-  },
-  containerRespostas: {
-    backgroundColor: colors.component.card,
-    borderRadius: BorderRadius.lg,
-    padding: Spacing.xl,
-    marginBottom: Spacing.lg,
-    ...Shadow(colors).sm,
-  },
-  tituloRespostas: {
-    fontSize: Typography.fontSize.lg,
-    fontWeight: Typography.fontWeight.semibold,
-    color: colors.text.primary,
-    marginBottom: Spacing.md,
-  },
-  gridRespostas: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-  },
-  itemResposta: {
-    width: '18%',
-    backgroundColor: colors.background.secondary,
-    borderRadius: BorderRadius.md,
-    padding: Spacing.md,
-    marginBottom: Spacing.md,
-    alignItems: 'center',
-    minHeight: 80,
-  },
-  numeroQuestao: {
-    fontSize: Typography.fontSize.xs,
-    color: colors.text.secondary,
-    fontWeight: Typography.fontWeight.semibold,
-  },
-  alternativaResposta: {
-    fontSize: Typography.fontSize.xxl,
-    fontWeight: Typography.fontWeight.bold,
-    color: colors.feedback.success,
-    marginTop: Spacing.xs,
-  },
-  naoIdentificada: {
-    color: colors.feedback.error,
-  },
-  barraConfianca: {
-    width: '100%',
-    height: 3,
-    backgroundColor: colors.border.light,
-    borderRadius: 2,
-    marginTop: Spacing.sm,
-  },
-  preenchimentoConfianca: {
-    height: '100%',
-    backgroundColor: colors.feedback.success,
-    borderRadius: 2,
-  },
-  resumo: {
-    marginTop: Spacing.lg,
-    padding: Spacing.lg,
-    backgroundColor: colors.feedback.success + '20',
-    borderRadius: BorderRadius.md,
-    borderLeftWidth: 4,
-    borderLeftColor: colors.feedback.success,
-  },
-  textoResumo: {
-    fontSize: Typography.fontSize.sm,
-    color: colors.text.primary,
-    marginBottom: Spacing.xs,
-  },
-});
+  return StyleSheet.create({
+    screenContainer: {
+      ...containers.screenContainer,
+    },
+    card: {
+      ...cards.base,
+    },
+    input: {
+      ...inputs.input,
+    },
+    camera: {
+      ...camera.camera,
+    },
+
+    screenContainer: {
+      flex: 1,
+      padding: Spacing.lg,
+      backgroundColor: colors.background.primary,
+    },
+    header: {
+      alignItems: 'center',
+      marginBottom: Spacing.xl,
+      marginTop: Spacing.xxl,
+    },
+    titulo: {
+      fontSize: Typography.fontSize.xxl,
+      fontWeight: Typography.fontWeight.bold,
+      color: colors.text.primary,
+      marginTop: Spacing.md,
+    },
+    subtitulo: {
+      fontSize: Typography.fontSize.md,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginTop: Spacing.xs,
+    },
+    card: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.xl,
+      marginBottom: Spacing.lg,
+      ...Shadow(colors).sm,
+    },
+    label: {
+      fontSize: Typography.fontSize.md,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.md,
+    },
+    input: {
+      borderWidth: 1,
+      borderColor: colors.border.light,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.lg,
+      fontSize: Typography.fontSize.md,
+      marginBottom: Spacing.xl,
+      backgroundColor: colors.background.secondary,
+    },
+    instrucoes: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.xl,
+      ...Shadow(colors).sm,
+    },
+    tituloInstrucoes: {
+      fontSize: Typography.fontSize.lg,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.md,
+    },
+    textoInstrucoes: {
+      fontSize: Typography.fontSize.sm,
+      color: colors.text.secondary,
+      lineHeight: Typography.lineHeight.md,
+      marginBottom: Spacing.sm,
+    },
+    containerCamera: {
+      flex: 1,
+    },
+    camera: {
+      flex: 1,
+    },
+    overlayCamera: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: 'transparent',
+      justifyContent: 'space-between',
+    },
+    guiaCaptura: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    bordaGuia: {
+      width: '80%',
+      height: '50%',
+      borderWidth: 2,
+      borderColor: colors.text.onPrimary,
+      borderRadius: BorderRadius.lg,
+      borderStyle: 'dashed',
+    },
+    controlesCamera: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      paddingHorizontal: Spacing.xl,
+      paddingBottom: Spacing.xl,
+    },
+    botaoGaleria: {
+      width: 50,
+      height: 50,
+      borderRadius: 25,
+      backgroundColor: colors.gray[600] + '4D',
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    erro: {
+      fontSize: Typography.fontSize.md,
+      color: colors.feedback.error,
+      textAlign: 'center',
+      marginBottom: Spacing.lg,
+    },
+    headerResultado: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: Spacing.lg,
+      marginTop: Spacing.xxl,
+    },
+    tituloResultado: {
+      fontSize: Typography.fontSize.xxl,
+      fontWeight: Typography.fontWeight.bold,
+      color: colors.text.primary,
+    },
+    containerImagem: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.md,
+      marginBottom: Spacing.lg,
+      ...Shadow(colors).sm,
+    },
+    imagemProcessada: {
+      width: '100%',
+      height: 200,
+      borderRadius: BorderRadius.md,
+    },
+    containerProcessando: {
+      alignItems: 'center',
+      padding: Spacing.xl,
+    },
+    textoProcessando: {
+      fontSize: Typography.fontSize.md,
+      color: colors.text.secondary,
+      marginTop: Spacing.md,
+    },
+    containerRespostas: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.lg,
+      padding: Spacing.xl,
+      marginBottom: Spacing.lg,
+      ...Shadow(colors).sm,
+    },
+    tituloRespostas: {
+      fontSize: Typography.fontSize.lg,
+      fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.primary,
+      marginBottom: Spacing.md,
+    },
+    gridRespostas: {
+      flexDirection: 'row',
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+    },
+    itemResposta: {
+      width: '18%',
+      backgroundColor: colors.background.secondary,
+      borderRadius: BorderRadius.md,
+      padding: Spacing.md,
+      marginBottom: Spacing.md,
+      alignItems: 'center',
+      minHeight: 80,
+    },
+    numeroQuestao: {
+      fontSize: Typography.fontSize.xs,
+      color: colors.text.secondary,
+      fontWeight: Typography.fontWeight.semibold,
+    },
+    alternativaResposta: {
+      fontSize: Typography.fontSize.xxl,
+      fontWeight: Typography.fontWeight.bold,
+      color: colors.feedback.success,
+      marginTop: Spacing.xs,
+    },
+    naoIdentificada: {
+      color: colors.feedback.error,
+    },
+    barraConfianca: {
+      width: '100%',
+      height: 3,
+      backgroundColor: colors.border.light,
+      borderRadius: 2,
+      marginTop: Spacing.sm,
+    },
+    preenchimentoConfianca: {
+      height: '100%',
+      backgroundColor: colors.feedback.success,
+      borderRadius: 2,
+    },
+    resumo: {
+      marginTop: Spacing.lg,
+      padding: Spacing.lg,
+      backgroundColor: colors.feedback.success + '20',
+      borderRadius: BorderRadius.md,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.feedback.success,
+    },
+    textoResumo: {
+      fontSize: Typography.fontSize.sm,
+      color: colors.text.primary,
+      marginBottom: Spacing.xs,
+    },
+  });
+};

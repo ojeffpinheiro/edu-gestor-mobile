@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
+import { ColorScheme } from '../../styles/colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'outline' | 'ghost' | 'floating' | 'text';
 type ButtonSize = 'sm' | 'md' | 'lg';
@@ -122,7 +123,7 @@ const Button: React.FC<ButtonProps> = ({
   );
 };
 
-const createButtonStyles = (colors: any) => {
+const createButtonStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
     // Base styles
     button: {

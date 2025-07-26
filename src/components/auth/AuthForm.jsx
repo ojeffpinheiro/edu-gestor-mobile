@@ -15,17 +15,18 @@ import { useTheme } from '../../context/ThemeContext';
 import { createStyles } from './styles';
 import InputField from '../common/InputField';
 import Button from '../common/Button';
+import { Spacing } from '../../styles/designTokens';
 
 const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
   const { colors } = useTheme();
   const styles = createStyles(colors);
-  
+
   const [password, setPassword] = useState('admin123');
   const [showPassword, setShowPassword] = useState(false);
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(30));
   const passwordInputRef = useRef(null);
-
+  
   const validatePassword = () => {
     if (password === 'admin123') {
       setIsAuthenticated(true);
@@ -61,30 +62,31 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
       keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <View style={styles.container}>
-          <TouchableOpacity
-            activeOpacity={1}
-            onPress={() => passwordInputRef.current?.focus()}
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => passwordInputRef.current?.focus()}
+          style={styles.container}
+        >
+          <Animated.View
+            style={[
+              styles.card,
+              {
+                opacity: fadeAnim,
+                transform: [{ translateY: slideAnim }]
+              }
+            ]}
           >
-            <Animated.View
-              style={[
-                styles.card,
-                {
-                  opacity: fadeAnim,
-                  transform: [{ translateY: slideAnim }]
-                }
-              ]}
-            >
-              <View style={styles.header}>
-                <View style={styles.iconContainer}>
-                  <View style={styles.iconGradient}>
-                    <Shield size={28} color={colors.text.onPrimary} />
-                  </View>
+            <View style={styles.header}>
+              <View style={styles.iconContainer}>
+                <View style={styles.iconGradient}>
+                  <Shield size={28} color={colors.text.onPrimary} />
                 </View>
-                <Text style={styles.title}>Bem-vindo de volta</Text>
-                <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
               </View>
+              <Text style={styles.title}>Bem-vindo de volta</Text>
+              <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
+            </View>
 
+            <View style={{ marginBottom: Spacing.xxl }}>
               <InputField
                 label='Senha'
                 placeholder="Digite sua senha"
@@ -99,31 +101,33 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                 onToggleVisibility={() => setShowPassword(!showPassword)}
                 colors={colors}
               />
+            </View>
 
-              <View style={styles.buttonSection}>
-                <Button
-                  title="Entrar"
-                  onPress={validatePassword}
-                  variant="primary"
-                  disabled={password.length === 0}
-                  style={[styles.primaryButton, password.length === 0 && styles.disabledButton]}
-                  textStyle={styles.buttonText}
-                  colors={colors}
-                />
+            <View style={styles.buttonSection}>
+              <Button
+                title="Entrar"
+                onPress={validatePassword}
+                variant="primary"
+                size="lg"
+                disabled={password.length === 0}
+                style={{ marginBottom: Spacing.md }}
+                fullWidth
+              />
 
-                <Button
-                  title="Voltar ao início"
-                  onPress={() => {
-                    setCurrentView('home');
-                    Keyboard.dismiss();
-                  }}
-                  variant="outline"
-                  textStyle={styles.secondaryButtonText}
-                  style={styles.secondaryButton}
-                  colors={colors}
-                />
-              </View>
 
+              <Button
+                title="Voltar ao início"
+                onPress={() => {
+                  setCurrentView('home');
+                  Keyboard.dismiss();
+                }}
+                variant="outline"
+                size="lg"
+                fullWidth
+              />
+            </View>
+
+            <View style={{ marginTop: Spacing.xxl }}>
               <View style={styles.demoBox}>
                 <View style={styles.demoHeader}>
                   <View style={styles.demoBadge}>
@@ -134,9 +138,9 @@ const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
                   Use a senha <Text style={styles.demoPassword}>'admin123'</Text> para testar o sistema
                 </Text>
               </View>
-            </Animated.View>
-          </TouchableOpacity>
-        </View>
+            </View>
+          </Animated.View>
+        </TouchableOpacity>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
   );

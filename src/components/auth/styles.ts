@@ -16,7 +16,7 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
     },
     header: {
       alignItems: 'center',
-      marginBottom: Spacing.xxl,
+      marginBottom: Spacing.md,
     },
     iconContainer: {
       backgroundColor: colors.primary.main + '20',
@@ -44,7 +44,7 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
     infoBox: {
       backgroundColor: colors.primary.main + '10',
       borderRadius: BorderRadius.lg,
-      padding: Spacing.md,
+      padding: Spacing.sm,
       marginBottom: Spacing.xxl,
       borderWidth: 1,
       borderColor: colors.primary.main,
@@ -370,6 +370,25 @@ export const createScanResultCardStyles = (colors: ColorScheme) => {
   });
 };
 
+export const createAuthFormStyles = (colors: ColorScheme) => {
+  return StyleSheet.create({
+    container: {
+      flex: 1,
+      padding: Spacing.xxl,
+      justifyContent: 'center',
+      backgroundColor: colors.background.primary,
+    },
+    card: {
+      backgroundColor: colors.component.card,
+      borderRadius: BorderRadius.xl,
+      padding: Spacing.xxl,
+      margin: Spacing.lg,
+      ...Shadow(colors).md,
+      borderWidth: 1,
+      borderColor: colors.border.light,
+    },
+  });
+};
 export const createStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
     // Containers
@@ -378,6 +397,7 @@ export const createStyles = (colors: ColorScheme) => {
       padding: Spacing.md,
       backgroundColor: colors.background.primary,
       justifyContent: 'center',
+      width: '100%',
     },
 
     // Cards
@@ -385,7 +405,7 @@ export const createStyles = (colors: ColorScheme) => {
       backgroundColor: colors.component.card,
       borderRadius: BorderRadius.xl,
       padding: Spacing.xxl,
-      margin: Spacing.md,
+      margin: Spacing.lg,
       ...Shadow(colors).md,
       borderWidth: 1,
       borderColor: colors.border.light,
@@ -415,7 +435,7 @@ export const createStyles = (colors: ColorScheme) => {
     title: {
       fontSize: Typography.fontSize.xxl,
       fontWeight: Typography.fontWeight.bold,
-      color: colors.text.primary,
+      color: 'red',
       marginBottom: Spacing.xs,
       textAlign: 'center',
       letterSpacing: -0.5,

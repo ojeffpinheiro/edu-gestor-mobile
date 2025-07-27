@@ -5,7 +5,7 @@ import { ColorScheme } from '../../styles/colors';
 import { Spacing, BorderRadius, Shadow, Typography } from '../../styles/designTokens';
 
 // Estilos globais
-import { 
+import {
   createContainerStyles,
   createCardStyles,
   createButtonStyles,
@@ -97,7 +97,7 @@ export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
 // HomeScreen Styles
 export const createHomeScreenStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     centeredContainer: {
       ...baseStyles.centeredContainer,
@@ -138,14 +138,16 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
 // ScannerScreen Styles
 export const createScannerScreenStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     screenContainer: {
       ...baseStyles.screenContainer,
       padding: 0,
+      width: '100%' as const,
     },
     scrollContainer: {
       flex: 1,
+      width: '100%' as const,
     },
     scannerContainer: {
       height: 300,
@@ -167,6 +169,8 @@ export const createScannerScreenStyles = (colors: ColorScheme) => {
       backgroundColor: colors.background.tertiary,
     },
     scannerIconContainer: {
+      alignItems: 'center',
+      justifyContent: 'center',
       backgroundColor: `${colors.primary.main}20`,
       padding: Spacing.lg,
       borderRadius: BorderRadius.round,
@@ -188,7 +192,7 @@ export const createScannerScreenStyles = (colors: ColorScheme) => {
 // StudentsScreen Styles
 export const createStudentsScreenStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     screenContainer: {
       ...baseStyles.screenContainer,
@@ -232,7 +236,7 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
 // SelectableListItem Styles
 export const createSelectableListItemStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     listItem: {
       ...baseStyles.item,
@@ -261,18 +265,22 @@ export const createSelectableListItemStyles = (colors: ColorScheme) => {
 // AuthForm Styles
 export const createAuthFormStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     container: {
       ...baseStyles.screenContainer,
       padding: Spacing.xxl,
       justifyContent: 'center' as const,
+      backgroundColor: colors.background.primary,
     },
     card: {
       ...baseStyles.base,
       padding: Spacing.xxl,
       margin: Spacing.lg,
       ...baseStyles.md,
+      borderWidth: 1,
+      borderColor: colors.border.medium,
+      backgroundColor: colors.background.secondary,
     },
     header: {
       alignItems: 'center' as const,
@@ -283,21 +291,30 @@ export const createAuthFormStyles = (colors: ColorScheme) => {
       textAlign: 'center' as const,
       marginTop: Spacing.lg,
       marginBottom: Spacing.sm,
+      color: colors.text.primary,
     },
     subtitle: {
       ...baseStyles.body,
       textAlign: 'center' as const,
-      color: colors.text.secondary,
+      color: colors.text.secondary, // Cor secundária
+      lineHeight: Typography.lineHeight.md, // Melhor legibilidade
     },
     buttonSection: {
       width: '100%',
     },
     iconGradient: {
-      // Estilo para o gradiente do ícone
-      // (substitua por um LinearGradient real se estiver usando expo-linear-gradient)
-      backgroundColor: colors.primary.main,
+      width: 64,
+      height: 64,
       borderRadius: BorderRadius.round,
-      padding: Spacing.md,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginBottom: Spacing.lg,
+      // Substituir por isso se estiver usando LinearGradient:
+      // backgroundGradient: {
+      //   colors: [colors.primary.dark, colors.primary.main],
+      //   start: [0, 0],
+      //   end: [1, 1]
+      // }
     },
     demoPassword: {
       fontWeight: 'bold' as const,
@@ -308,7 +325,7 @@ export const createAuthFormStyles = (colors: ColorScheme) => {
 
 export const createScanResultCardStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     scanResultCard: {
       ...baseStyles.base,
@@ -333,7 +350,7 @@ export const createScanResultCardStyles = (colors: ColorScheme) => {
 
 export const createScannerOverlayStyles = (colors: ColorScheme, scannerSize: number) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     overlay: {
       ...StyleSheet.absoluteFillObject,
@@ -459,7 +476,7 @@ export const createScannerControlsStyles = (colors: ColorScheme) => {
 
 export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
-  
+
   return StyleSheet.create({
     permissionCard: {
       ...baseStyles.base,

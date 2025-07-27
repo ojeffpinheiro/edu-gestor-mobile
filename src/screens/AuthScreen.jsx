@@ -15,13 +15,7 @@ const AuthScreen = () => {
     switch (currentView) {
       case 'auth':
         return (
-          <AuthForm
-            setCurrentView={setCurrentView}
-            setIsAuthenticated={setIsAuthenticated}
-            selectedStudent={selectedStudent}
-            setSelectedStudent={setSelectedStudent}
-            isAuthenticated={isAuthenticated}
-          />
+          <AuthForm setCurrentView={setCurrentView} />
         );
       case 'scanner':
         return (

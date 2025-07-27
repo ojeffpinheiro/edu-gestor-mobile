@@ -1,156 +1,172 @@
-import React, { useState, useRef, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  Alert,
-  KeyboardAvoidingView,
-  Platform,
-  TouchableWithoutFeedback,
-  Keyboard,
-  Animated
-} from 'react-native';
-import { Shield } from 'lucide-react-native';
-import { LinearGradient } from 'expo-linear-gradient';
-
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
+import createAuthStyles from './stylesAuth';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-import InputField from '../common/InputField';
-import Button from '../common/Button';
-
-import { Spacing } from '../../styles/designTokens';
-import { createAuthFormStyles as createStyles } from './styles';
-
-const AuthForm = ({ setCurrentView, setIsAuthenticated }) => {
-  const { colors } = useTheme();
-  const styles = createStyles(colors);
-
-  const [password, setPassword] = useState('admin123');
+const AuthScreen = ({ setCurrentView }) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [fadeAnim] = useState(new Animated.Value(0));
-  const [slideAnim] = useState(new Animated.Value(30));
-  const passwordInputRef = useRef(null);
-
-  const validatePassword = () => {
-    if (password === 'admin123') {
-      setIsAuthenticated(true);
-      setCurrentView('scanner');
-    } else {
-      Alert.alert('Erro', 'Senha incorreta!');
-    }
-    Keyboard.dismiss();
+  const { colors } = useTheme();
+  const styles = createAuthStyles(colors);
+  const toggleAuthMode = () => {
+    setIsLogin(!isLogin);
+    setEmail('');
+    setPassword('');
   };
 
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 600,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 600,
-        useNativeDriver: true,
-      })
-    ]).start();
-
-    if (passwordInputRef.current) {
-      passwordInputRef.current.focus();
+  const handleSubmit = () => {
+    if (isLogin) {
+      // Handle login
+      console.log('Login with:', email, password);
+      setCurrentView('scanner');
+    } else {
+      // Handle signup
+      console.log('Signup with:', email);
     }
-  }, []);
+  };
 
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 40 : 0}
+      style={styles.container}
     >
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <TouchableOpacity
-          activeOpacity={1}
-          onPress={() => passwordInputRef.current?.focus()}
-          style={styles.container}
-        >
-          <Animated.View
-            style={[
-              styles.card,
-              {
-                opacity: fadeAnim,
-                transform: [{ translateY: slideAnim }]
-              }
-            ]}
-          >
-            <View style={styles.header}>
-              <View style={styles.iconContainer}>
-                <LinearGradient
-                  colors={[colors.primary.main, colors.primary.dark]}
-                  style={styles.iconGradient}
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.logoContainer}>
+          <View style={styles.logo}>
+            {/* Replace with your actual logo */}
+            <Text style={styles.logoText}>TECHNO</Text>
+          </View>
+          <Text style={styles.welcomeText}>
+            Welcome to <Text style={styles.brandText}>TECHNO</Text>
+          </Text>
+          <Text style={styles.subtitle}>
+            {isLogin ? 'Login to Techno' : 'Get started for Free'}
+          </Text>
+        </View>
+
+        <View style={styles.formContainer}>
+          {!isLogin && (
+            <Text style={styles.termsText}>
+              By clicking any of the Sign Up buttons, you agree to the{' '}
+              <Text style={styles.linkText}>terms of service</Text>.
+            </Text>
+          )}
+
+          <View style={styles.inputContainer}>
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputWrapper}>
+              <TextInput
+                style={styles.input}
+                placeholder="yourname@email.com"
+                placeholderTextColor={colors.text.secondary}
+                value={email}
+                onChangeText={setEmail}
+                keyboardType="email-address"
+                autoCapitalize="none"
+                autoComplete="email"
+              />
+              {email.length > 0 && (
+                <TouchableOpacity
+                  style={styles.clearButton}
+                  onPress={() => setEmail('')}
                 >
-                  <Shield size={28} color={colors.text.onPrimary} />
-                </LinearGradient>
+                  <Text style={styles.clearIcon}>×</Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </View>
+
+          {isLogin && (
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Password</Text>
+              <View style={styles.inputWrapper}>
+                <TextInput
+                  style={styles.input}
+                  placeholder="••••••••"
+                  placeholderTextColor={colors.text.secondary}
+                  value={password}
+                  onChangeText={setPassword}
+                  secureTextEntry={!showPassword}
+                />
+                <TouchableOpacity
+                  style={styles.eyeButton}
+                  onPress={() => setShowPassword(!showPassword)}
+                >
+                  <MaterialCommunityIcons
+                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
+                    size={24}
+                    color={colors.text.secondary}
+                  />
+                </TouchableOpacity>
               </View>
-              <Text style={styles.title}>Bem-vindo de volta</Text>
-              <Text style={styles.subtitle}>Digite sua senha para acessar o sistema</Text>
+              <TouchableOpacity style={styles.forgotPassword}>
+                <Text style={styles.linkText}>Forgot Password?</Text>
+              </TouchableOpacity>
             </View>
+          )}
 
-            <View style={{ marginBottom: Spacing.xxl }}>
-              <InputField
-                label='Senha'
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(text) => {
-                  setPassword(text);
-                  if (passwordInputRef.current) {
-                    passwordInputRef.current.focus();
-                  }
-                }}
-                secureTextEntry={!showPassword}
-                onToggleVisibility={() => setShowPassword(!showPassword)}
-                colors={colors}
-              />
-            </View>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.submitButtonText}>
+              {isLogin ? 'Login' : 'Sign Up'}
+            </Text>
+          </TouchableOpacity>
 
-            <View style={styles.buttonSection}>
-              <Button
-                title="Entrar"
-                onPress={validatePassword}
-                variant="primary"
-                size="lg"
-                disabled={password.length === 0}
-                style={{ marginBottom: Spacing.md }}
-                fullWidth
-              />
+          <TouchableOpacity onPress={toggleAuthMode} style={styles.switchAuth}>
+            <Text style={styles.switchAuthText}>
+              {isLogin ? "Don't have an account? " : 'Already have an account? '}
+              <Text style={styles.linkText}>
+                {isLogin ? 'Sign Up' : 'Login'}
+              </Text>
+            </Text>
+          </TouchableOpacity>
 
+          <View style={styles.separator}>
+            <View style={styles.separatorLine} />
+            <Text style={styles.separatorText}>or</Text>
+            <View style={styles.separatorLine} />
+          </View>
 
-              <Button
-                title="Voltar ao início"
-                onPress={() => {
-                  setCurrentView('home');
-                  Keyboard.dismiss();
-                }}
-                variant="outline"
-                size="lg"
-                fullWidth
-              />
-            </View>
+          <View style={styles.socialButtonsContainer}>
+            <TouchableOpacity style={styles.socialButton}>
+              <Text style={styles.socialButtonText}>
+                {isLogin ? 'Login' : 'Sign Up'} with Google
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.socialButton}>
+              <Text style={styles.socialButtonText}>
+                {isLogin ? 'Login' : 'Sign Up'} with GitHub
+              </Text>
+            </TouchableOpacity>
+            {!isLogin && (
+              <TouchableOpacity style={styles.socialButton}>
+                <Text style={styles.socialButtonText}>Sign Up with Microsoft</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+        </View>
 
-            <View style={{ marginTop: Spacing.xxl }}>
-              <View style={styles.demoBox}>
-                <View style={styles.demoHeader}>
-                  <View style={styles.demoBadge}>
-                    <Text style={styles.demoBadgeText}>DEMO</Text>
-                  </View>
-                </View>
-                <Text style={styles.demoText}>
-                  Use a senha <Text style={styles.demoPassword}>'admin123'</Text> para testar o sistema
-                </Text>
-              </View>
-            </View>
-          </Animated.View>
-        </TouchableOpacity>
-      </TouchableWithoutFeedback>
+        <View style={styles.footer}>
+          <Text style={styles.footerText}>© 2024 TECHNO</Text>
+          <View style={styles.footerLinks}>
+            <TouchableOpacity>
+              <Text style={styles.footerLink}>Terms & Conditions</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerSeparator}>|</Text>
+            <TouchableOpacity>
+              <Text style={styles.footerLink}>Privacy Policy</Text>
+            </TouchableOpacity>
+            <Text style={styles.footerSeparator}>|</Text>
+            <TouchableOpacity>
+              <Text style={styles.footerLink}>Legal Notice</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default AuthForm;
+export default AuthScreen;

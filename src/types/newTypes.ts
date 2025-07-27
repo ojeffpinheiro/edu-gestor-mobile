@@ -1,3 +1,4 @@
+import { BarcodeType } from "expo-camera";
 
 export interface GradeConfig {
   expectedQuestions: number;

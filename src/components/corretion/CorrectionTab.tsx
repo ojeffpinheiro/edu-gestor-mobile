@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, ActivityIndicator } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import ExamItem from './ExamItem';
 import { useTheme } from '../../context/ThemeContext';
@@ -16,6 +16,7 @@ interface CorrectionTabProps {
     score?: number;
     status?: string;
   }>;
+  isLoading: boolean;
   answerKey?: any[];
   onExamPress?: (exam: any) => void;
   onProcessAll?: () => void;
@@ -23,6 +24,7 @@ interface CorrectionTabProps {
 
 const CorrectionTab: React.FC<CorrectionTabProps> = ({ 
   exams = [], 
+  isLoading,
   answerKey = [], 
   onExamPress = () => {}, 
   onProcessAll = () => {} 
@@ -38,18 +40,18 @@ const CorrectionTab: React.FC<CorrectionTabProps> = ({
         <Button
           variant="primary"
           onPress={onProcessAll}
-          icon={<CheckCircle size={20} color={colors.text.onPrimary} />}
-          title="Corrigir Todas"
+          disabled={isLoading}
+          icon={
+            isLoading ? (
+              <ActivityIndicator size="small" color={colors.text.onPrimary} />
+            ) : (
+              <CheckCircle size={20} color={colors.text.onPrimary} />
+            )
+          }
+          title={isLoading ? "Processando..." : "Corrigir Todas"}
           style={styles.primaryButton}
           textStyle={styles.buttonText}
         />
-      </View>
-
-      <View style={styles.examList}>
-        <Text style={styles.sectionTitle}>Provas Recentes</Text>
-        {exams.map(exam => (
-          <ExamItem key={exam.id} exam={exam} onPress={() => onExamPress(exam)} />
-        ))}
       </View>
     </View>
   );

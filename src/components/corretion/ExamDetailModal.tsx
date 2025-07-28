@@ -19,11 +19,11 @@ interface ExamDetailModalProps {
   onClose: () => void;
 }
 
-const ExamDetailModal: React.FC<ExamDetailModalProps> = ({ 
-  visible, 
-  exam, 
-  answerKey, 
-  onClose 
+const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
+  visible,
+  exam,
+  answerKey,
+  onClose
 }) => {
   const { colors } = useTheme();
   const styles = createExamDetailModalStyles(colors);
@@ -77,9 +77,9 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
               <Text style={styles.studentIdModal}>ID: {safeExam.studentId}</Text>
               <Text style={styles.examSubjectModal}>{safeExam.subject}</Text>
               <Text style={[
-                styles.scoreModal, 
-                { 
-                  color: score >= 6 ? colors.feedback.success : colors.feedback.error 
+                styles.scoreModal,
+                {
+                  color: score >= 6 ? colors.feedback.success : colors.feedback.error
                 }
               ]}>
                 Nota: {score.toFixed(1)}
@@ -89,7 +89,11 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
             <View style={styles.correctionsContainer}>
               <Text style={styles.correctionsTitle}>Correções por Questão</Text>
               {corrections.map((item, index) => (
-                <View key={`correction-${index}`} style={styles.correctionItem}>
+                <View key={`correction-${index}`}
+                  style={[
+                    styles.correctionItem,
+                    !item.isCorrect && styles.incorrectAnswer
+                  ]}>
                   <Text style={styles.questionNumber}>Q{item.question}</Text>
                   <Text style={styles.studentAnswerText}>Resposta: {item.studentAnswer}</Text>
                   <Text style={styles.correctAnswerText}>Gabarito: {item.correctAnswer}</Text>

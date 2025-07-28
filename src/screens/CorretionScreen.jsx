@@ -19,7 +19,7 @@ import CorrectionTab from '../components/corretion/CorrectionTab';
 import { Spacing } from '../styles/designTokens';
 
 const CorrectionScreen = () => {
-  const { exams, isLoading, processAllPendingExams, error } = useExams();
+  const { exams, processAllPendingExams, error } = useExams();
   const [answerKey, setAnswerKey] = useState(['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B']);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);

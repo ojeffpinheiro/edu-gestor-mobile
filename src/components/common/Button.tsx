@@ -58,21 +58,21 @@ const Button: React.FC<ButtonProps> = ({
   const styles = createButtonStyles(colors);
 
   const buttonStyles: StyleProp<ViewStyle> = [
-  styles.button,
-  variant === 'text' ? styles.textVariant : styles[variant], // Ajuste aqui
-  styles[size],
-  disabled && styles.disabled,
-  fullWidth && styles.fullWidth,
-  rounded && styles.rounded,
-  style,
-];
+    styles.button,
+    variant === 'text' ? styles.textVariant : styles[variant], // Ajuste aqui
+    styles[size],
+    disabled && styles.disabled,
+    fullWidth && styles.fullWidth,
+    rounded && styles.rounded,
+    style,
+  ];
 
   const textStyles: StyleProp<TextStyle> = [
-  styles.textStyle,
-  styles[`${variant}Text`],
-  styles[`${size}Text`],
-  textStyle,
-];
+    styles.textStyle,
+    styles[`${variant}Text`],
+    styles[`${size}Text`],
+    textStyle,
+  ];
 
   const iconColor = {
     primary: colors.text.onPrimary,
@@ -125,7 +125,6 @@ const Button: React.FC<ButtonProps> = ({
 
 const createButtonStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
-    // Base styles
     button: {
       flexDirection: 'row',
       alignItems: 'center',
@@ -134,23 +133,20 @@ const createButtonStyles = (colors: ColorScheme) => {
       borderWidth: 1,
       borderColor: 'transparent',
     },
-    
     textStyle: {
       fontWeight: Typography.fontWeight.semibold,
     },
-    
     fullWidth: {
       width: '100%',
     },
-    
     rounded: {
       borderRadius: BorderRadius.xxl,
     },
-    
     disabled: {
       opacity: 0.6,
+      backgroundColor: colors.component.disabled
     },
-    
+
     // Variants
     primary: {
       backgroundColor: colors.primary.main,
@@ -159,7 +155,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     primaryText: {
       color: colors.text.onPrimary,
     },
-    
+
     secondary: {
       backgroundColor: colors.secondary.main,
       borderColor: colors.secondary.main,
@@ -167,7 +163,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     secondaryText: {
       color: colors.text.onPrimary,
     },
-    
+
     success: {
       backgroundColor: colors.feedback.success,
       borderColor: colors.feedback.success,
@@ -175,7 +171,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     successText: {
       color: colors.text.onPrimary,
     },
-    
+
     error: {
       backgroundColor: colors.feedback.error,
       borderColor: colors.feedback.error,
@@ -183,7 +179,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     errorText: {
       color: colors.text.onPrimary,
     },
-    
+
     warning: {
       backgroundColor: colors.feedback.warning,
       borderColor: colors.feedback.warning,
@@ -191,7 +187,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     warningText: {
       color: colors.text.primary,
     },
-    
+
     info: {
       backgroundColor: colors.feedback.info,
       borderColor: colors.feedback.info,
@@ -199,7 +195,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     infoText: {
       color: colors.text.onPrimary,
     },
-    
+
     outline: {
       backgroundColor: 'transparent',
       borderColor: colors.primary.main,
@@ -207,7 +203,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     outlineText: {
       color: colors.primary.main,
     },
-    
+
     ghost: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
@@ -215,7 +211,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     ghostText: {
       color: colors.primary.main,
     },
-    
+
     floating: {
       backgroundColor: colors.gray[900] + 'CC',
       width: 56,
@@ -228,7 +224,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     floatingText: {
       color: colors.text.onPrimary,
     },
-    
+
     textVariant: {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
@@ -237,7 +233,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     textVariantText: {
       color: colors.text.primary,
     },
-    
+
     // Sizes
     sm: {
       paddingVertical: Spacing.xs,
@@ -246,7 +242,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     smText: {
       fontSize: Typography.fontSize.sm,
     },
-    
+
     md: {
       paddingVertical: Spacing.sm,
       paddingHorizontal: Spacing.md,
@@ -254,7 +250,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     mdText: {
       fontSize: Typography.fontSize.md,
     },
-    
+
     lg: {
       paddingVertical: Spacing.md,
       paddingHorizontal: Spacing.lg,
@@ -262,12 +258,12 @@ const createButtonStyles = (colors: ColorScheme) => {
     lgText: {
       fontSize: Typography.fontSize.lg,
     },
-    
+
     // Icon positioning
     iconLeft: {
       marginRight: Spacing.sm,
     },
-    
+
     iconRight: {
       marginLeft: Spacing.sm,
     },

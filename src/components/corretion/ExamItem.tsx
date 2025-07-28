@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
-import { CheckCircle, XCircle } from 'lucide-react-native';
+import { CheckCircle, Clock, XCircle } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { createExamItemStyles } from './ExamItemStyles';
 import Button from '../common/Button';
@@ -32,6 +32,8 @@ const ExamItem: React.FC<ExamItemProps> = ({ exam, onPress }) => {
         <View style={styles.examStatus}>
           {exam.status === 'corrected' ? (
             <CheckCircle size={20} color={colors.feedback.success} />
+          ) : exam.status === 'pending' ? (
+            <Clock size={20} color={colors.feedback.warning} />
           ) : (
             <XCircle size={20} color={colors.feedback.error} />
           )}
@@ -42,9 +44,9 @@ const ExamItem: React.FC<ExamItemProps> = ({ exam, onPress }) => {
         <Text style={styles.examDate}>{exam.examDate}</Text>
         {exam.score !== null && exam.score !== undefined && (
           <Text style={[
-            styles.examScore, 
-            { 
-              color: exam.score >= 6 ? colors.feedback.success : colors.feedback.error 
+            styles.examScore,
+            {
+              color: exam.score >= 6 ? colors.feedback.success : colors.feedback.error
             }
           ]}>
             Nota: {exam.score}

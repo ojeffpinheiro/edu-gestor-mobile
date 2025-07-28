@@ -31,23 +31,74 @@ export const mockQRcodes = {
 
 export const mockStudents = [
   {
-    id: "12345",
-    name: "John Doe",
-    course: "Computer Science",
-    photo: "https://randomuser.me/api/portraits/men/1.jpg"
+    id: '1',
+    name: 'João Silva',
+    registrationNumber: '20230001',
+    class: '3A',
+    photo: 'https://example.com/photo1.jpg'
   },
   {
-    id: "67890",
-    name: "Jane Smith",
-    course: "Electrical Engineering",
-    photo: "https://randomuser.me/api/portraits/women/1.jpg"
+    id: '2',
+    name: 'Maria Souza',
+    registrationNumber: '20230002',
+    class: '3B',
+    photo: 'https://example.com/photo2.jpg'
   },
   {
-    id: "54321",
-    name: "Robert Johnson",
-    course: "Mathematics",
-    photo: "https://randomuser.me/api/portraits/men/2.jpg"
-  }
+    id: '3',
+    name: 'Carlos Oliveira',
+    registrationNumber: '20230003',
+    class: '3A',
+    photo: 'https://example.com/photo3.jpg'
+  },
+  {
+    id: '4',
+    name: 'Ana Costa',
+    registrationNumber: '901234',
+    class: 'Biologia',
+    // Aqui, sem a foto
+  },
+  {
+    id: '5',
+    name: 'Lucas Pereira',
+    registrationNumber: '567890',
+    // Aqui, sem a classe e a foto
+  },
+  {
+    id: '6',
+    name: 'Carla Mendes',
+    registrationNumber: '678901',
+    class: 'História',
+    photo: 'https://example.com/photos/carla.jpg'
+  },
+  {
+    id: '7',
+    name: 'Felipe Rocha',
+    registrationNumber: '234567',
+    class: 'Geografia'
+    // sem foto
+  },
+  {
+    id: '8',
+    name: 'Bruna Almeida',
+    registrationNumber: '890123',
+    class: 'Filosofia',
+    photo: 'https://example.com/photos/bruna.jpg'
+  },
+  {
+    id: '9',
+    name: 'Ricardo Lima',
+    registrationNumber: '456789',
+    // sem class
+    photo: 'https://example.com/photos/ricardo.jpg'
+  },
+  {
+    id: '10',
+    name: 'Juliana Martins',
+    registrationNumber: '112233',
+    class: 'Sociologia'
+    // sem foto
+  },
 ];
 
 export const mockBooks = [

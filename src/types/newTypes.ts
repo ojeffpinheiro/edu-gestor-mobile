@@ -88,5 +88,7 @@ export interface AlignmentResult {
 export interface Student {
   id: string;
   name: string;
-  class: string;
+  registrationNumber: string;
+  class?: string;
+  photo?: string;
 }

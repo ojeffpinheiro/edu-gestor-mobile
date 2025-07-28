@@ -13,9 +13,9 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
     },
     scrollContent: {
       flexGrow: 1,
-      paddingTop: 60, 
+      paddingTop: 60,
     },
-    
+
     // Header Moderno
     headerContainer: {
       paddingHorizontal: 24,
@@ -233,6 +233,172 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       color: colors.text.primary,
       textAlign: 'center',
       marginTop: 20
+    },
+    container: {
+      flex: 1,
+      padding: 16,
+    },
+    searchInput: {
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 12,
+      borderWidth: 1,
+    },
+    selectAllButton: {
+      padding: 12,
+      borderRadius: 8,
+      alignItems: 'center',
+      marginBottom: 12,
+    },
+    listContent: {
+      paddingBottom: 80,
+    },
+    studentItem: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      padding: 12,
+      borderRadius: 8,
+      marginBottom: 8,
+    },
+    studentInfo: {
+      marginLeft: 12,
+    },
+    studentName: {
+      fontSize: 16,
+      fontWeight: '500',
+    },
+    studentRegNumber: {
+      fontSize: 14,
+    },
+    selectAllText: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    confirmText: {
+      fontSize: 16,
+      fontWeight: '600',
+    },
+    searchContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.background.secondary,
+      borderRadius: 12,
+      paddingHorizontal: 16,
+      paddingVertical: 12,
+      marginTop: 16,
+    },
+    searchIcon: {
+      marginRight: 8,
+    },
+    clearSearchButton: {
+      marginLeft: 8,
+      padding: 4,
+    },
+    headerRow: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    headerTitle: {
+      fontSize: 22,
+      fontWeight: '600',
+      color: colors.text.primary,
+      marginLeft: 16,
+    },
+    studentAvatar: {
+      width: 48,
+      height: 48,
+      borderRadius: 24,
+      backgroundColor: `${colors.primary.main}15`,
+      justifyContent: 'center',
+      alignItems: 'center',
+      marginRight: 16,
+    },
+    studentInitial: {
+      fontSize: 18,
+      fontWeight: '600',
+      color: colors.primary.main,
+    },
+    studentInfoContainer: {
+      flex: 1,
+    },
+    studentDetails: {
+      fontSize: 14,
+      color: colors.text.secondary,
+    },
+    selectionBadge: {
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      borderWidth: 2,
+      borderColor: colors.primary.main,
+      justifyContent: 'center',
+      alignItems: 'center',
+    },
+    selectedBadge: {
+      backgroundColor: colors.primary.main,
+    },
+    floatingActionBar: {
+      position: 'absolute',
+      bottom: 24,
+      left: 24,
+      right: 24,
+      borderRadius: 16,
+      padding: 16,
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      ...Shadow(colors).md,
+      elevation: 8,
+    },
+    selectionCountText: {
+      fontSize: 14,
+      color: colors.text.secondary,
+    },
+    confirmButton: {
+      backgroundColor: colors.primary.main,
+      borderRadius: 12,
+      paddingVertical: 12,
+      paddingHorizontal: 20,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    confirmButtonText: {
+      color: colors.text.onPrimary,
+      fontSize: 16,
+      fontWeight: '600',
+      marginRight: 8,
+    }, emptyContainer: {
+      flex: 1,
+      justifyContent: 'center',
+      alignItems: 'center',
+      paddingHorizontal: 40,
+    },
+    emptyIllustration: {
+      marginBottom: 24,
+    },
+    emptyDescription: {
+      fontSize: 16,
+      color: colors.text.secondary,
+      textAlign: 'center',
+      marginBottom: 24,
+      lineHeight: 24,
+    },
+    emptyActionButton: {
+      backgroundColor: colors.primary.main,
+      paddingHorizontal: 24,
+      paddingVertical: 12,
+      borderRadius: 8,
+    },
+    emptyActionText: {
+      color: colors.text.onPrimary,
+      fontWeight: '600',
+    },
+    backButton: {
+      padding: 8,
+      marginRight: 8,
+    },
+    confirmIcon: {
+      marginLeft: 8,
     },
   });
 };

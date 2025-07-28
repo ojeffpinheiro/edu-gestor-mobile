@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { Settings, Plus } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import createSettingsTabStyles from './SettingsTabStyles';
 import Button from '../common/Button';
+import { createSettingsTabStyles } from './SettingsTabStyles';
 
 interface SettingsTabProps {
   answerKey?: string[];

@@ -2,12 +2,12 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { User } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
-import createHeaderstyles from './AppHeaderStyles';
 import Button from '../common/Button';
+import { createHeaderStyles } from './AppHeaderStyles';
 
 const AppHeader = () => {
   const { colors } = useTheme();
-  const styles = createHeaderstyles(colors);
+  const styles = createHeaderStyles(colors);
 
   return (
     <View style={styles.header}>

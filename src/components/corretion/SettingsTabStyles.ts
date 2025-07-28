@@ -60,5 +60,14 @@ export const createSettingsTabStyles = (colors: ColorScheme) => {
     dangerText: {
       color: colors.feedback.error,
     },
+    answerKeyText: {
+      ...body,
+    },
+    settingsButton: {
+      ...secondary,
+    },
+    settingsButtonText: {
+      ...text,
+    }
   });
 };

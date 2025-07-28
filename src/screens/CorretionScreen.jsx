@@ -1,78 +1,33 @@
 import React, { useState } from 'react';
 import { SafeAreaView, ScrollView, StatusBar, Alert, StyleSheet } from 'react-native';
+
 import { correctExam, generateReport } from '../utils/examUtils';
+import { useTheme } from '../context/ThemeContext';
+import { useExams } from '../hooks/useExams';
+
 import { Exam } from '../types/examTypes';
+
+import StatusMessage from '../components/common/StatusMessage';
+
 import ReportsTab from '../components/corretion/ReportsTab';
 import SettingsTab from '../components/corretion/SettingsTab';
 import AppHeader from '../components/corretion/AppHeader';
 import TabNavigation from '../components/corretion/TabNavigation';
 import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import CorrectionTab from '../components/corretion/CorrectionTab';
-import { useTheme } from '../context/ThemeContext';
+
 import { Spacing } from '../styles/designTokens';
 
 const CorrectionScreen = () => {
-  const [activeTab, setActiveTab] = useState('correction');
-  const [exams, setExams] = useState([
-    {
-      id: 1,
-      studentName: 'João Silva',
-      studentId: '2023001',
-      examDate: '2024-03-15',
-      subject: 'Matemática',
-      answers: ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B'],
-      status: 'corrected',
-      score: 8.5,
-      totalQuestions: 10
-    },
-    {
-      id: 2,
-      studentName: 'Maria Santos',
-      studentId: '2023002',
-      examDate: '2024-03-15',
-      subject: 'Matemática',
-      answers: ['A', 'B', 'C', 'A', 'A', 'B', 'C', 'D', 'B', 'B'],
-      status: 'corrected',
-      score: 7.0,
-      totalQuestions: 10
-    },
-    {
-      id: 3,
-      studentName: 'Pedro Costa',
-      studentId: '2023003',
-      examDate: '2024-03-15',
-      subject: 'Matemática',
-      answers: ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B'],
-      status: 'pending',
-      score: null,
-      totalQuestions: 10
-    }
-  ]);
-
-  const { colors } = useTheme();
-  const styles = createCorrectionScreenStyles(colors);
-
+  const { exams, isLoading, processAllPendingExams, error } = useExams();
   const [answerKey, setAnswerKey] = useState(['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B']);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
 
-  const processAllPendingExams = () => {
-    const updatedExams = exams.map(exam => {
-      if (exam.status === 'pending') {
-        const { score } = correctExam(exam.answers, answerKey);
-        return {
-          ...exam,
-          score: parseFloat(score.toFixed(1)),
-          status: 'corrected'
-        };
-      }
-      return exam;
-    });
+  const [activeTab, setActiveTab] = useState('correction');
 
-    setExams(updatedExams);
-    Alert.alert('Sucesso', 'Todas as provas foram corrigidas!');
-  };
-
+  const { colors } = useTheme();
+  const styles = createCorrectionScreenStyles(colors);
   const report = generateReport(exams);
 
   const renderTabContent = () => {
@@ -98,16 +53,33 @@ const CorrectionScreen = () => {
     }
   };
 
-  const handleExamPress = (exam) => {
-    setSelectedExam(exam);
-    setModalVisible(true);
-  };
-
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.screenContainer}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       <AppHeader />
+
+      {/* Feedback de erro/sucesso */}
+      {error && (
+        <StatusMessage
+          type="error"
+          title="Erro de validação"
+          message={error}
+          onDismiss={() => setLocalError(null)}
+        />
+      )}
+
+      {error && (
+        <StatusMessage
+          type="error"
+          title={error.title}
+          message={error.message}
+          actions={error.actions?.map(action => ({
+            label: action.text,
+            onPress: action.onPress
+          }))}
+        />
+      )}
 
       <ScrollView style={styles.content}>
         {renderTabContent()}
@@ -115,7 +87,7 @@ const CorrectionScreen = () => {
 
       <TabNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <ExamDetailModal 
+      <ExamDetailModal
         visible={modalVisible}
         exam={selectedExam}
         answerKey={answerKey}

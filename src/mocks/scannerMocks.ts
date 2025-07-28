@@ -1,3 +1,4 @@
+import { ExamResult } from "../hooks/useExams";
 import { ExamTemplate, Student } from "../types/newTypes";
 
 // mocks/scannerMocks.ts
@@ -167,3 +168,39 @@ export const sampleStudents: Student[] = [
     photo: 'https://example.com/photos/luis.jpg'
   }
 ];
+
+export const initialExams: ExamResult[] = [
+  {
+    id: '1',
+    studentName: 'João Silva',
+    studentId: '2023001',
+    examDate: '2024-03-15',
+    subject: 'Matemática',
+    answers: ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B'],
+    status: 'corrected',
+    score: 8.5,
+    totalQuestions: 10
+  },
+  {
+    id: '2',
+    studentName: 'Maria Santos',
+    studentId: '2023002',
+    examDate: '2024-03-15',
+    subject: 'Matemática',
+    answers: ['A', 'B', 'C', 'A', 'A', 'B', 'C', 'D', 'B', 'B'],
+    status: 'corrected',
+    score: 7.0,
+    totalQuestions: 10
+  },
+  {
+    id: '3',
+    studentName: 'Pedro Costa',
+    studentId: '2023003',
+    examDate: '2024-03-15',
+    subject: 'Matemática',
+    answers: ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B'],
+    status: 'pending',
+    score: null,
+    totalQuestions: 10
+  }
+]

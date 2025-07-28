@@ -163,8 +163,8 @@ export const darkColors: ColorPalette = {
     secondary: '#1E1E1E', // Preto mais claro
     tertiary: '#2D2D2D', // Cinza escuro
     overlay: {
-      main: 'rgba(255, 255, 255, 0.7)',
-      light: 'rgba(0, 0, 0, 0.8)'
+      main: 'rgba(0, 0, 0, 0.8)',
+      light: 'rgba(255, 255, 255, 0.7)'
     }
   },
   text: {

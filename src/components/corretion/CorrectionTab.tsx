@@ -2,9 +2,9 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import ExamItem from './ExamItem';
-import createCorrectionTabStyles from './CorrectionTabStyles';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
+import { createCorrectionTabStyles } from './CorrectionTabStyles';
 
 interface CorrectionTabProps {
   exams?: Array<{

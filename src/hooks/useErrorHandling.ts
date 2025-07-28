@@ -133,6 +133,34 @@ const useErrorHandling = () => {
         'Verifique se não há caracteres inválidos'
       ]
     },
+    invalid_input: {
+      title: 'Entrada inválida',
+      message: 'Verifique os dados fornecidos:',
+      troubleshooting: [
+        'O gabarito deve conter apenas respostas A, B, C ou D',
+        'Nenhum campo pode estar vazio',
+        'Verifique se todas as provas têm respostas cadastradas'
+      ]
+    },
+
+    no_pending_exams: {
+      title: 'Nenhuma prova pendente',
+      message: 'Todas as provas já foram corrigidas.',
+      troubleshooting: [
+        'Verifique se há novas provas para corrigir',
+        'Se necessário, redefina o status de alguma prova'
+      ]
+    },
+
+    processing_error: {
+      title: 'Erro na correção',
+      message: 'Ocorreu um erro durante o processamento:',
+      troubleshooting: [
+        'Verifique a conexão com a internet',
+        'Tente novamente com um gabarito diferente',
+        'Se o problema persistir, contate o suporte'
+      ]
+    }
   };
 
   const getErrorConfig = (errorCode: string) => {

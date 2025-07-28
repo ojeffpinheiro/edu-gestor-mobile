@@ -4,12 +4,12 @@ import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import ScannerCamera from '../common/ScannerCamera';
-import { BarcodeType } from 'expo-camera';
+import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 interface BarcodeGuideProps {
   setActiveMode: (mode: null) => void;
   isScanning: boolean;
-  handleBarcodeScanned: (result: { data: string }) => void;
+  handleBarcodeScanned: (result: BarcodeScanningResult) => void;
   barcodeTypes: BarcodeType[];
   torchOn: boolean;
   scanLineAnimation: any;

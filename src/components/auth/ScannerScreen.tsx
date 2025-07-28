@@ -84,22 +84,19 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   };
 
   const handleBarcodeScanned = (result: BarcodeScanningResult) => {
-    const { data } = result;
-    if (!scannedCode && isScanning) {
-      // Verifica se o código escaneado é válido (mock)
-      const isValid = validateScannedCode(data, activeMode);
+    console.log('Barcode scanned:', result.data);
+    const isValid = validateScannedCode(result.data, activeMode);
 
-      if (isValid) {
-        setScannedCode(data);
-        setIsScanning(false);
-        setIsAuthenticated(true);
-        setCurrentView('students');
-        Alert.alert('Sucesso', 'Código válido escaneado!');
-      } else {
-        Alert.alert('Erro', 'Código inválido. Por favor, tente novamente.');
-        setIsScanning(false);
-      }
+    if (isValid) {
+      console.log('Code is valid, proceeding...');
+      setScannedCode(result.data);
+      setIsAuthenticated(true);
+      setCurrentView('students');
+    } else {
+      console.log('Invalid code');
+      Alert.alert('Erro', 'Código inválido. Por favor, tente novamente.');
     }
+    setIsScanning(false);
   };
 
   const validateScannedCode = (code: string, mode: 'qr' | 'barcode' | 'manual' | null): boolean => {
@@ -146,9 +143,14 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   };
 
   const mockScan = (type: 'valid' | 'invalid') => {
+    console.log('MockScan called with type:', type);
+    setIsScanning(true);
+
     const code = activeMode === 'qr'
       ? mockQRcodes[type][Math.floor(Math.random() * mockQRcodes[type].length)]
       : mockBarcodes[type][Math.floor(Math.random() * mockBarcodes[type].length)];
+
+    console.log('Generated mock code:', code);
 
     const mockResult: BarcodeScanningResult = {
       data: code,
@@ -165,6 +167,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
       }
     };
 
+    console.log('Calling handleBarcodeScanned with:', mockResult);
     handleBarcodeScanned(mockResult);
   };
 

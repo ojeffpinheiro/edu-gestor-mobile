@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, Animated } from 'react-native';
+import { View, Text, Animated, ScrollView } from 'react-native';
 import { CheckCircle } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 
@@ -33,7 +33,7 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
   };
 
   return (
-    <View style={styles.screenContainer}>
+    <ScrollView style={styles.screenContainer}>
       <Card variant="elevated">
         <SectionHeader
           title="Identificação de Aluno"
@@ -91,7 +91,7 @@ const StudentsScreen = ({ scannedCode, selectedStudent, setSelectedStudent, setC
           />
         </View>
       </Card>
-    </View>
+    </ScrollView>
   );
 };
 

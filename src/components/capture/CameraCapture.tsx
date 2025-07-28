@@ -17,6 +17,7 @@ import MarkAnalysis from './MarkAnalysis';
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import { createContainerStyles, createTextStyles } from '../../styles/globalStyles';
 import { Spacing } from '../../styles/designTokens';
+import LoadingOverlay from '../LoadingOverlay';
 
 interface PointsStatus {
   [key: number]: boolean;
@@ -46,6 +47,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   const containers = createContainerStyles(colors);
   const text = createTextStyles(colors);
 
+  const [isLoading, setIsLoading] = useState(false);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [dimensions, setDimensions] = useState(Dimensions.get('window'));
@@ -274,8 +276,10 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
   };
 
   const handleCapture = useCallback(async () => {
+    if (isLoading) return;
     console.log('Iniciando captura...');
-
+    setIsLoading(true);
+    
     if (!cameraRef.current) {
       console.log('Referência da câmera não disponível');
       return;
@@ -400,6 +404,8 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
           </Text>
         </View>
       )}
+
+      {isLoading && <LoadingOverlay /> }
 
       <CaptureControls
         onCapture={handleCapture}

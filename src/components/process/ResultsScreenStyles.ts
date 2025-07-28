@@ -11,6 +11,9 @@ export const createResultsScreenStyles = (colors: ColorScheme) => {
     screenContainer: {
       ...containers.screenContainer,
     },
+    heading1: {
+      ...text.heading1,
+    },
     emptyState: {
       ...containers.centeredContainer,
       gap: Spacing.md,

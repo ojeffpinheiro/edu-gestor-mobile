@@ -92,3 +92,26 @@ export interface Student {
   class?: string;
   photo?: string;
 }
+
+export interface CorrectionResult {
+  studentId: string; // ID do aluno
+  studentName: string; // Nome do aluno
+  totalQuestions: number; // Total de questões na prova
+  correctAnswers: number; // Número de respostas corretas
+  score: number; // Pontuação do aluno (porcentagem)
+  detailedResults: {
+    question: number; // Número da questão
+    studentAnswer: string; // Resposta do aluno
+    correctAnswer: string; // Resposta correta
+    isCorrect: boolean; // Indica se a resposta está correta
+  }[]; // Resultados detalhados para cada questão
+  timestamp: string; // Data e hora da correção
+}
+
+export interface ExamTemplate {
+  id: string;
+  title: string;
+  questions: number;
+  alternatives: string[];
+  answerKey: string[];
+}

@@ -15,7 +15,7 @@ const ResultsScreen = ({ corrections }) => {
       {corrections.length === 0 ? (
         <View style={styles.emptyState}>
           <BarChart3 size={48} color={colors.icons.secondary} />
-          <Text style={styles.bodyText}>Nenhuma correção realizada ainda</Text>
+          <Text style={styles.emptyText}>Nenhuma correção realizada ainda</Text>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.resultsList}>

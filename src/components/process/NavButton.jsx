@@ -3,15 +3,15 @@ import { StyleSheet } from 'react-native';
 import Button from '../common/Button';
 import { useTheme } from '../../context/ThemeContext';
 import { Shadow } from '../../styles/designTokens';
+import { createButtonStyles } from '../../styles/globalStyles';
 
 const NavButton = ({ icon, active, ...props }) => {
   const { colors } = useTheme();
+    const buttons = createButtonStyles(colors);
   
   const styles = StyleSheet.create({
     button: {
-      width: 50,
-      height: 50,
-      padding: 0,
+      ...buttons.round
     },
     activeButton: {
       ...Shadow(colors).sm,

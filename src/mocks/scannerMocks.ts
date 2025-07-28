@@ -1,3 +1,5 @@
+import { ExamTemplate, Student } from "../types/newTypes";
+
 // mocks/scannerMocks.ts
 export const mockBarcodes = {
   valid: [
@@ -119,5 +121,49 @@ export const mockBooks = [
     title: "Domain-Driven Design",
     author: "Eric Evans",
     available: true
+  }
+];
+
+export const sampleExamTemplate: ExamTemplate = {
+  id: '001',
+  title: 'Prova de Matemática - 3º Ano',
+  questions: 20,
+  alternatives: ['A', 'B', 'C', 'D', 'E'],
+  answerKey: ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B', 'C', 'D']
+};
+
+export const sampleStudents: Student[] = [
+  {
+    id: '1',
+    name: 'João Silva',
+    registrationNumber: '2023001',
+    class: 'Turma A',
+    photo: 'https://example.com/photos/joao.jpg'
+  },
+  {
+    id: '2',
+    name: 'Maria Oliveira',
+    registrationNumber: '2023002',
+    class: 'Turma B',
+    photo: 'https://example.com/photos/maria.jpg'
+  },
+  {
+    id: '3',
+    name: 'Carlos Souza',
+    registrationNumber: '2023003',
+    photo: 'https://example.com/photos/carlos.jpg'
+  },
+  {
+    id: '4',
+    name: 'Ana Costa',
+    registrationNumber: '2023004',
+    class: 'Turma C',
+  },
+  {
+    id: '5',
+    name: 'Luís Pereira',
+    registrationNumber: '2023005',
+    class: 'Turma A',
+    photo: 'https://example.com/photos/luis.jpg'
   }
 ];

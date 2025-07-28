@@ -13,6 +13,7 @@ export const createNavigationStyles = (colors: ColorScheme) => {
     container: {
       ...header.navHeader,
       padding: Spacing.md,
+      backgroundColor: colors.primary.light,
     },
     title: {
       ...text.heading2,
@@ -24,6 +25,7 @@ export const createNavigationStyles = (colors: ColorScheme) => {
     },
     button: {
       ...buttons.round,
+      justifyContent: 'center',
     },
   });
 };

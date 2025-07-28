@@ -12,6 +12,9 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
     screenContainer: {
       ...containers.screenContainer,
     },
+    emptyCapture:{
+      ...containers.buttonContainer
+    },
     heading1: {
       ...text.heading1,
       textAlign: 'center',
@@ -19,6 +22,12 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
     },
     heading2: {
       ...text.heading2,
+    },
+    bodyText: {
+      ...text.body,
+    },
+    captureText: {
+      ...text.caption,
     },
     card: {
       ...cards.base,

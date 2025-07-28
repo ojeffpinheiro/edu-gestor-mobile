@@ -14,6 +14,12 @@ export const createSettingsScreenStyles = (colors: ColorScheme) => {
       ...containers.screenContainer,
       gap: Spacing.xl,
     },
+    heading1: {
+      ...text.heading1,
+    },
+    heading2: {
+      ...text.heading2,
+    },
     card: {
       ...cards.base,
     },
@@ -45,6 +51,9 @@ export const createSettingsScreenStyles = (colors: ColorScheme) => {
     switchLabel: {
       ...text.body,
       flex: 1,
+    },
+    bodyText: {
+      ...text.body,
     },
     button: {
       marginTop: Spacing.md,

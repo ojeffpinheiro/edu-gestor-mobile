@@ -133,7 +133,6 @@ const CaptureScreen = () => {
   }
 
   // Tela Principal
-  // Tela Principal
   return (
     <View style={styles.screenContainer}>
       <Text style={styles.title}>
@@ -142,7 +141,7 @@ const CaptureScreen = () => {
 
       {!selectedImage && !isProcessing && (
         <View style={styles.imagePlaceholder}>
-          <Text>
+          <Text style={styles.placeholderText}>
             Nenhuma imagem selecionada
           </Text>
         </View>
@@ -169,6 +168,7 @@ const CaptureScreen = () => {
       <View style={styles.buttonContainer}>
         <AppButton
           title="Abrir Câmera"
+          textStyle={{ color: colors.text.card }}
           onPress={() => setCurrentScreen('camera')}
           style={[styles.button, styles.cameraButton]}
           icon={<MaterialIcons name="photo-camera" size={20} color="white" />}
@@ -245,6 +245,9 @@ export const createCaptureScreenStyles = (colors) => {
       alignItems: 'center',
       marginVertical: Spacing.lg,
     },
+    placeholderText: {
+      color: colors.text.primary
+    },
     buttonContainer: {
       ...containers.buttonContainer,
     },
@@ -257,7 +260,8 @@ export const createCaptureScreenStyles = (colors) => {
       backgroundColor: colors.primary.main,
     },
     galleryButton: {
-      ...buttons.secondary,
+      backgroundColor: colors.secondary.main,
+      color: colors.text.card
     },
     colorDetectorButton: {
       backgroundColor: colors.primary.light,

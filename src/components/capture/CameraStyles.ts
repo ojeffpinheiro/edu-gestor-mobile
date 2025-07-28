@@ -14,6 +14,12 @@ export const createCameraBaseStyles = (colors: ColorScheme) => {
       position: 'relative',
       backgroundColor: colors.background.primary,
     },
+    processingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background.overlay.main,
+    },
     permissionContainer: {
       flex: 1,
       justifyContent: 'center',

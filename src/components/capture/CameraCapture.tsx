@@ -85,6 +85,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
     return () => {
       clearInterval(interval);
       clearTimeout(timeout);
+      tf.disposeVariables();
     };
   }, [autoCaptureMode, isProcessing, hasPermission]);
 

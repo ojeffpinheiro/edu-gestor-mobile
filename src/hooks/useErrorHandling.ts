@@ -114,7 +114,25 @@ const useErrorHandling = () => {
         'Tente novamente em um ambiente mais iluminado',
         'Reinicie o aplicativo'
       ]
-    }
+    },
+    image_validation: {
+      title: 'Problema na imagem',
+      message: 'A imagem não atende aos requisitos mínimos.',
+      troubleshooting: [
+        'Verifique se a imagem está nítida e bem iluminada',
+        'Certifique-se de que o formato é JPG, JPEG ou PNG',
+        'Reduza o tamanho da imagem se for muito grande'
+      ]
+    },
+    invalid_question_count: {
+      title: 'Número inválido',
+      message: 'O número de questões deve ser entre 1 e 100.',
+      troubleshooting: [
+        'Digite um número inteiro',
+        'Use valores entre 1 e 100',
+        'Verifique se não há caracteres inválidos'
+      ]
+    },
   };
 
   const getErrorConfig = (errorCode: string) => {
@@ -131,11 +149,11 @@ const useErrorHandling = () => {
       troubleshooting: config.troubleshooting
     });
 
-    
+
     // Monta os botões de ação
     const buttons = [
       ...(config.actions || []),
-      { text: 'Entendi', onPress: () => {} }
+      { text: 'Entendi', onPress: () => { } }
     ];
 
     Alert.alert(
@@ -143,14 +161,14 @@ const useErrorHandling = () => {
       errorMessage || config.message,
       buttons
     );
-    
+
     // Para erros mais complexos, mostra um segundo alerta com dicas
     if (config.troubleshooting && config.troubleshooting.length > 0) {
       setTimeout(() => {
         Alert.alert(
           'Como resolver?',
           config.troubleshooting!.join('\n\n• '),
-          [{ text: 'OK', onPress: () => {} }]
+          [{ text: 'OK', onPress: () => { } }]
         );
       }, 500);
     }
@@ -174,7 +192,8 @@ const useErrorHandling = () => {
   return {
     showError,
     showCustomError,
-    errorMappings
+    errorMappings,
+    getErrorConfig
   };
 };
 

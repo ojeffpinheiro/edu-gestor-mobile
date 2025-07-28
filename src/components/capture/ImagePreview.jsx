@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Image, Text } from 'react-native';
+import React, { useState } from 'react';
+import { View, Image, Text, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import { createCameraStyles } from './CameraStyles';
@@ -7,8 +7,27 @@ import Button from '../common/Button';
 import { Spacing } from '../../styles/designTokens';
 
 const ImagePreview = ({ imageUri, onRetry, onConfirm }) => {
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const scaleAnim = useState(new Animated.Value(0.9))[0];
+  
   const { colors } = useTheme();
   const cameraStyles = createCameraStyles(colors);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 500,
+        easing: Easing.out(Easing.back(1)),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   return (
     // Atualizar estilos usando createThemeStyles

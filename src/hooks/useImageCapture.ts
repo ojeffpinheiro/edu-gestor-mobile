@@ -10,6 +10,7 @@ import chroma from 'chroma-js';
 import { Buffer } from 'buffer';
 import * as Haptics from 'expo-haptics';
 import useErrorHandling from './useErrorHandling';
+import { validateImageFile, validateImageQuality, validateLightingConditions } from '../utils/validationUtils';
 
 interface ImageCaptureResult {
   uri: string;
@@ -87,6 +88,18 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const analyzePoints = async (imageUri: string, landscape: boolean): Promise<PointAnalysisResult> => {
     try {
       setIsProcessing(true);
+      
+      // Validação do arquivo de imagem
+      const fileValidation = validateImageFile({ uri: imageUri });
+      if (!fileValidation.isValid) {
+        throw new Error(fileValidation.message);
+      }
+
+      // Validação da qualidade da imagem
+      const qualityValidation = await validateImageQuality(imageUri);
+      if (!qualityValidation.isValid) {
+        throw new Error(qualityValidation.message);
+      }
 
       const base64String = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
@@ -94,9 +107,15 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
 
       const rawImageData = Buffer.from(base64String, 'base64');
       const imageData = jpeg.decode(rawImageData, { useTArray: true });
-
       const pixelBuffer = new Uint8Array(imageData.data);
       let imageTensor = tf.tensor3d(pixelBuffer, [imageData.height, imageData.width, 4], 'float32');
+
+      // Validação das condições de iluminação
+      const lightingValidation = validateLightingConditions(imageTensor);
+      if (!lightingValidation.isValid) {
+        tf.dispose(imageTensor);
+        throw new Error(lightingValidation.message);
+      }
 
       // Redimensionar se necessário
       const MAX_SIZE = 1024;
@@ -182,9 +201,9 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
         shouldCapture: correctPoints === referencePoints.length
       };
     } catch (error) {
-      const errorObj = error instanceof Error ? error : new Error(String(error));
-      showError('image_processing', errorObj);
-      throw errorObj; // Rejeita a promise com o erro correto
+      const errorObj = error instanceof Error ? error : new Error('Falha na validação da imagem');
+      showError('image_validation', errorObj);
+      throw errorObj;
     } finally {
       setIsProcessing(false);
     }

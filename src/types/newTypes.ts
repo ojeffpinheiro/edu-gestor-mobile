@@ -84,3 +84,9 @@ export interface AlignmentResult {
   quality: number;
   corners?: { x: number; y: number }[];
 }
+
+export interface Student {
+  id: string;
+  name: string;
+  class: string;
+}

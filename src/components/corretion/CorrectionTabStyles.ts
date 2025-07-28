@@ -41,6 +41,10 @@ export const createCorrectionTabStyles = (colors: ColorScheme) => {
       paddingHorizontal: Spacing.lg,
       gap: Spacing.sm,
     },
+    primaryButtonDisabled: {
+      ...buttons.primary,
+      opacity: 0.6,
+    },
 
     // Button text
     buttonText: {

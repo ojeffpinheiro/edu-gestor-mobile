@@ -84,9 +84,10 @@ export const createExamDetailModalStyles = (colors: ColorScheme) => {
       borderLeftColor: colors.feedback.success,
     },
     incorrectAnswer: {
-      backgroundColor: colors.feedback.error,
+      backgroundColor: colors.feedback.error + '20',
       borderLeftWidth: 4,
-      borderLeftColor: colors.feedback.error + '99',
+      borderLeftColor: colors.feedback.error,
+      padding: Spacing.sm,
     },
     modalBody: {
       flex: 1,

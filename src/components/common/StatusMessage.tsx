@@ -6,7 +6,7 @@ import { X, CheckCircle, AlertCircle } from 'lucide-react-native';
 import { ColorScheme } from '../../styles/colors';
 import { Spacing } from '../../styles/designTokens';
 
-type StatusType = 'error' | 'success' | 'warning';
+type StatusType = 'error' | 'success' | 'warning' | 'info' | 'default';
 
 interface StatusMessageProps {
   type: StatusType;

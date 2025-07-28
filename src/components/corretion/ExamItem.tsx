@@ -22,8 +22,17 @@ const ExamItem: React.FC<ExamItemProps> = ({ exam, onPress }) => {
   const { colors } = useTheme();
   const styles = createExamItemStyles(colors);
 
+  const statusStyle = exam.status === 'corrected'
+    ? styles.examItemCorrected
+    : exam.status === 'pending'
+      ? styles.examItemPending
+      : null;
+
   return (
-    <TouchableOpacity style={styles.examItem} onPress={onPress}>
+    <TouchableOpacity
+      style={[styles.examItem, statusStyle]}
+      onPress={onPress}
+    >
       <View style={styles.examHeader}>
         <View>
           <Text style={styles.studentName}>{exam.studentName}</Text>

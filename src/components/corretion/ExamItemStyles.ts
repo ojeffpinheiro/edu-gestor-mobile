@@ -12,7 +12,15 @@ export const createExamItemStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
     examItem: {
       ...cards.examItem,
-      ...listItems.base
+      ...listItems.base,
+      borderLeftWidth: 4,
+      borderLeftColor: colors.background.primary
+    },
+    examItemPending: {
+      borderLeftColor: colors.feedback.warning
+    },
+    examItemCorrected: {
+      borderLeftColor: colors.feedback.success
     },
     examHeader: {
       flexDirection: 'row',

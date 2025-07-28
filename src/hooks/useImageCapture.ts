@@ -9,6 +9,7 @@ import * as jpeg from 'jpeg-js';
 import chroma from 'chroma-js';
 import { Buffer } from 'buffer';
 import * as Haptics from 'expo-haptics';
+import useErrorHandling from './useErrorHandling';
 
 interface ImageCaptureResult {
   uri: string;
@@ -36,6 +37,8 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const [autoCaptureMode, setAutoCaptureMode] = useState<'OFF' | 'FAST' | 'SLOW'>('OFF');
   const [isLandscape, setIsLandscape] = useState(false);
 
+  const { showError } = useErrorHandling();
+
   // Solicitar permissões da câmera e galeria
   useEffect(() => {
     const requestPermissions = async () => {
@@ -58,11 +61,6 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
     updateOrientation();
 
     return () => subscription?.remove();
-  }, []);
-
-  const showError = useCallback((title: string, message: string) => {
-    Alert.alert(title, message, [{ text: 'OK' }]);
-    console.error(`${title}: ${message}`);
   }, []);
 
   const analyzeColor = (r: number, g: number, b: number) => {
@@ -89,7 +87,7 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const analyzePoints = async (imageUri: string, landscape: boolean): Promise<PointAnalysisResult> => {
     try {
       setIsProcessing(true);
-      
+
       const base64String = await FileSystem.readAsStringAsync(imageUri, {
         encoding: FileSystem.EncodingType.Base64,
       });
@@ -113,15 +111,14 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
         imageTensor = resizedTensor;
       }
 
-      const referencePoints = landscape
-        ? [
-          { id: 1, x: 0.26, y: 0.1 },
-          { id: 2, x: 0.26, y: 0.85 },
-          { id: 3, x: 0.35, y: 0.1 },
-          { id: 4, x: 0.5, y: 0.85 },
-          { id: 5, x: 0.8, y: 0.1 },
-          { id: 6, x: 0.8, y: 0.85 }
-        ]
+      const referencePoints = landscape ? [
+        { id: 1, x: 0.26, y: 0.1 },
+        { id: 2, x: 0.26, y: 0.85 },
+        { id: 3, x: 0.35, y: 0.1 },
+        { id: 4, x: 0.5, y: 0.85 },
+        { id: 5, x: 0.8, y: 0.1 },
+        { id: 6, x: 0.8, y: 0.85 }
+      ]
         : [
           { id: 1, x: 0.1, y: 0.2 },
           { id: 2, x: 1, y: 0.2 },
@@ -176,7 +173,7 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
       }
 
       tf.dispose(imageTensor);
-      
+
       return {
         pointsStatus: newPointsStatus,
         pointsColors: newPointsColors,
@@ -185,8 +182,9 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
         shouldCapture: correctPoints === referencePoints.length
       };
     } catch (error) {
-      console.error('Erro na análise de pontos:', error);
-      throw error;
+      const errorObj = error instanceof Error ? error : new Error(String(error));
+      showError('image_processing', errorObj);
+      throw errorObj; // Rejeita a promise com o erro correto
     } finally {
       setIsProcessing(false);
     }
@@ -197,7 +195,8 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
       setCapturedImage(imageResult.uri);
       onPhotoCaptured(imageResult.uri);
     } catch (error) {
-      showError('Erro de Processamento', error instanceof Error ? error.message : 'Falha ao processar imagem');
+      const errorObj = error instanceof Error ? error : new Error('Falha ao processar imagem');
+      showError('image_processing', errorObj);
     }
   }, [onPhotoCaptured, showError]);
 
@@ -205,6 +204,7 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
     if (isProcessing || !cameraRef.current) return;
 
     setIsProcessing(true);
+
     try {
       const photo: CameraCapturedPicture = await cameraRef.current.takePictureAsync({
         quality: 0.8,
@@ -217,11 +217,19 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
       setPointsStatus(result.pointsStatus);
       setPointsColors(result.pointsColors);
 
-      if (result.shouldCapture) {
-        await handleImageCapture({ uri: photo.uri });
+      if (result.correctPoints < result.totalPoints) {
+        const errorMessage = `Pontos identificados: ${result.correctPoints}/${result.totalPoints}`;
+        showError('point_analysis_failed', new Error(errorMessage));
+        return;
       }
+
+      await handleImageCapture({ uri: photo.uri });
     } catch (error) {
-      showError('Erro de Captura', 'Falha ao processar a imagem');
+      if (error instanceof Error && error.message.includes('permission')) {
+        showError('camera_permission_denied');
+      } else {
+        showError('capture_failed', error instanceof Error ? error : undefined);
+      }
     } finally {
       setIsProcessing(false);
     }
@@ -243,8 +251,10 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
           height: result.assets[0].height
         });
       }
+
     } catch (error) {
-      showError('Erro na Galeria', error instanceof Error ? error.message : 'Falha ao abrir galeria');
+      const errorObj = error instanceof Error ? error : new Error('Falha ao abrir galeria');
+      showError('gallery_permission', errorObj);
     }
   }, [handleImageCapture, showError]);
 

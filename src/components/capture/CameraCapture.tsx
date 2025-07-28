@@ -1,17 +1,22 @@
 // src/components/capture/CameraCapture.tsx
 import React, { useRef, useState } from 'react';
-import { View, StyleSheet, ActivityIndicator, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Text } from 'react-native';
 import { CameraView } from 'expo-camera';
+
 import { useTheme } from '../../context/ThemeContext';
+
+import useImageCapture from '../../hooks/useImageCapture';
+import useErrorHandling from '../../hooks/useErrorHandling';
+
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import { createContainerStyles, createTextStyles } from '../../styles/globalStyles';
 import { Spacing } from '../../styles/designTokens';
+
 import LoadingOverlay from '../LoadingOverlay';
 import ReferencePoints from './ReferencePoints';
 import CaptureControls from './CaptureControls';
 import ImagePreview from './ImagePreview';
-import MarkAnalysis from './MarkAnalysis'; // Adicionei esta importação que estava faltando
-import useImageCapture from '../../hooks/useImageCapture';
+import MarkAnalysis from './MarkAnalysis';
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const { colors } = useTheme();
@@ -34,6 +39,7 @@ const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ o
     handleAutoCaptureToggle,
     setCapturedImage
   } = useImageCapture(onPhotoCaptured);
+  const { showError } = useErrorHandling();
 
   const [analysisMode, setAnalysisMode] = useState(false);
 

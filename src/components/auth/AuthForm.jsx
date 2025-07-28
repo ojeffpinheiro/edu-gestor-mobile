@@ -1,32 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
-import createAuthStyles from './stylesAuth';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const AuthScreen = ({ setCurrentView }) => {
-  const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
-  const { colors } = useTheme();
-  const styles = createAuthStyles(colors);
-  const toggleAuthMode = () => {
-    setIsLogin(!isLogin);
-    setEmail('');
-    setPassword('');
-  };
+import { useTheme } from '../../context/ThemeContext';
 
-  const handleSubmit = () => {
-    if (isLogin) {
-      // Handle login
-      console.log('Login with:', email, password);
-      setCurrentView('scanner');
-    } else {
-      // Handle signup
-      console.log('Signup with:', email);
-    }
-  };
+import useAuth from '../../hooks/useAuth';
+
+import createAuthStyles from './stylesAuth';
+
+const AuthScreen = ({ setCurrentView }) => {
+  const { colors } = useTheme();
+  const { 
+    email, password, isLogin, showPassword, 
+    setEmail, setPassword, setShowPassword, handleSubmit,
+     toggleAuthMode 
+  } = useAuth();
+  const styles = createAuthStyles(colors);
 
   return (
     <KeyboardAvoidingView
@@ -108,7 +97,7 @@ const AuthScreen = ({ setCurrentView }) => {
             </View>
           )}
 
-          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+          <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit(setCurrentView)}>
             <Text style={styles.submitButtonText}>
               {isLogin ? 'Login' : 'Sign Up'}
             </Text>

@@ -1,175 +1,55 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { View, StyleSheet, Alert, Linking, Animated, Text, TouchableOpacity, Easing } from 'react-native';
-import { Camera, BarcodeScanningResult, BarcodeType } from 'expo-camera';
+import React from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import QRGuide from './QRGuide';
 import BarcodeGuide from './BarcodeGuide';
 import ManualGuide from './ManualGuide';
 import BottomBar from './BottomBar';
 import MainButtons from '../common/MainButtons';
-import { mockBarcodes, mockQRcodes } from '../../mocks/scannerMocks';
 import { Ionicons } from '@expo/vector-icons';
+import { useScanner } from '../../hooks/useScanner';
 
 interface ScannerProps {
   setCurrentView: (view: string) => void;
-  scannedCode: string;
-  setScannedCode: (code: string) => void;
   setIsAuthenticated: (auth: boolean) => void;
   isAuthenticated: boolean;
 }
 
 const ScannerScreen: React.FC<ScannerProps> = ({
   setCurrentView,
-  scannedCode,
-  setScannedCode,
   setIsAuthenticated,
   isAuthenticated
 }) => {
   const { colors } = useTheme();
-  const [activeMode, setActiveMode] = useState<'qr' | 'barcode' | 'manual' | null>(null);
-  const [manualInput, setManualInput] = useState('');
-  const [showError, setShowError] = useState(false);
-  const [hasPermission, setHasPermission] = useState<boolean | null>(null);
-  const [isScanning, setIsScanning] = useState(false);
-  const [torchOn, setTorchOn] = useState(false);
-  const scanLineAnimation = useRef(new Animated.Value(0)).current;
+  const {
+    activeMode,
+    setActiveMode,
+    manualInput,
+    setManualInput,
+    showError,
+    setShowError,
+    hasPermission,
+    isScanning,
+    torchOn,
+    scanLineAnimation,
+    barcodeTypes,
+    scannedCode,
+    setScannedCode,
+    toggleTorch,
+    handleBarcodeScanned,
+    startScanning,
+    stopScanning,
+    handleManualSubmit,
+    mockScan
+  } = useScanner();
 
-  const barcodeTypes: BarcodeType[] = [
-    'qr', 'pdf417', 'ean13', 'ean8', 'code128', 'code39', 'code93',
-    'codabar', 'itf14', 'upc_a', 'upc_e', 'aztec', 'datamatrix'
-  ];
-
-  useEffect(() => {
-    if (isScanning) {
-      Animated.loop(
-        Animated.timing(scanLineAnimation, {
-          toValue: 1,
-          duration: 2000,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
-      ).start();
-    } else {
-      scanLineAnimation.setValue(0);
-    }
-  }, [isScanning]);
-
-  useEffect(() => {
-    const getCameraPermissions = async () => {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    };
-    getCameraPermissions();
-  }, []);
-
-  const toggleTorch = async () => {
-    try {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      if (status === 'granted') {
-        setTorchOn(!torchOn);
-      } else {
-        Alert.alert(
-          "Permissão necessária",
-          "Você precisa permitir o acesso à câmera para usar o flash.",
-          [
-            { text: "Cancelar", style: "cancel" },
-            { text: "Abrir Configurações", onPress: () => Linking.openSettings() },
-          ]
-        );
-      }
-    } catch (error) {
-      console.error("Erro ao alternar flash:", error);
-      Alert.alert("Erro", "Não foi possível ativar o flash.");
-    }
-  };
-
-  const handleBarcodeScanned = (result: BarcodeScanningResult) => {
-    console.log('Barcode scanned:', result.data);
-    const isValid = validateScannedCode(result.data, activeMode);
-
-    if (isValid) {
-      console.log('Code is valid, proceeding...');
-      setScannedCode(result.data);
+  // Efeito para lidar com a autenticação quando um código é escaneado
+  React.useEffect(() => {
+    if (scannedCode) {
       setIsAuthenticated(true);
       setCurrentView('students');
-    } else {
-      console.log('Invalid code');
-      Alert.alert('Erro', 'Código inválido. Por favor, tente novamente.');
     }
-    setIsScanning(false);
-  };
-
-  const validateScannedCode = (code: string, mode: 'qr' | 'barcode' | 'manual' | null): boolean => {
-    if (!mode) return false;
-
-    if (mode === 'qr') {
-      return mockQRcodes.valid.includes(code);
-    } else if (mode === 'barcode' || mode === 'manual') {
-      return mockBarcodes.valid.includes(code);
-    }
-
-    return false;
-  };
-
-  const startScanning = async () => {
-    if (hasPermission === false) {
-      Alert.alert('Permissão Negada', 'Você precisa conceder permissão para a câmera para usar o scanner.');
-      return;
-    }
-    setIsScanning(true);
-    setScannedCode('');
-  };
-
-  const stopScanning = () => {
-    setIsScanning(false);
-  };
-
-  const handleManualSubmit = () => {
-    if (manualInput.length > 0) {
-      const isValid = validateScannedCode(manualInput, 'manual');
-
-      if (isValid) {
-        setScannedCode(manualInput);
-        setIsAuthenticated(true);
-        setCurrentView('students');
-        Alert.alert('Sucesso', 'Código válido inserido!');
-      } else {
-        setShowError(true);
-        Alert.alert('Erro', 'Código inválido. Por favor, verifique e tente novamente.');
-      }
-    } else {
-      setShowError(true);
-    }
-  };
-
-  const mockScan = (type: 'valid' | 'invalid') => {
-    console.log('MockScan called with type:', type);
-    setIsScanning(true);
-
-    const code = activeMode === 'qr'
-      ? mockQRcodes[type][Math.floor(Math.random() * mockQRcodes[type].length)]
-      : mockBarcodes[type][Math.floor(Math.random() * mockBarcodes[type].length)];
-
-    console.log('Generated mock code:', code);
-
-    const mockResult: BarcodeScanningResult = {
-      data: code,
-      type: activeMode === 'qr' ? 'qr' : 'ean13',
-      cornerPoints: [
-        { x: 0, y: 0 },
-        { x: 100, y: 0 },
-        { x: 100, y: 100 },
-        { x: 0, y: 100 }
-      ],
-      bounds: {
-        origin: { x: 0, y: 0 },
-        size: { width: 100, height: 100 }
-      }
-    };
-
-    console.log('Calling handleBarcodeScanned with:', mockResult);
-    handleBarcodeScanned(mockResult);
-  };
+  }, [scannedCode]);
 
   if (hasPermission === null) {
     return (
@@ -228,7 +108,13 @@ const ScannerScreen: React.FC<ScannerProps> = ({
           setManualInput={setManualInput}
           showError={showError}
           setShowError={setShowError}
-          handleManualSubmit={handleManualSubmit}
+          handleManualSubmit={() => {
+            if (handleManualSubmit()) {
+              setIsAuthenticated(true);
+              setCurrentView('students');
+              Alert.alert('Sucesso', 'Código válido inserido!');
+            }
+          }}
         />
       )}
 
@@ -256,6 +142,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   );
 };
 
+// Manter os mesmos estilos do original
 const styles = StyleSheet.create({
   container: {
     flex: 1,

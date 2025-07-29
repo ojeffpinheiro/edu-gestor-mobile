@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { mockStudents } from '../mocks/scannerMocks';
 import { Student } from '../types/newTypes';
-import { useFeedback } from './useFeedback';
+import { useUserFeedback } from './useUserFeedback';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -14,8 +14,7 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-
-  const { showFeedback } = useFeedback();
+  const { showFeedback } = useUserFeedback();
 
   // Carrega os alunos (mock ou API)
   useEffect(() => {
@@ -24,11 +23,11 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
         setIsLoading(true);
         // Simula chamada assíncrona
         await new Promise(resolve => setTimeout(resolve, 500));
-        
+
         // Aqui viria a chamada real à API
         // const response = await api.get('/students');
         // setStudents(response.data);
-        
+
         // Usando mock por enquanto
         setStudents(mockStudents);
       } catch (err) {
@@ -72,14 +71,22 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   // Confirma seleção (pode ser usado para navegação ou outras ações)
   const confirmSelection = () => {
     if (selectedStudents.length === 0) {
-      showFeedback('Erro ao confirmar seleção', 'error');
+      showFeedback({
+        type: 'error',
+        message: 'Erro ao confirmar seleção',
+        useAlert: true
+      });
       Alert.alert('Nenhum aluno selecionado', 'Por favor, selecione pelo menos um aluno.');
       return false;
     }
-    
+
     // Aqui você pode adicionar lógica adicional antes de confirmar
     console.log('Alunos selecionados:', selectedStudents);
-      showFeedback('Aluno(s) selecionado(s) com sucesso!', 'success');
+    showFeedback({
+      type: 'success',
+      message: 'Aluno(s) selecionado(s) com sucesso!',
+      haptic: true
+    });
     return true;
   };
 

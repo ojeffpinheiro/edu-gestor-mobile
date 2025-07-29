@@ -6,7 +6,7 @@ import { BarcodeType } from 'expo-camera';
 import { useTheme } from '../../../context/ThemeContext';
 
 import ScannerCamera from '../../common/ScannerCamera';
-import { useToast } from '../../../hooks/useToast';
+import { useUserFeedback } from '../../../hooks/useUserFeedback';
 
 interface QRGuideProps {
   setActiveMode: (mode: null) => void;
@@ -28,24 +28,27 @@ const QRGuide: React.FC<QRGuideProps> = ({
   onMockScan
 }) => {
   const { colors } = useTheme();
-  const { showToast } = useToast();
+  const { showFeedback } = useUserFeedback();
 
   const handleMockScan = (type: 'valid' | 'invalid') => {
     onMockScan(type);
-    showToast({
+    showFeedback({
       type: type === 'valid' ? 'success' : 'error',
       message: type === 'valid'
         ? 'Código válido detectado!'
         : 'Código inválido. Por favor, tente novamente.',
-      duration: 3000
+      duration: 3000,
+      useToast: true,
+      haptic: true
     });
   };
 
   const handleUpload = () => {
-    showToast({
+    showFeedback({
       type: 'info',
       message: 'Funcionalidade de upload em desenvolvimento',
-      duration: 2000
+      duration: 2000,
+      useToast: true
     });
   };
 

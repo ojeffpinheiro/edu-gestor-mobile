@@ -3,7 +3,7 @@ import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 import { useTheme } from '../../../context/ThemeContext';
-import { useToast } from '../../../hooks/useToast';
+import { useUserFeedback } from '../../../hooks/useUserFeedback';
 import ScannerCamera from '../../common/ScannerCamera';
 
 interface BarcodeGuideProps {
@@ -26,24 +26,27 @@ const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
   onMockScan,
 }) => {
   const { colors } = useTheme();
-  const { showToast } = useToast();
+  const { showFeedback } = useUserFeedback();
 
   const handleMockScan = (type: 'valid' | 'invalid') => {
     onMockScan(type);
-    showToast({
+    showFeedback({
       type: type === 'valid' ? 'success' : 'error',
       message: type === 'valid'
         ? 'Código válido detectado!'
         : 'Código inválido. Por favor, tente novamente.',
-      duration: 3000
+      duration: 3000,
+      useToast: true,
+      haptic: true
     });
   };
 
   const handleUpload = () => {
-    showToast({
+    showFeedback({
       type: 'info',
       message: 'Funcionalidade de upload em desenvolvimento',
-      duration: 2000
+      duration: 2000,
+      useToast: true
     });
   };
 

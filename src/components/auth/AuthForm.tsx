@@ -4,17 +4,17 @@ import { useTheme } from '../../context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import createAuthStyles from './authStyles';
 import { useAuthForm } from '../../hooks/useAuthForm';
-import { useFeedback } from '../../hooks/useFeedback';
 import Feedback from '../common/Feedback';
+import { useUserFeedback } from '../../hooks/useUserFeedback';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
 
-  const { feedback, showFeedback, setFeedback } = useFeedback();
+  const { showFeedback, feedbackConfig, hideFeedback } = useUserFeedback();
 
   const {
-    mode, formState, errors, passwordErrors, touched, isLoading,
+    mode, formState, errors, touched, isLoading, passwordErrors,
     toggleAuthMode, handleChange, handleBlur, handleSubmit, toggleShowPassword
   } = useAuthForm();
 
@@ -26,12 +26,7 @@ const AuthScreen = ({ setCurrentView }) => {
         setTimeout(() => setCurrentView('scanner'), 1500);
       }
     } catch (error) {
-      showFeedback({
-        type: 'error',
-        message: 'Erro ao fazer login. Tente novamente.',
-        position: 'bottom',
-        duration: 3000
-      });
+      showFeedback({ message: 'Hello', type: 'info' });
     }
   };
 
@@ -86,7 +81,8 @@ const AuthScreen = ({ setCurrentView }) => {
             )}
           </View>
 
-          {/* Password Input */}<View style={styles.inputContainer}>
+          {/* Password Input */}
+          <View style={styles.inputContainer}>
             <Text style={styles.label}>Senha</Text>
             <View style={styles.passwordContainer}>
               <TextInput
@@ -127,6 +123,15 @@ const AuthScreen = ({ setCurrentView }) => {
               </View>
             )}
           </View>
+          <TouchableOpacity
+            style={styles.testButton}
+            onPress={() => {
+              handleChange('email', 'usuario@teste.com');
+              handleChange('password', 'Senha123');
+            }}
+          >
+            <Text style={styles.testButtonText}>Preencher dados de teste</Text>
+          </TouchableOpacity>
 
           {/* Submit Button */}
           <TouchableOpacity
@@ -191,10 +196,11 @@ const AuthScreen = ({ setCurrentView }) => {
           </View>
         </View>
 
+
         <Feedback
-          visible={feedback.visible}
-          options={feedback.options}
-          onHide={() => setFeedback(prev => ({ ...prev, visible: false }))}
+          visible={feedbackConfig.visible}
+          options={feedbackConfig.options}
+          onHide={hideFeedback}
         />
       </ScrollView>
     </KeyboardAvoidingView>

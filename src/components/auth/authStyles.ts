@@ -333,6 +333,16 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         height: 50,
         width: '100%',
         paddingRight: 40,
+    }, testButton: {
+        marginTop: 10,
+        padding: 10,
+        backgroundColor: colors.background.secondary,
+        borderRadius: 5,
+        alignItems: 'center'
+    },
+    testButtonText: {
+        color: colors.text.secondary,
+        fontSize: 12
     },
 });
 

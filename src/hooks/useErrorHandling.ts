@@ -1,6 +1,5 @@
 import { Alert, Linking, Platform } from 'react-native';
-import { useFeedback } from './useFeedback';
-import { useToast } from './useToast';
+import { useUserFeedback } from './useUserFeedback';
 
 type ErrorAction = {
   text: string;
@@ -17,8 +16,7 @@ interface ErrorMapping {
 }
 
 const useErrorHandling = () => {
-  const { showFeedback } = useFeedback();
-  const { showToast } = useToast();
+  const { showFeedback, showToast } = useUserFeedback();
 
   const openAppSettings = () => {
     Linking.openSettings().catch(() => {
@@ -193,9 +191,13 @@ const useErrorHandling = () => {
     ];
 
     if (options?.useToast) {
-      showToast({ type: 'error', message: config.message });
+      showToast(config.message, 'error', 3000);
     } else if (options?.useFeedback) {
-      showFeedback(config.message, 'error');
+      showFeedback({
+        type: 'error',
+        message: 'Ocorreu um erro durante o processamento',
+        useAlert: true
+      });
     } else {
       // Mostrar alerta padrão
     }

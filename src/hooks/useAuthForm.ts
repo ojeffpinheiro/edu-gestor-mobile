@@ -1,8 +1,9 @@
 import { useState, useCallback } from 'react';
 import { Alert } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { AuthFormErrors, AuthFormState, AuthMode } from '../types/authTypes';
-import { useFeedback } from './useFeedback';
 import { authService } from '../services/authService';
+import { useUserFeedback } from './useUserFeedback';
 
 type ErrorAction = {
   text: string;
@@ -36,9 +37,8 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     password: false
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
 
-  const { showFeedback } = useFeedback();
+  const { showFeedback } = useUserFeedback();
 
   // Mapeamento de erros
   const errorMappings: ErrorMapping = {
@@ -84,7 +84,6 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   const toggleAuthMode = useCallback(() => {
     setMode(prev => prev === 'login' ? 'register' : 'login');
     setErrors({ email: '', password: '', general: '' });
-    setPasswordErrors([]);
     setFormState(prev => ({ ...prev, password: '' }));
   }, []);
 
@@ -107,20 +106,22 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   }, []);
 
   // Validar senha
-  const validatePassword = useCallback((password: string) => {
+  const validatePassword = useCallback((password: string): boolean => {
     const criteria = [
       { test: (pwd: string) => pwd.length >= 6, message: "Mínimo 6 caracteres" },
       { test: (pwd: string) => /[A-Z]/.test(pwd), message: "Uma letra maiúscula" },
       { test: (pwd: string) => /[0-9]/.test(pwd), message: "Um número" }
     ];
-
-    const errors = criteria
+    const errorMessages = criteria
       .filter(rule => !rule.test(password))
       .map(rule => rule.message);
 
-    setPasswordErrors(errors);
-    setErrors(prev => ({ ...prev, password: errors.length > 0 ? errors[0] : '' }));
-    return errors.length === 0;
+
+    // Mostra apenas o primeiro erro para o usuário
+    const firstError = errorMessages[0] || '';
+    setErrors(prev => ({ ...prev, password: firstError }));
+
+    return errorMessages.length === 0;
   }, []);
 
   // Validar campo individual
@@ -141,7 +142,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     if (touched[field] && field !== 'showPassword') {
       validateField(field, String(value));
     }
-  }, [touched, validateField]);
+  }, [touched, validateEmail, validatePassword]);
 
   // Marcar campo como tocado
   const handleBlur = useCallback((field: Exclude<keyof AuthFormState, 'showPassword'>) => {
@@ -178,13 +179,13 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showFeedback({
         message: 'Por favor, corrija os erros no formulário',
         type: 'error'
       });
       return false;
     }
-    console.log('Tentando login com:', formState.email, formState.password);
 
     setIsLoading(true);
     try {
@@ -205,15 +206,23 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
       }
     } catch (error) {
       let message = 'Credenciais inválidas';
+      let errorCode = 'invalid_credentials';
 
       if (error instanceof Error) {
         if (error.message.includes('invalid-credentials')) {
           message = 'E-mail ou senha incorretos';
+          errorCode = 'invalid_credentials';
         } else if (error.message.includes('weak-password')) {
           message = 'Senha deve ter pelo menos 6 caracteres';
+          errorCode = 'weak_password';
+        } else if (error.message.includes('email-already-in-use')) {
+          message = 'Este e-mail já está cadastrado';
+          errorCode = 'email_already_in_use';
         }
       }
 
+      setErrors(prev => ({ ...prev, general: message }));
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showFeedback({
         message,
         type: 'error'
@@ -229,13 +238,26 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     setFormState(prev => ({ ...prev, showPassword: !prev.showPassword }));
   }, []);
 
+  const getPasswordErrors = useCallback((password: string): string[] => {
+    const criteria = [
+      { test: (pwd: string) => pwd.length >= 6, message: "Mínimo 6 caracteres" },
+      { test: (pwd: string) => /[A-Z]/.test(pwd), message: "Uma letra maiúscula" },
+      { test: (pwd: string) => /[0-9]/.test(pwd), message: "Um número" }
+    ];
+
+    return criteria
+      .filter(rule => !rule.test(password))
+      .map(rule => rule.message);
+  }, []);
+
   return {
     mode,
     formState,
     errors,
-    passwordErrors,
     touched,
     isLoading,
+    passwordErrors: mode === 'register' ? getPasswordErrors(formState.password) : [],
+    showError,
     toggleAuthMode,
     handleChange,
     handleBlur,

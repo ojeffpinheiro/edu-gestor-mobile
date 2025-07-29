@@ -4,10 +4,10 @@ import { Camera, BarcodeScanningResult, BarcodeType } from 'expo-camera';
 import { Easing, Animated } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { mockBarcodes, mockQRcodes } from '../mocks/scannerMocks';
-import { useFeedback } from './useFeedback';
+import { useUserFeedback } from './useUserFeedback';
 
 export const useScanner = () => {
-  const { showFeedback } = useFeedback();
+  const { showFeedback } = useUserFeedback();
 
   const [activeMode, setActiveMode] = useState<'qr' | 'barcode' | 'manual' | null>(null);
   const [manualInput, setManualInput] = useState('');
@@ -94,13 +94,21 @@ export const useScanner = () => {
     if (isValid) {
       console.log('Code is valid, proceeding...');
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showFeedback('Código escaneado com sucesso!', 'success');
+      showFeedback({
+        type: 'success',
+        message: 'Código escaneado com sucesso!',
+        haptic: true
+      });
       setScannedCode(result.data);
       setIsScanning(false);
       return true;
     } else {
       console.log('Invalid code');
-      showFeedback('Código inválido. Por favor, tente novamente.', 'error');
+      showFeedback({
+        type: 'error',
+        message: 'Código inválido. Por favor, tente novamente.',
+        haptic: true
+      });
       setIsScanning(false);
       return false;
     }
@@ -108,10 +116,11 @@ export const useScanner = () => {
 
   const startScanning = async () => {
     if (hasPermission === false) {
-      showFeedback(
-        'Permissão da câmera negada. Por favor, habilite nas configurações.',
-        'error'
-      );
+      showFeedback({
+        type: 'error',
+        message: 'Permissão da câmera negada. Por favor, habilite nas configurações.',
+        haptic: true
+      });
       Alert.alert('Permissão Negada', 'Você precisa conceder permissão para a câmera para usar o scanner.');
       return;
     }
@@ -133,10 +142,11 @@ export const useScanner = () => {
         return true;
       } else {
         setShowError(true);
-        showFeedback(
-          'Código inválido. Por favor, verifique e tente novamente.',
-          'error'
-        );
+        showFeedback({
+          type: 'error',
+          message: 'Código inválido. Por favor, verifique e tente novamente.',
+          haptic: true
+        });
         Alert.alert('Erro', 'Código inválido. Por favor, verifique e tente novamente.');
         return false;
       }

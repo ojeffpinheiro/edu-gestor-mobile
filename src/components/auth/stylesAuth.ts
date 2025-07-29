@@ -73,13 +73,17 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         paddingRight: 40,
         color: colors.text.primary,
         fontSize: 16,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        height: 50, // Altura fixa para o input
     },
     clearButton: {
         position: 'absolute',
         right: 10,
         top: '50%',
-        transform: [{ translateY: -12 }],
         padding: 5,
+        transform: [{ translateY: -10 }],
+        zIndex: 1,
     },
     clearIcon: {
         color: colors.text.secondary,
@@ -91,10 +95,6 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         right: 10,
         top: '50%',
         transform: [{ translateY: -12 }],
-        padding: 0,
-    },
-    eyeIcon: {
-        fontSize: 20,
     },
     forgotPassword: {
         alignSelf: 'flex-end',
@@ -200,6 +200,7 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
     inputWrapperError: {
         position: 'relative',
         marginBottom: 4, // Espaço extra para a mensagem de erro
+        height: 50, // Altura fixa para o wrapper
     },
     requiredIndicator: {
         color: colors.feedback.error,
@@ -215,6 +216,123 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
     errorIcon: {
         marginRight: 8,
         color: colors.feedback.error // Use a cor do seu tema
+    },
+    inputDisabled: {
+        opacity: 0.7,
+        backgroundColor: colors.background.tertiary
+    },
+
+    passwordStrengthContainer: {
+        marginTop: 4,
+        flexDirection: 'row',
+        gap: 4
+    },
+
+    strengthBar: {
+        height: 4,
+        flex: 1,
+        backgroundColor: colors.border.light,
+        borderRadius: 2
+    },
+
+    strengthBarActive: {
+        backgroundColor: colors.feedback.success
+    },
+
+    validationMessage: {
+        fontSize: 12,
+        marginTop: 4,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+
+    validationIcon: {
+        marginRight: 4
+    },
+
+    successValidation: {
+        color: colors.feedback.success
+    },
+
+    errorValidation: {
+        color: colors.feedback.error
+    },
+
+    loadingOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.7)',
+        borderRadius: 8
+    },
+
+    animatedButton: {
+        transform: [{ scale: 1 }]
+    },
+    passwordContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        position: 'relative',
+        height: 50,
+    },
+    button: {
+        backgroundColor: colors.primary.main,
+        borderRadius: 8,
+        padding: 16,
+        alignItems: 'center',
+        marginTop: 24
+    },
+    buttonDisabled: {
+        opacity: 0.6,
+        backgroundColor: colors.background.tertiary
+    },
+    buttonText: {
+        color: colors.text.onPrimary,
+        fontSize: 16,
+        fontWeight: 'bold'
+    },
+    toggleText: {
+        color: colors.primary.main,
+        textAlign: 'center',
+        marginTop: 16,
+        fontSize: 14
+    },
+    buttonError: {
+        backgroundColor: colors.feedback.error
+    },
+    passwordRequirements: {
+        marginTop: 8,
+        paddingHorizontal: 8,
+    },
+    passwordErrorText: {
+        color: colors.feedback.error,
+        fontSize: 12,
+        marginVertical: 2,
+    },
+    generalErrorText: {
+        color: colors.feedback.error,
+        fontSize: 14,
+        textAlign: 'center',
+        marginTop: 16,
+        marginBottom: 8,
+    },
+    inputWithClear: {
+        paddingRight: 40, // Espaço para o botão de limpar
+    },
+
+    // Estilo para o container de senha
+    passwordInput: {
+        backgroundColor: colors.component.input,
+        borderWidth: 1,
+        borderColor: colors.border.medium,
+        borderRadius: 10,
+        paddingHorizontal: 15,
+        paddingVertical: 12,
+        color: colors.text.primary,
+        fontSize: 16,
+        height: 50,
+        width: '100%',
+        paddingRight: 40,
     },
 });
 

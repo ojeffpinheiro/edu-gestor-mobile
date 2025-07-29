@@ -1,38 +1,24 @@
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
-import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import createAuthStyles from './stylesAuth';
-import { usePressAnimation } from '../../hooks/usePressAnimation';
-import StatusMessage from '../common/StatusMessage';
 import { useAuthForm } from '../../hooks/useAuthForm';
-import useAuth from '../../hooks/useAuth';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
-  const { scaleValue, animatePress } = usePressAnimation();
 
   const {
-    email, password, isLogin, showPassword,
-    setEmail, setPassword, setShowPassword,
-    toggleAuthMode
-  } = useAuth();
+    mode, formState, errors, passwordErrors, touched, isLoading,
+    toggleAuthMode, handleChange, handleBlur, handleSubmit, toggleShowPassword
+  } = useAuthForm();
 
-  const {
-    formErrors,
-    isLoading,
-    feedback,
-    submit,
-    validateField,
-    handleBlur,
-    touchedFields
-  } = useAuthForm(setCurrentView, email, password);
-
-  const handleSubmit = () => {
-    animatePress();
-    submit(email, password, isLogin);
+  const handleFormSubmit = async () => {
+    const success = await handleSubmit();
+    if (success && mode === 'login') {
+      setCurrentView('scanner');
+    }
   };
 
   return (
@@ -43,187 +29,150 @@ const AuthScreen = ({ setCurrentView }) => {
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
-            {/* Replace with your actual logo */}
             <Text style={styles.logoText}>TECHNO</Text>
           </View>
           <Text style={styles.welcomeText}>
             Welcome to <Text style={styles.brandText}>TECHNO</Text>
           </Text>
           <Text style={styles.subtitle}>
-            {isLogin ? 'Login to Techno' : 'Get started for Free'}
+            {mode === 'login' ? 'Login to Techno' : 'Get started for Free'}
           </Text>
         </View>
 
         <View style={styles.formContainer}>
+          {/* Email Input */}
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>
-              Email
-              <Text style={styles.requiredIndicator}>*</Text>
-            </Text>
-            <View style={[
-              styles.inputWrapper,
-              (touchedFields.email && formErrors.email) && styles.inputWrapperError
-            ]}>
+            <Text style={styles.label}>Email</Text>
+            <View style={styles.inputWrapper}>
               <TextInput
                 style={[
                   styles.input,
-                  (touchedFields.email && formErrors.email) && styles.errorInput
+                  touched.email && errors.email && styles.errorInput,
+                  formState.email ? styles.inputWithClear : null
                 ]}
-                placeholder="seu@email.com"
-                placeholderTextColor={colors.text.secondary}
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text);
-                  if (touchedFields.email) {
-                    validateField('email', text, isLogin);
-                  }
-                }}
-                onBlur={() => handleBlur('email', email, isLogin)}
+                value={formState.email}
+                onChangeText={(text) => handleChange('email', text)}
+                onBlur={() => handleBlur('email')}
                 keyboardType="email-address"
                 autoCapitalize="none"
-                autoComplete="email"
+                placeholder="Digite seu e-mail"
+                placeholderTextColor={colors.text.secondary}
               />
-              {email.length > 0 && (
+              {formState.email ? (
                 <TouchableOpacity
                   style={styles.clearButton}
-                  onPress={() => {
-                    setEmail('');
-                    validateField('email', '', isLogin);
-                  }}
+                  onPress={() => handleChange('email', '')}
                 >
-                  <Text style={styles.clearIcon}>×</Text>
+                  <Ionicons name="close-circle" size={20} color={colors.text.secondary} />
                 </TouchableOpacity>
-              )}
-
-              {touchedFields.email && formErrors.email && (
-                <Text style={styles.errorText}>
-                  <MaterialIcons
-                    name="error-outline"
-                    size={14}
-                    style={styles.errorIcon}
-                  />
-                  {formErrors.email}
-                </Text>
-              )}
+              ) : null}
             </View>
+            {touched.email && errors.email && (
+              <Text style={styles.errorText}>{errors.email}</Text>
+            )}
           </View>
 
-          {isLogin && (
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>
-                Senha
-                <Text style={styles.requiredIndicator}>*</Text>
-              </Text>
-              <View style={[
-                styles.inputWrapper,
-                (touchedFields.password && formErrors.password) && styles.inputWrapperError
-              ]}>
-                <TextInput
-                  style={[
-                    styles.input,
-                    (touchedFields.password && formErrors.password) && styles.errorInput
-                  ]}
-                  placeholder="••••••••"
-                  placeholderTextColor={colors.text.secondary}
-                  value={password}
-                  onChangeText={(text) => {
-                    setPassword(text);
-                    if (touchedFields.password) {
-                      validateField('password', text, isLogin);
-                    }
-                  }}
-                  onBlur={() => handleBlur('password', password, isLogin)}
-                  secureTextEntry={!showPassword}
+          {/* Password Input */}<View style={styles.inputContainer}>
+            <Text style={styles.label}>Senha</Text>
+            <View style={styles.passwordContainer}>
+              <TextInput
+                style={[
+                  styles.passwordInput,
+                  touched.password && errors.password && styles.errorInput
+                ]}
+                value={formState.password}
+                onChangeText={(text) => handleChange('password', text)}
+                onBlur={() => handleBlur('password')}
+                secureTextEntry={!formState.showPassword}
+                placeholder="Digite sua senha"
+                placeholderTextColor={colors.text.secondary}
+              />
+              <TouchableOpacity
+                style={styles.eyeButton}
+                onPress={toggleShowPassword}
+              >
+                <MaterialIcons
+                  name={formState.showPassword ? 'visibility-off' : 'visibility'}
+                  size={24}
+                  color={colors.text.secondary}
                 />
-                <TouchableOpacity
-                  style={styles.eyeButton}
-                  onPress={() => setShowPassword(!showPassword)}
-                >
-                  <MaterialCommunityIcons
-                    name={showPassword ? 'eye-outline' : 'eye-off-outline'}
-                    size={24}
-                    color={colors.text.secondary}
-                  />
-                </TouchableOpacity>
-              </View>
-              {touchedFields.password && formErrors.password && (
-                <Text style={styles.errorText}>
-                  <MaterialIcons
-                    name="error-outline"
-                    size={14}
-                    style={styles.errorIcon}
-                  />
-                  {formErrors.password}
-                </Text>
-              )}
-              <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.linkText}>Esqueceu a senha?</Text>
               </TouchableOpacity>
             </View>
-          )}
+            {touched.password && errors.password && (
+              <Text style={styles.errorText}>{errors.password}</Text>
+            )}
 
+            {/* Mostrar todos os erros de senha durante o cadastro */}
+            {mode === 'register' && passwordErrors.length > 0 && (
+              <View style={styles.passwordRequirements}>
+                {passwordErrors.map((error, index) => (
+                  <Text key={index} style={styles.passwordErrorText}>
+                    • {error}
+                  </Text>
+                ))}
+              </View>
+            )}
+          </View>
+
+          {/* Submit Button */}
           <TouchableOpacity
-            disabled={isLoading}
-            activeOpacity={0.8}
-            style={[styles.submitButton, isLoading && styles.disabledButton]}
-            onPress={handleSubmit}
+            style={[styles.button, (isLoading || !formState.email || !formState.password) && styles.buttonDisabled]}
+            onPress={handleFormSubmit}
+            disabled={isLoading || !formState.email || !formState.password}
           >
             {isLoading ? (
               <ActivityIndicator color={colors.text.onPrimary} />
             ) : (
-              <Text style={styles.submitButtonText}>
-                {isLogin ? 'Entrar' : 'Cadastrar'}
+              <Text style={styles.buttonText}>
+                {mode === 'login' ? 'Entrar' : 'Cadastrar'}
               </Text>
             )}
           </TouchableOpacity>
 
+          {/* Toggle Auth Mode */}
+          <TouchableOpacity onPress={toggleAuthMode}>
+            <Text style={styles.toggleText}>
+              {mode === 'login'
+                ? 'Não tem uma conta? Cadastre-se'
+                : 'Já tem uma conta? Faça login'}
+            </Text>
+          </TouchableOpacity>
+
+          {/* Error Message */}
+          {errors.general && (
+            <Text style={styles.generalErrorText}>{errors.general}</Text>
+          )}
+
+          {/* Social Login Options */}
           <View style={styles.separator}>
             <View style={styles.separatorLine} />
-            <Text style={styles.separatorText}>or</Text>
+            <Text style={styles.separatorText}>ou</Text>
             <View style={styles.separatorLine} />
           </View>
 
           <View style={styles.socialButtonsContainer}>
             <TouchableOpacity style={styles.socialButton}>
               <Text style={styles.socialButtonText}>
-                {isLogin ? 'Login' : 'Sign Up'} with Google
+                {mode === 'login' ? 'Entrar' : 'Cadastrar'} com Google
               </Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.socialButton}>
               <Text style={styles.socialButtonText}>
-                {isLogin ? 'Login' : 'Sign Up'} with GitHub
+                {mode === 'login' ? 'Entrar' : 'Cadastrar'} com GitHub
               </Text>
             </TouchableOpacity>
-            {!isLogin && (
-              <TouchableOpacity style={styles.socialButton}>
-                <Text style={styles.socialButtonText}>Sign Up with Microsoft</Text>
-              </TouchableOpacity>
-            )}
           </View>
-
-
-          {feedback.visible && (
-            <StatusMessage
-              variant={feedback.type}
-              message={feedback.message}
-              style={styles.feedbackMessage}
-            />
-          )}
         </View>
 
         <View style={styles.footer}>
           <Text style={styles.footerText}>© 2024 TECHNO</Text>
           <View style={styles.footerLinks}>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Terms & Conditions</Text>
+              <Text style={styles.footerLink}>Termos</Text>
             </TouchableOpacity>
             <Text style={styles.footerSeparator}>|</Text>
             <TouchableOpacity>
-              <Text style={styles.footerLink}>Privacy Policy</Text>
-            </TouchableOpacity>
-            <Text style={styles.footerSeparator}>|</Text>
-            <TouchableOpacity>
-              <Text style={styles.footerLink}>Legal Notice</Text>
+              <Text style={styles.footerLink}>Privacidade</Text>
             </TouchableOpacity>
           </View>
         </View>

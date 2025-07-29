@@ -4,12 +4,13 @@ import AuthForm from '../components/auth/AuthForm';
 import ScannerScreen from '../components/auth/ScannerScreen';
 import StudentsScreen from '../components/auth/StudentsScreen';
 import HomeScreen from '../components/auth/HomeScreen';
+import { AuthView } from '../types/newTypes';
 
 const AuthScreen = () => {
-  const [currentView, setCurrentView] = useState('home');
-  const [scannedCode, setScannedCode] = useState('');
-  const [selectedStudent, setSelectedStudent] = useState('');
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [currentView, setCurrentView] = useState<AuthView>('home');
+  const [scannedCode, setScannedCode] = useState<string>('');
+  const [selectedStudent, setSelectedStudent] = useState<string>('');
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
   const renderCurrentView = () => {
     switch (currentView) {
@@ -21,8 +22,6 @@ const AuthScreen = () => {
         return (
           <ScannerScreen
             setCurrentView={setCurrentView}
-            scannedCode={scannedCode}
-            setScannedCode={setScannedCode}
             setIsAuthenticated={setIsAuthenticated}
             isAuthenticated={isAuthenticated}
           />
@@ -34,7 +33,6 @@ const AuthScreen = () => {
             scannedCode={scannedCode}
             selectedStudent={selectedStudent}
             setSelectedStudent={setSelectedStudent}
-            isAuthenticated={isAuthenticated}
           />
         );
       default:

@@ -115,3 +115,5 @@ export interface ExamTemplate {
   alternatives: string[];
   answerKey: string[];
 }
+
+export type AuthView = 'auth' | 'scanner' | 'students' | 'home'; 

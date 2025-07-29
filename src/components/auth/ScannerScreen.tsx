@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -14,9 +14,10 @@ import ManualGuide from './ManualGuide';
 import BottomBar from './BottomBar';
 import { Camera } from 'expo-camera';
 import PermissionRequestCard from './PermissionRequestCard';
+import { AuthView } from '../../types/newTypes';
 
 interface ScannerProps {
-  setCurrentView: (view: string) => void;
+  setCurrentView: (view: AuthView) => void;
   setIsAuthenticated: (auth: boolean) => void;
   isAuthenticated: boolean;
 }

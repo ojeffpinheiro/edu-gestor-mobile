@@ -1,4 +1,3 @@
-// components/auth/QRGuide.tsx
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';

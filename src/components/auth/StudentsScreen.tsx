@@ -8,7 +8,7 @@ import * as Haptics from 'expo-haptics';
 import { useTheme } from '../../context/ThemeContext';
 import { useStudents } from '../../hooks/useStudents';
 
-import { Student } from '../../types/newTypes';
+import { AuthView, Student } from '../../types/newTypes';
 
 import Button from '../common/Button';
 
@@ -20,7 +20,7 @@ interface StudentsScreenProps {
   scannedCode?: string;
   selectedStudent?: string | null;
   setSelectedStudent: (id: string) => void;
-  setCurrentView: (view: string) => void;
+  setCurrentView: (view: AuthView) => void;
 }
 
 const ANIMATION_CONFIG = {

@@ -32,28 +32,35 @@ const SkeletonLoader: React.FC = () => {
 
     return (
         <View style={styles.container}>
-            <Animated.View
-                style={[
-                    styles.skeletonItem,
-                    {
-                        backgroundColor: colors.background.secondary,
-                        opacity,
-                    },
-                ]}
-            />
+            {[...Array(4)].map((_, i) => (
+                <Animated.View
+                    key={i}
+                    style={[
+                        styles.card,
+                        {
+                            backgroundColor: colors.background.secondary,
+                            opacity,
+                        },
+                    ]}
+                />
+            ))}
+
         </View>
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: 16,
         padding: 16,
     },
-    skeletonItem: {
+    card: {
+        width: '45%',
         height: 100,
         borderRadius: 8,
-        marginBottom: 16,
+        opacity: 0.6,
     },
 });
 

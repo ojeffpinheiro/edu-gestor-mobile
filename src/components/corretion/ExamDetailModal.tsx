@@ -1,5 +1,5 @@
-import React from 'react';
-import { View, Text, Modal, ScrollView } from 'react-native';
+import React, { useRef, useEffect } from 'react';
+import { Animated, Easing, View, Text, Modal, ScrollView } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
 import { correctExam } from '../../utils/examUtils';
 import { createExamDetailModalStyles } from './ExamDetailModalStyles';
@@ -27,8 +27,45 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
 }) => {
   const { colors } = useTheme();
   const styles = createExamDetailModalStyles(colors);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(300)).current;
 
-  if (!visible || !exam || !answerKey) return null;
+  useEffect(() => {
+    if (visible) {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    } else {
+      Animated.parallel([
+        Animated.timing(fadeAnim, {
+          toValue: 0,
+          duration: 200,
+          useNativeDriver: true,
+        }),
+        Animated.timing(slideAnim, {
+          toValue: 300,
+          duration: 200,
+          easing: Easing.in(Easing.cubic),
+          useNativeDriver: true,
+        }),
+      ]).start();
+    }
+  }, [visible]);
+
+  // Early return deve vir DEPOIS de todos os Hooks
+  if (!visible || !exam || !answerKey) {
+    return null;
+  }
 
   const safeExam = {
     ...exam,
@@ -55,13 +92,23 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
 
   return (
     <Modal
-      animationType="slide"
+      animationType="none" // Desativa a animação padrão pois usaremos Animated
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
     >
-      <View style={styles.modalOverlay}>
-        <View style={styles.modalContent}>
+      <Animated.View
+        style={[
+          styles.modalOverlay,
+          { opacity: fadeAnim }
+        ]}
+      >
+        <Animated.View
+          style={[
+            styles.modalContent,
+            { transform: [{ translateY: slideAnim }] }
+          ]}
+        >
           <View style={styles.modalHeader}>
             <Text style={styles.modalTitle}>Detalhes da Prova</Text>
             <Button
@@ -106,8 +153,8 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
               ))}
             </View>
           </ScrollView>
-        </View>
-      </View>
+        </Animated.View>
+      </Animated.View>
     </Modal>
   );
 };

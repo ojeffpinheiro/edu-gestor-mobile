@@ -17,18 +17,25 @@ import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import CorrectionTab from '../components/corretion/CorrectionTab';
 
 import { Spacing } from '../styles/designTokens';
+import SkeletonLoader from '../components/common/SkeletonLoader';
 
 const CorrectionScreen = () => {
-  const { exams, processAllPendingExams, error } = useExams();
+  const { exams, processAllPendingExams, isLoading, error } = useExams();
+  const [processing, setProcessing] = useState(false);
   const [answerKey, setAnswerKey] = useState(['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D', 'A', 'B']);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
-
   const [activeTab, setActiveTab] = useState('correction');
 
   const { colors } = useTheme();
   const styles = createCorrectionScreenStyles(colors);
   const report = generateReport(exams);
+
+  const handleProcessAll = async () => {
+    setProcessing(true);
+    await processAllPendingExams(answerKey);
+    setProcessing(false);
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -45,7 +52,11 @@ const CorrectionScreen = () => {
           />
         );
       case 'reports':
-        return <ReportsTab report={report} />;
+        return report ? (
+          <ReportsTab report={report} />
+        ) : (
+          <SkeletonLoader />
+        );
       case 'settings':
         return <SettingsTab answerKey={answerKey} />;
       default:
@@ -55,6 +66,8 @@ const CorrectionScreen = () => {
 
   return (
     <SafeAreaView style={styles.screenContainer}>
+      {processing && <LoadingOverlay />}
+
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 
       <AppHeader />

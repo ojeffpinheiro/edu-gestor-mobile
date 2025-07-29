@@ -1,6 +1,6 @@
 // components/common/StatusMessage.tsx
-import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { X, CheckCircle, AlertCircle } from 'lucide-react-native';
 import { ColorScheme } from '../../styles/colors';
@@ -26,9 +26,28 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   onDismiss,
   actions
 }) => {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
   const { colors } = useTheme();
   const styles = createStatusMessageStyles(colors, type);
   const iconColor = getIconColor(colors, type);
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: true,
+      }),
+    ]).start();
+  }, []);
 
   const Icon = {
     error: AlertCircle,
@@ -37,7 +56,12 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
   }[type];
 
   return (
-    <View style={styles.container}>
+    <Animated.View
+      style={[styles.container, {
+        opacity: fadeAnim,
+        transform: [{ translateY: slideAnim }],
+      }]}>
+
       <View style={styles.content}>
         <Icon size={20} color={iconColor} />
         <View style={styles.textContainer}>
@@ -64,7 +88,7 @@ const StatusMessage: React.FC<StatusMessageProps> = ({
           ))}
         </View>
       )}
-    </View>
+    </Animated.View>
   );
 };
 

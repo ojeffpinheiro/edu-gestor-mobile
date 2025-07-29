@@ -1,10 +1,11 @@
 import React, { useRef, useEffect } from 'react';
 import { Animated, Easing, View, Text, Modal, ScrollView } from 'react-native';
 import { XCircle, CheckCircle } from 'lucide-react-native';
-import { correctExam } from '../../utils/examUtils';
+import { calculateCorrections, correctExam } from '../../utils/examUtils';
 import { createExamDetailModalStyles } from './ExamDetailModalStyles';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
+import QuestionCorrectionItem from './QuestionCorrectionItem';
 
 interface ExamDetailModalProps {
   visible: boolean;
@@ -62,10 +63,19 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
     }
   }, [visible]);
 
-  // Early return deve vir DEPOIS de todos os Hooks
-  if (!visible || !exam || !answerKey) {
-    return null;
-  }
+  if (!visible || !exam || !answerKey) return null;
+
+  const renderCorrections = () => {
+    return corrections.map((item, index) => (
+      <QuestionCorrectionItem
+        key={`correction-${index}`}
+        question={item.question}
+        studentAnswer={item.studentAnswer}
+        correctAnswer={item.correctAnswer}
+        isCorrect={item.isCorrect}
+      />
+    ));
+  };
 
   const safeExam = {
     ...exam,
@@ -75,48 +85,11 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
 
   const safeAnswerKey = Array.isArray(answerKey) ? answerKey : [];
 
-  const calculateCorrections = () => {
-    try {
-      // Validação antes de calcular
-      if (!Array.isArray(exam.answers)) {
-        console.warn('Exam answers is not an array', exam.answers);
-        return { score: 0, corrections: [] };
-      }
-
-      if (!Array.isArray(answerKey)) {
-        console.warn('Answer key is not an array', answerKey);
-        return { score: 0, corrections: [] };
-      }
-
-      const validAnswers = exam.answers
-        .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
-        .filter(a => ['A', 'B', 'C', 'D', ''].includes(a));
-
-      const validAnswerKey = answerKey
-        .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
-        .filter(a => ['A', 'B', 'C', 'D'].includes(a));
-
-      if (validAnswers.length === 0 || validAnswerKey.length === 0) {
-        return { score: 0, corrections: [] };
-      }
-
-      const result = correctExam(safeExam.answers, safeAnswerKey);
-
-      return {
-        score: safeExam.score !== null ? safeExam.score : result.score,
-        corrections: result.corrections || []
-      };
-    } catch (error) {
-      console.error("Error calculating corrections:", error);
-      return { score: 0, corrections: [] };
-    }
-  };
-
-  const { score, corrections } = calculateCorrections();
+  const { score, corrections } = calculateCorrections(exam, answerKey);
 
   return (
     <Modal
-      animationType="none" // Desativa a animação padrão pois usaremos Animated
+      animationType="none"
       transparent={true}
       visible={visible}
       onRequestClose={onClose}
@@ -159,22 +132,7 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
 
             <View style={styles.correctionsContainer}>
               <Text style={styles.correctionsTitle}>Correções por Questão</Text>
-              {corrections.map((item, index) => (
-                <View key={`correction-${index}`}
-                  style={[
-                    styles.correctionItem,
-                    !item.isCorrect && styles.incorrectAnswer
-                  ]}>
-                  <Text style={styles.questionNumber}>Q{item.question}</Text>
-                  <Text style={styles.studentAnswerText}>Resposta: {item.studentAnswer}</Text>
-                  <Text style={styles.correctAnswerText}>Gabarito: {item.correctAnswer}</Text>
-                  {item.isCorrect ? (
-                    <CheckCircle size={16} color={colors.feedback.success} />
-                  ) : (
-                    <XCircle size={16} color={colors.feedback.error} />
-                  )}
-                </View>
-              ))}
+              {renderCorrections()}
             </View>
           </ScrollView>
         </Animated.View>

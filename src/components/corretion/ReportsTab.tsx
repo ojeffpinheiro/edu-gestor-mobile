@@ -5,6 +5,7 @@ import StatsCard from './StatsCard';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 import createReportsTabStyles from './ReportsTabStyles';
+import ReportStatsGrid from './ReportStatsGrid';
 
 interface ReportData {
   totalExams: number;
@@ -33,32 +34,7 @@ const ReportsTab: React.FC<ReportsTabProps> = ({ report = null }) => {
     <View style={styles.tabContent}>
       <Text style={styles.sectionTitle}>Relatório de Desempenho</Text>
 
-      <View style={styles.statsGrid}>
-        <StatsCard
-          title="Total de Provas"
-          value={report.totalExams}
-          icon={FileText}
-          color={colors.primary.main}
-        />
-        <StatsCard
-          title="Média Geral"
-          value={report.averageScore.toFixed(1)}
-          icon={Target}
-          color={colors.feedback.info}
-        />
-        <StatsCard
-          title="Aprovados"
-          value={report.passedStudents}
-          icon={Trophy}
-          color={colors.feedback.success}
-        />
-        <StatsCard
-          title="Taxa de Aprovação"
-          value={`${report.passRate}%`}
-          icon={TrendingUp}
-          color={colors.secondary.main}
-        />
-      </View>
+      <ReportStatsGrid report={report} colors={colors} />
 
       <View style={styles.reportActions}>
         <Button

@@ -70,3 +70,29 @@ export const generateReport = (exams: Exam[] = []): ExamReport => {
       : 0
   };
 };
+
+export const calculateCorrections = (exam: { answers: any[], score: number | null }, answerKey: any[]) => {
+  if (!Array.isArray(exam.answers) || !Array.isArray(answerKey)) {
+    console.warn('Invalid input for calculateCorrections');
+    return { score: 0, corrections: [] };
+  }
+
+  const validAnswers = exam.answers
+    .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
+    .filter(a => ['A', 'B', 'C', 'D', ''].includes(a));
+
+  const validAnswerKey = answerKey
+    .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
+    .filter(a => ['A', 'B', 'C', 'D'].includes(a));
+
+  if (validAnswers.length === 0 || validAnswerKey.length === 0) {
+    return { score: 0, corrections: [] };
+  }
+
+  const result = correctExam(validAnswers, validAnswerKey);
+  
+  return {
+    score: exam.score !== null ? exam.score : result.score,
+    corrections: result.corrections || []
+  };
+};

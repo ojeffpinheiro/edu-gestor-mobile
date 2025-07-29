@@ -12,9 +12,8 @@ import QRGuide from './QRGuide';
 import BarcodeGuide from './BarcodeGuide';
 import ManualGuide from './ManualGuide';
 import BottomBar from './BottomBar';
-import { Camera, PermissionStatus } from 'expo-camera';
+import { Camera } from 'expo-camera';
 import PermissionRequestCard from './PermissionRequestCard';
-
 
 interface ScannerProps {
   setCurrentView: (view: string) => void;

@@ -187,6 +187,8 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         fontSize: 12,
         marginTop: 4,
         marginLeft: 4,
+        flexDirection: 'row',
+        alignItems: 'center'
     },
 
     generalError: {
@@ -204,6 +206,15 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
     },
     disabledButton: {
         opacity: 0.7,
+    }, feedbackMessage: {
+        marginTop: 16,
+        marginBottom: 8,
+        padding: 12,
+        borderRadius: 8,
+    },
+    errorIcon: {
+        marginRight: 8,
+        color: colors.feedback.error // Use a cor do seu tema
     },
 });
 

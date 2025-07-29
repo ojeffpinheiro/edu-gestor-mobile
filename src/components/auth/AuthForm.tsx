@@ -1,27 +1,39 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator, Animated } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
-
 import { useTheme } from '../../context/ThemeContext';
-
-import useAuth from '../../hooks/useAuth';
 
 import createAuthStyles from './stylesAuth';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
 import StatusMessage from '../common/StatusMessage';
 import { useAuthForm } from '../../hooks/useAuthForm';
+import useAuth from '../../hooks/useAuth';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
-
   const { scaleValue, animatePress } = usePressAnimation();
-  const { feedback, formErrors, isLoading, submit } = useAuthForm(setCurrentView);
+
   const {
     email, password, isLogin, showPassword,
     setEmail, setPassword, setShowPassword,
     toggleAuthMode
   } = useAuth();
+
+  const {
+    formErrors,
+    isLoading,
+    feedback,
+    submit,
+    validateField,
+    handleBlur,
+    touchedFields
+  } = useAuthForm(setCurrentView, email, password);
+
+  const handleSubmit = () => {
+    animatePress();
+    submit(email, password, isLogin);
+  };
 
   return (
     <KeyboardAvoidingView
@@ -43,28 +55,30 @@ const AuthScreen = ({ setCurrentView }) => {
         </View>
 
         <View style={styles.formContainer}>
-          {!isLogin && (
-            <Text style={styles.termsText}>
-              By clicking any of the Sign Up buttons, you agree to the{' '}
-              <Text style={styles.linkText}>terms of service</Text>.
-            </Text>
-          )}
-
           <View style={styles.inputContainer}>
             <Text style={styles.label}>
               Email
               <Text style={styles.requiredIndicator}>*</Text>
             </Text>
-            <View style={[styles.inputWrapper, formErrors.email && styles.inputWrapperError]}>
+            <View style={[
+              styles.inputWrapper,
+              (touchedFields.email && formErrors.email) && styles.inputWrapperError
+            ]}>
               <TextInput
                 style={[
                   styles.input,
-                  formErrors.email && styles.errorInput
+                  (touchedFields.email && formErrors.email) && styles.errorInput
                 ]}
-                placeholder="yourname@email.com"
+                placeholder="seu@email.com"
                 placeholderTextColor={colors.text.secondary}
                 value={email}
-                onChangeText={setEmail}
+                onChangeText={(text) => {
+                  setEmail(text);
+                  if (touchedFields.email) {
+                    validateField('email', text, isLogin);
+                  }
+                }}
+                onBlur={() => handleBlur('email', email, isLogin)}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoComplete="email"
@@ -72,13 +86,16 @@ const AuthScreen = ({ setCurrentView }) => {
               {email.length > 0 && (
                 <TouchableOpacity
                   style={styles.clearButton}
-                  onPress={() => setEmail('')}
+                  onPress={() => {
+                    setEmail('');
+                    validateField('email', '', isLogin);
+                  }}
                 >
                   <Text style={styles.clearIcon}>×</Text>
                 </TouchableOpacity>
               )}
 
-              {formErrors.email && (
+              {touchedFields.email && formErrors.email && (
                 <Text style={styles.errorText}>
                   <MaterialIcons
                     name="error-outline"
@@ -93,14 +110,29 @@ const AuthScreen = ({ setCurrentView }) => {
 
           {isLogin && (
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Password</Text>
-              <View style={styles.inputWrapper}>
+              <Text style={styles.label}>
+                Senha
+                <Text style={styles.requiredIndicator}>*</Text>
+              </Text>
+              <View style={[
+                styles.inputWrapper,
+                (touchedFields.password && formErrors.password) && styles.inputWrapperError
+              ]}>
                 <TextInput
-                  style={styles.input}
+                  style={[
+                    styles.input,
+                    (touchedFields.password && formErrors.password) && styles.errorInput
+                  ]}
                   placeholder="••••••••"
                   placeholderTextColor={colors.text.secondary}
                   value={password}
-                  onChangeText={setPassword}
+                  onChangeText={(text) => {
+                    setPassword(text);
+                    if (touchedFields.password) {
+                      validateField('password', text, isLogin);
+                    }
+                  }}
+                  onBlur={() => handleBlur('password', password, isLogin)}
                   secureTextEntry={!showPassword}
                 />
                 <TouchableOpacity
@@ -114,36 +146,35 @@ const AuthScreen = ({ setCurrentView }) => {
                   />
                 </TouchableOpacity>
               </View>
+              {touchedFields.password && formErrors.password && (
+                <Text style={styles.errorText}>
+                  <MaterialIcons
+                    name="error-outline"
+                    size={14}
+                    style={styles.errorIcon}
+                  />
+                  {formErrors.password}
+                </Text>
+              )}
               <TouchableOpacity style={styles.forgotPassword}>
-                <Text style={styles.linkText}>Forgot Password?</Text>
+                <Text style={styles.linkText}>Esqueceu a senha?</Text>
               </TouchableOpacity>
             </View>
           )}
 
-          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-            <TouchableOpacity disabled={isLoading} activeOpacity={0.8}
-              style={[styles.submitButton, isLoading && styles.disabledButton]}
-              onPress={() => { animatePress(); submit(); }} >
-              {isLoading
-                ? (<ActivityIndicator color={colors.text.onPrimary} />)
-                : (
-                  <Text style={styles.submitButtonText}>
-                    {isLogin ? 'Login' : 'Sign Up'}
-                  </Text>
-                )}
-            </TouchableOpacity>
-          </Animated.View>
-
           <TouchableOpacity
-            onPress={toggleAuthMode}
-            style={styles.switchAuth}
+            disabled={isLoading}
+            activeOpacity={0.8}
+            style={[styles.submitButton, isLoading && styles.disabledButton]}
+            onPress={handleSubmit}
           >
-            <Text style={styles.switchAuthText}>
-              {isLogin ? "Don't have an account? " : 'Already have an account? '}
-              <Text style={styles.linkText}>
-                {isLogin ? 'Sign Up' : 'Login'}
+            {isLoading ? (
+              <ActivityIndicator color={colors.text.onPrimary} />
+            ) : (
+              <Text style={styles.submitButtonText}>
+                {isLogin ? 'Entrar' : 'Cadastrar'}
               </Text>
-            </Text>
+            )}
           </TouchableOpacity>
 
           <View style={styles.separator}>

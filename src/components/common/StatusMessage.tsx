@@ -1,152 +1,44 @@
-// components/common/StatusMessage.tsx
-import React, { useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+// src/components/common/StatusMessage.tsx
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { X, CheckCircle, AlertCircle } from 'lucide-react-native';
-import { ColorScheme } from '../../styles/colors';
-import { Spacing } from '../../styles/designTokens';
-
-type StatusType = 'error' | 'success' | 'warning' | 'info' | 'default';
 
 interface StatusMessageProps {
-  type: StatusType;
-  title: string;
+  variant: 'success' | 'error' | 'info' | 'warning';
   message: string;
-  onDismiss?: () => void;
-  actions?: Array<{
-    label: string;
-    onPress: () => void;
-  }>;
+  style?: object;
 }
 
-const StatusMessage: React.FC<StatusMessageProps> = ({
-  type,
-  title,
-  message,
-  onDismiss,
-  actions
-}) => {
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(20)).current;
-
+const StatusMessage: React.FC<StatusMessageProps> = ({ variant, message, style }) => {
   const { colors } = useTheme();
-  const styles = createStatusMessageStyles(colors, type);
-  const iconColor = getIconColor(colors, type);
-
-  useEffect(() => {
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        easing: Easing.out(Easing.quad),
-        useNativeDriver: true,
-      }),
-    ]).start();
-  }, []);
-
-  const Icon = {
-    error: AlertCircle,
-    success: CheckCircle,
-    warning: AlertCircle
-  }[type];
+  
+  const backgroundColor = {
+    success: colors.feedback.success,
+    error: colors.feedback.error,
+    info: colors.feedback.info,
+    warning: colors.feedback.warning,
+  }[variant];
 
   return (
-    <Animated.View
-      style={[styles.container, {
-        opacity: fadeAnim,
-        transform: [{ translateY: slideAnim }],
-      }]}>
-
-      <View style={styles.content}>
-        <Icon size={20} color={iconColor} />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{title}</Text>
-          <Text style={styles.message}>{message}</Text>
-        </View>
-        {onDismiss && (
-          <TouchableOpacity onPress={onDismiss}>
-            <X size={20} color={iconColor} />
-          </TouchableOpacity>
-        )}
-      </View>
-
-      {actions && actions.length > 0 && (
-        <View style={styles.actionsContainer}>
-          {actions.map((action, index) => (
-            <TouchableOpacity
-              key={index}
-              onPress={action.onPress}
-              style={styles.actionButton}
-            >
-              <Text style={styles.actionText}>{action.label}</Text>
-            </TouchableOpacity>
-          ))}
-        </View>
-      )}
-    </Animated.View>
+    <View style={[styles.container, { backgroundColor }, style]}>
+      <Text style={[styles.message, { color: colors.text.onPrimary }]}>
+        {message}
+      </Text>
+    </View>
   );
 };
 
-// Função separada para obter a cor do ícone
-const getIconColor = (colors: ColorScheme, type: StatusType) => {
-  return {
-    error: colors.feedback.error,
-    success: colors.feedback.success,
-    warning: colors.feedback.warning
-  }[type];
-};
-
-// Função para criar estilos
-const createStatusMessageStyles = (colors: ColorScheme, type: StatusType) => {
-  const backgroundColor = {
-    error: colors.feedback.error,
-    success: colors.feedback.success,
-    warning: colors.feedback.warning
-  }[type];
-
-  return StyleSheet.create({
-    container: {
-      backgroundColor,
-      borderRadius: Spacing.sm,
-      padding: Spacing.md,
-      marginVertical: Spacing.sm,
-    },
-    content: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      gap: Spacing.sm,
-    },
-    textContainer: {
-      flex: 1,
-    },
-    title: {
-      fontWeight: 'bold',
-      color: colors.text.primary,
-      marginBottom: Spacing.xs,
-    },
-    message: {
-      color: colors.text.primary,
-    },
-    actionsContainer: {
-      flexDirection: 'row',
-      justifyContent: 'flex-end',
-      gap: Spacing.sm,
-      marginTop: Spacing.sm,
-    },
-    actionButton: {
-      paddingHorizontal: Spacing.md,
-      paddingVertical: Spacing.xs,
-    },
-    actionText: {
-      color: colors.text.primary,
-      fontWeight: 'bold',
-    },
-  });
-};
+const styles = StyleSheet.create({
+  container: {
+    padding: 12,
+    borderRadius: 8,
+    marginVertical: 8,
+    alignItems: 'center',
+  },
+  message: {
+    fontSize: 14,
+    fontWeight: '500',
+  },
+});
 
 export default StatusMessage;

@@ -3,6 +3,7 @@ import { View, Text, Animated, ScrollView, StatusBar, TouchableOpacity, TextInpu
 import { CheckCircle, Users, Sparkles, ArrowRight, ChevronLeft, SearchIcon, X, Check } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient'; // ou react-native-linear-gradient
+import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../../context/ThemeContext';
 import { useStudents } from '../../hooks/useStudents';
@@ -38,11 +39,11 @@ const StudentsScreen = ({
   setSelectedStudent,
   setCurrentView
 }: StudentsScreenProps) => {
-  const { colors } = useTheme();
-  const styles = createStudentsScreenStyles(colors);
   const navigation = useNavigation();
   const scaleValue = useRef(new Animated.Value(1)).current;
 
+  const { colors } = useTheme();
+  const styles = createStudentsScreenStyles(colors);
   const {
     students,
     selectedStudents,
@@ -57,6 +58,7 @@ const StudentsScreen = ({
   } = useStudents();
 
   const handleStudentSelect = (student: Student) => {
+    Haptics.selectionAsync();
     toggleStudentSelection(student);
 
     // Feedback tátil
@@ -82,36 +84,45 @@ const StudentsScreen = ({
     [selectedStudent, students]
   );
 
-  const renderItem = ({ item }: { item: Student }) => (
-    <TouchableOpacity
-      style={styles.studentCard}
-      onPress={() => handleStudentSelect(item)}
-      activeOpacity={0.7}
-      accessibilityLabel={`Selecionar aluno ${item.name}`}
-      accessibilityHint={`${selectedStudents.some(s => s.id === item.id) ? 'Desselecionar' : 'Selecionar'} aluno ${item.name} da turma ${item.class}`}
-      accessibilityRole="button"
-    >
-      <View style={styles.studentAvatar}>
-        <Text style={styles.studentInitial}>{item.name.charAt(0)}</Text>
-      </View>
+  const renderItem = ({ item }: { item: Student }) => {
+    const isSelected = selectedStudents.some(s => s.id === item.id);
+    return (
+      <Animated.View
+        style={[
+          styles.studentCard,
+          isSelected && styles.selectedCard,
+          { transform: [{ scale: scaleValue }] }
+        ]}>
+        <TouchableOpacity
+          onPress={() => handleStudentSelect(item)}
+          activeOpacity={0.7}
+          accessibilityLabel={`Selecionar aluno ${item.name}`}
+          accessibilityHint={`${selectedStudents.some(s => s.id === item.id) ? 'Desselecionar' : 'Selecionar'} aluno ${item.name} da turma ${item.class}`}
+          accessibilityRole="button"
+        >
+          <View style={styles.studentAvatar}>
+            <Text style={styles.studentInitial}>{item.name.charAt(0)}</Text>
+          </View>
 
-      <View style={styles.studentInfoContainer}>
-        <Text style={styles.studentName}>{item.name}</Text>
-        <Text style={styles.studentDetails}>
-          {item.registrationNumber} • Turma {item.class}
-        </Text>
-      </View>
+          <View style={styles.studentInfoContainer}>
+            <Text style={styles.studentName}>{item.name}</Text>
+            <Text style={styles.studentDetails}>
+              {item.registrationNumber} • Turma {item.class}
+            </Text>
+          </View>
 
-      <View style={[
-        styles.selectionBadge,
-        selectedStudents.some(s => s.id === item.id) && styles.selectedBadge
-      ]}>
-        {selectedStudents.some(s => s.id === item.id) && (
-          <Check size={16} color="white" />
-        )}
-      </View>
-    </TouchableOpacity>
-  );
+          <View style={[
+            styles.selectionBadge,
+            selectedStudents.some(s => s.id === item.id) && styles.selectedBadge
+          ]}>
+            {selectedStudents.some(s => s.id === item.id) && (
+              <Check size={16} color="white" />
+            )}
+          </View>
+        </TouchableOpacity>
+      </Animated.View>
+    );
+  };
 
   if (isLoading) {
     return (

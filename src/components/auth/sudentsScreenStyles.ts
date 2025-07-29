@@ -400,6 +400,11 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
     confirmIcon: {
       marginLeft: 8,
     },
+    selectedCard: {
+      backgroundColor: `${colors.primary.main}15`,
+      borderWidth: 1,
+      borderColor: colors.primary.main,
+    },
   });
 };
 

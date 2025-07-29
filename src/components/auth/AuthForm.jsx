@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator, Animated } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -7,17 +7,23 @@ import { useTheme } from '../../context/ThemeContext';
 import useAuth from '../../hooks/useAuth';
 
 import createAuthStyles from './stylesAuth';
+import { usePressAnimation } from '../../hooks/usePressAnimation';
+import { useFeedback } from '../../hooks/useFeedback';
+import StatusMessage from '../common/StatusMessage';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
+  const styles = createAuthStyles(colors);
+  const { scaleValue, animatePress } = usePressAnimation();
+
   const {
     email, password, isLogin, showPassword,
     setEmail, setPassword, setShowPassword,
     toggleAuthMode
   } = useAuth();
+  const { showFeedback, feedback } = useFeedback();
 
-  const styles = createAuthStyles(colors);
-
+  const [isLoading, setIsLoading] = useState(false);
   const [formErrors, setFormErrors] = useState({
     email: '',
     password: '',
@@ -36,36 +42,46 @@ const AuthScreen = ({ setCurrentView }) => {
       isValid = false;
     }
 
-    if (isLogin && !password) {
-      errors.password = 'Senha é obrigatória';
-      isValid = false;
-    } else if (isLogin && password.length < 6) {
-      errors.password = 'Senha deve ter pelo menos 6 caracteres';
-      isValid = false;
+    if (isLogin) {
+      if (!password) {
+        errors.password = 'Senha é obrigatória';
+        isValid = false;
+      } else if (password.length < 6) {
+        errors.password = 'Senha deve ter pelo menos 6 caracteres';
+        isValid = false;
+      }
     }
 
     setFormErrors(errors);
     return isValid;
   };
 
-
-  const handleSubmit = async (setCurrentView) => {
+  const handleSubmit = async () => {
     if (!validateForm()) return;
 
     try {
+      setIsLoading(true);
+
+      // Simulação de chamada de API
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
       if (isLogin) {
-        // Chamada API para login
+        // Login bem-sucedido
+        showFeedback('Login realizado com sucesso!', 'success');
         setCurrentView('scanner');
-        showSuccess('Login bem-sucedido!');
       } else {
-        // Chamada API para cadastro
-        showSuccess('Cadastro realizado com sucesso!');
+        // Cadastro bem-sucedido
+        showFeedback('Cadastro realizado com sucesso!', 'success');
+        toggleAuthMode(); // Alterna para modo de login após cadastro
       }
     } catch (error) {
+      showFeedback(error.message || 'Falha na autenticação', 'error');
       setFormErrors({
         ...formErrors,
         general: error.message || 'Ocorreu um erro. Tente novamente.'
       });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -97,7 +113,10 @@ const AuthScreen = ({ setCurrentView }) => {
           )}
 
           <View style={styles.inputContainer}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>
+              Email
+              <Text style={styles.requiredIndicator}>*</Text>
+            </Text>
             <View style={[styles.inputWrapper, formErrors.email && styles.inputWrapperError]}>
               <TextInput
                 style={[
@@ -163,13 +182,24 @@ const AuthScreen = ({ setCurrentView }) => {
             </View>
           )}
 
-          <TouchableOpacity style={styles.submitButton} onPress={() => handleSubmit(setCurrentView)}>
-            <Text style={styles.submitButtonText}>
-              {isLogin ? 'Login' : 'Sign Up'}
-            </Text>
-          </TouchableOpacity>
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity disabled={isLoading} activeOpacity={0.8}
+              style={[styles.submitButton, isLoading && styles.disabledButton]}
+              onPress={() => { animatePress(); handleSubmit(); }} >
+              {isLoading
+                ? (<ActivityIndicator color={colors.text.onPrimary} />)
+                : (
+                  <Text style={styles.submitButtonText}>
+                    {isLogin ? 'Login' : 'Sign Up'}
+                  </Text>
+                )}
+            </TouchableOpacity>
+          </Animated.View>
 
-          <TouchableOpacity onPress={toggleAuthMode} style={styles.switchAuth}>
+          <TouchableOpacity
+            onPress={toggleAuthMode}
+            style={styles.switchAuth}
+          >
             <Text style={styles.switchAuthText}>
               {isLogin ? "Don't have an account? " : 'Already have an account? '}
               <Text style={styles.linkText}>
@@ -202,11 +232,12 @@ const AuthScreen = ({ setCurrentView }) => {
             )}
           </View>
 
-          {formErrors.general && (
+
+          {feedback.visible && (
             <StatusMessage
-              variant="error"
-              message={formErrors.general}
-              style={styles.generalError}
+              variant={feedback.type}
+              message={feedback.message}
+              style={styles.feedbackMessage}
             />
           )}
         </View>

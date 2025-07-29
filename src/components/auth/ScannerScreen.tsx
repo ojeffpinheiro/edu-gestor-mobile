@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert, Animated, Easing } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -59,6 +59,25 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     }
   }, [scannedCode]);
 
+  useEffect(() => {
+    if (isScanning) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scanLineAnimation, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+            easing: Easing.linear,
+          }),
+          Animated.timing(scanLineAnimation, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    }
+  }, [isScanning]);
 
   const requestPermission = async () => {
     try {
@@ -68,7 +87,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
       setPermissionStatus('denied');
     }
   };
-
 
   if (permissionStatus === 'denied') {
     return (

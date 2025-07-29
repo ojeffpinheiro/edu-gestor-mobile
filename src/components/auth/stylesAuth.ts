@@ -199,6 +199,12 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         position: 'relative',
         marginBottom: 4, // Espaço extra para a mensagem de erro
     },
+    requiredIndicator: {
+        color: colors.feedback.error,
+    },
+    disabledButton: {
+        opacity: 0.7,
+    },
 });
 
 export default createAuthStyles;

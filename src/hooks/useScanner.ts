@@ -1,10 +1,14 @@
 import { useState, useRef, useEffect } from 'react';
 import { Alert, Linking } from 'react-native';
 import { Camera, BarcodeScanningResult, BarcodeType } from 'expo-camera';
-import { mockBarcodes, mockQRcodes } from '../mocks/scannerMocks';
 import { Easing, Animated } from 'react-native';
+import * as Haptics from 'expo-haptics';
+import { mockBarcodes, mockQRcodes } from '../mocks/scannerMocks';
+import { useFeedback } from './useFeedback';
 
 export const useScanner = () => {
+  const { showFeedback } = useFeedback();
+
   const [activeMode, setActiveMode] = useState<'qr' | 'barcode' | 'manual' | null>(null);
   const [manualInput, setManualInput] = useState('');
   const [showError, setShowError] = useState(false);
@@ -22,12 +26,19 @@ export const useScanner = () => {
   useEffect(() => {
     if (isScanning) {
       Animated.loop(
-        Animated.timing(scanLineAnimation, {
-          toValue: 1,
-          duration: 2000,
-          easing: Easing.linear,
-          useNativeDriver: true,
-        })
+        Animated.sequence([
+          Animated.timing(scanLineAnimation, {
+            toValue: 1,
+            duration: 2000,
+            useNativeDriver: true,
+            easing: Easing.linear,
+          }),
+          Animated.timing(scanLineAnimation, {
+            toValue: 0,
+            duration: 0,
+            useNativeDriver: true,
+          }),
+        ])
       ).start();
     } else {
       scanLineAnimation.setValue(0);
@@ -77,16 +88,19 @@ export const useScanner = () => {
 
   const handleBarcodeScanned = (result: BarcodeScanningResult) => {
     console.log('Barcode scanned:', result.data);
+
     const isValid = validateScannedCode(result.data, activeMode);
 
     if (isValid) {
       console.log('Code is valid, proceeding...');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+      showFeedback('Código escaneado com sucesso!', 'success');
       setScannedCode(result.data);
       setIsScanning(false);
       return true;
     } else {
       console.log('Invalid code');
-      Alert.alert('Erro', 'Código inválido. Por favor, tente novamente.');
+      showFeedback('Código inválido. Por favor, tente novamente.', 'error');
       setIsScanning(false);
       return false;
     }
@@ -94,6 +108,10 @@ export const useScanner = () => {
 
   const startScanning = async () => {
     if (hasPermission === false) {
+      showFeedback(
+        'Permissão da câmera negada. Por favor, habilite nas configurações.',
+        'error'
+      );
       Alert.alert('Permissão Negada', 'Você precisa conceder permissão para a câmera para usar o scanner.');
       return;
     }
@@ -115,6 +133,10 @@ export const useScanner = () => {
         return true;
       } else {
         setShowError(true);
+        showFeedback(
+          'Código inválido. Por favor, verifique e tente novamente.',
+          'error'
+        );
         Alert.alert('Erro', 'Código inválido. Por favor, verifique e tente novamente.');
         return false;
       }

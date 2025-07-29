@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Alert } from 'react-native';
 import { mockStudents } from '../mocks/scannerMocks';
 import { Student } from '../types/newTypes';
+import { useFeedback } from './useFeedback';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -13,6 +14,8 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+
+  const { showFeedback } = useFeedback();
 
   // Carrega os alunos (mock ou API)
   useEffect(() => {
@@ -69,12 +72,14 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   // Confirma seleção (pode ser usado para navegação ou outras ações)
   const confirmSelection = () => {
     if (selectedStudents.length === 0) {
+      showFeedback('Erro ao confirmar seleção', 'error');
       Alert.alert('Nenhum aluno selecionado', 'Por favor, selecione pelo menos um aluno.');
       return false;
     }
     
     // Aqui você pode adicionar lógica adicional antes de confirmar
     console.log('Alunos selecionados:', selectedStudents);
+      showFeedback('Aluno(s) selecionado(s) com sucesso!', 'success');
     return true;
   };
 

@@ -1,20 +1,25 @@
 import React, { useMemo, useRef } from 'react';
-import { View, Text, Animated, ScrollView, StatusBar, TouchableOpacity, TextInput, FlatList, Platform, UIManager, LayoutAnimation } from 'react-native';
-import { CheckCircle, Users, Sparkles, ArrowRight, ChevronLeft, SearchIcon, X, Check } from 'lucide-react-native';
+import { 
+  View, Text, Animated, ScrollView, 
+  StatusBar, TouchableOpacity, TextInput, 
+  FlatList, Platform, 
+  UIManager, LayoutAnimation 
+} from 'react-native';
+import { 
+  CheckCircle, Users, Sparkles, 
+  ArrowRight, ChevronLeft, 
+  SearchIcon, X, Check 
+} from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
-import { LinearGradient } from 'expo-linear-gradient'; // ou react-native-linear-gradient
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../../context/ThemeContext';
 import { useStudents } from '../../hooks/useStudents';
-
 import { AuthView, Student } from '../../types/newTypes';
-
 import Button from '../common/Button';
-
 import SectionHeader from '../common/SectionHeader';
-
-import { createStudentsScreenStyles } from './sudentsScreenStyles';
+import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
 
 interface StudentsScreenProps {
   scannedCode?: string;

@@ -1,8 +1,10 @@
 import { useState } from 'react';
 import { View } from 'react-native';
+
+import { AuthView } from '../types/newTypes';
+
 import AuthForm from '../components/auth/AuthForm';
 import ScannerScreen from '../components/views/ScannerScreen';
-import { AuthView } from '../types/newTypes';
 import StudentsScreen from '../components/views/StudentsScreen';
 import HomeScreen from '../components/views/HomeScreen';
 

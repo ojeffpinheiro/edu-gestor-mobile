@@ -1,7 +1,7 @@
 import { StyleSheet } from "react-native";
 import { ColorScheme } from "../../styles/colors";
 import { BorderRadius, Shadow, Spacing } from "../../styles/designTokens";
-import { createBaseStyles } from "./styles";
+import { createBaseStyles } from "../auth/styles";
 
 export const createStudentsScreenStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);

@@ -6,8 +6,7 @@ import { useTheme } from '../../context/ThemeContext';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import InfoBox from '../common/InfoBox';
-
-import { createHomeScreenStyles } from './styles';
+import { createHomeScreenStyles } from '../auth/styles';
 
 const HomeScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();

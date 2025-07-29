@@ -1,20 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert, Animated, Easing } from 'react-native';
+import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert, Animated, Easing } from 'react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 
 import { useScanner } from '../../hooks/useScanner';
 
+import { AuthView } from '../../types/newTypes';
+
 import MainButtons from '../common/MainButtons';
+import BottomBar from '../common/layout/BottomBar';
 
 import QRGuide from '../features/scanner/QRGuide';
 import BarcodeGuide from '../features/scanner/BarcodeGuide';
 import ManualGuide from '../features/scanner/ManualGuide';
-import BottomBar from '../common/layout/BottomBar';
-import { Camera } from 'expo-camera';
 import PermissionRequestCard from '../features/scanner/PermissionRequestCard';
-import { AuthView } from '../../types/newTypes';
 
 interface ScannerProps {
   setCurrentView: (view: AuthView) => void;

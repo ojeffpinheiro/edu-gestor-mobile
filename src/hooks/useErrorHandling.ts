@@ -1,4 +1,6 @@
 import { Alert, Linking, Platform } from 'react-native';
+import { useFeedback } from './useFeedback';
+import { useToast } from './useToast';
 
 type ErrorAction = {
   text: string;
@@ -15,6 +17,9 @@ interface ErrorMapping {
 }
 
 const useErrorHandling = () => {
+  const { showFeedback } = useFeedback();
+  const { showToast } = useToast();
+
   const openAppSettings = () => {
     Linking.openSettings().catch(() => {
       Alert.alert(
@@ -167,8 +172,11 @@ const useErrorHandling = () => {
     return errorMappings[errorCode] || errorMappings.default;
   };
 
-  const showError = (errorCode: string, error?: Error) => {
-    const config = errorMappings[errorCode] || errorMappings.default;
+  const showError = (errorCode: string, error?: Error, options?: {
+    useToast?: boolean;
+    useFeedback?: boolean;
+  }) => {
+    const config = getErrorConfig(errorCode);
     const errorMessage = typeof error === 'string' ? error : error?.message;
 
     // Log detalhado para desenvolvedores
@@ -183,6 +191,14 @@ const useErrorHandling = () => {
       ...(config.actions || []),
       { text: 'Entendi', onPress: () => { } }
     ];
+
+    if (options?.useToast) {
+      showToast({ type: 'error', message: config.message });
+    } else if (options?.useFeedback) {
+      showFeedback(config.message, 'error');
+    } else {
+      // Mostrar alerta padrão
+    }
 
     Alert.alert(
       config.title,

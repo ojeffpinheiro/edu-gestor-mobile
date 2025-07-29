@@ -77,7 +77,31 @@ const ExamDetailModal: React.FC<ExamDetailModalProps> = ({
 
   const calculateCorrections = () => {
     try {
+      // Validação antes de calcular
+      if (!Array.isArray(exam.answers)) {
+        console.warn('Exam answers is not an array', exam.answers);
+        return { score: 0, corrections: [] };
+      }
+
+      if (!Array.isArray(answerKey)) {
+        console.warn('Answer key is not an array', answerKey);
+        return { score: 0, corrections: [] };
+      }
+
+      const validAnswers = exam.answers
+        .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
+        .filter(a => ['A', 'B', 'C', 'D', ''].includes(a));
+
+      const validAnswerKey = answerKey
+        .map(a => typeof a === 'string' ? a.trim().toUpperCase() : '')
+        .filter(a => ['A', 'B', 'C', 'D'].includes(a));
+
+      if (validAnswers.length === 0 || validAnswerKey.length === 0) {
+        return { score: 0, corrections: [] };
+      }
+
       const result = correctExam(safeExam.answers, safeAnswerKey);
+
       return {
         score: safeExam.score !== null ? safeExam.score : result.score,
         corrections: result.corrections || []

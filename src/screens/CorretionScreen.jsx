@@ -26,16 +26,26 @@ const CorrectionScreen = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedExam, setSelectedExam] = useState(null);
   const [activeTab, setActiveTab] = useState('correction');
+  const [validationError, setValidationError] = useState('');
 
   const { colors } = useTheme();
   const styles = createCorrectionScreenStyles(colors);
   const report = generateReport(exams);
 
-  const handleProcessAll = async () => {
-    setProcessing(true);
-    await processAllPendingExams(answerKey);
-    setProcessing(false);
+  const handleAnswerKeyChange = (newAnswerKey) => {
+    setAnswerKey(newAnswerKey);
+    setValidationError('');
   };
+
+  const handleProcessAll = async () => {
+    if (answerKey.length === 0) {
+      setValidationError('O gabarito não pode estar vazio');
+      return;
+    }
+
+    await processAllPendingExams(answerKey);
+  };
+
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -58,7 +68,7 @@ const CorrectionScreen = () => {
           <SkeletonLoader />
         );
       case 'settings':
-        return <SettingsTab answerKey={answerKey} />;
+        return <SettingsTab answerKey={answerKey} onAnswerKeyChange={handleAnswerKeyChange} />;
       default:
         return null;
     }
@@ -67,6 +77,15 @@ const CorrectionScreen = () => {
   return (
     <SafeAreaView style={styles.screenContainer}>
       {processing && <LoadingOverlay />}
+
+      {validationError && (
+        <StatusMessage
+          type="error"
+          title="Erro de validação"
+          message={validationError}
+          onDismiss={() => setValidationError('')}
+        />
+      )}
 
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
 

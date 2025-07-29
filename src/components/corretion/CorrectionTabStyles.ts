@@ -12,25 +12,18 @@ export const createCorrectionTabStyles = (colors: ColorScheme) => {
   const lists = createListStyles(colors);
 
   return StyleSheet.create({
-    // Base container
     tabContent: {
       ...tabs.tabContainer,
     },
-
-    // Section title
     sectionTitle: {
       ...text.heading2,
       ...tabs.sectionHeader,
     },
-
-    // Action buttons container
     actionButtons: {
       flexDirection: 'row',
       gap: Spacing.sm,
       marginBottom: Spacing.lg,
     },
-
-    // Primary action button
     primaryButton: {
       ...buttons.primary,
       flex: 1,
@@ -42,34 +35,19 @@ export const createCorrectionTabStyles = (colors: ColorScheme) => {
       gap: Spacing.sm,
     },
     primaryButtonDisabled: {
-      ...buttons.primary,
       opacity: 0.6,
     },
-
-    // Button text
     buttonText: {
       ...buttons.text,
     },
-
-    // Exam list container
     examList: {
       gap: Spacing.sm,
     },
-
-    // Loading state text
     loadingText: {
       ...text.body,
       textAlign: 'center',
       marginTop: Spacing.xl,
     },
-
-    // Custom styles for correction items
-    correctionItem: {
-      ...lists.item,
-      padding: Spacing.lg,
-    },
-
-    // Status indicator
     statusIndicator: {
       width: Spacing.sm,
       height: Spacing.sm,

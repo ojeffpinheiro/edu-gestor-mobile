@@ -18,7 +18,6 @@ interface CorrectionTabProps {
     status?: string;
   }>;
   isLoading: boolean;
-  answerKey?: any[];
   onExamPress?: (exam: any) => void;
   onProcessAll?: () => void;
 }
@@ -26,7 +25,6 @@ interface CorrectionTabProps {
 const CorrectionTab: React.FC<CorrectionTabProps> = ({
   exams = [],
   isLoading,
-  answerKey = [],
   onExamPress = () => { },
   onProcessAll = () => { }
 }) => {
@@ -35,7 +33,7 @@ const CorrectionTab: React.FC<CorrectionTabProps> = ({
 
   const hasPendingExams = exams.some(exam => exam.status === 'pending');
 
-  if (!exams || !answerKey) return null;
+  if (!exams) return null;
 
   return (
     <View style={styles.tabContent}>

@@ -50,7 +50,8 @@ export const createExamItemStyles = (colors: ColorScheme) => {
     examScore: {
       ...text.body,
       ...text.semibold,
-      marginLeft: 'auto'
+      marginLeft: 'auto',
+      color: colors.text.primary
     },
     examStatus: {
       marginLeft: Spacing.sm,

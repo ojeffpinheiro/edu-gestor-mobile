@@ -82,18 +82,7 @@ export const useExams = () => {
       showError('invalid_input', new Error(`Respostas inválidas no gabarito: ${invalidAnswers.join(', ')}`));
       return false;
     }
-
     return true;
-  };
-
-  const resetExamCorrection = (examId: string) => {
-    setExams(prevExams =>
-      prevExams.map(exam =>
-        exam.id === examId
-          ? { ...exam, status: 'pending', score: null }
-          : exam
-      )
-    );
   };
 
   return {
@@ -101,7 +90,6 @@ export const useExams = () => {
     isLoading,
     error,
     processAllPendingExams,
-    resetExamCorrection,
     hasPendingExams: exams.some(exam => exam.status === 'pending')
   };
 };

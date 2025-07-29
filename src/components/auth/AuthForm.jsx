@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator, Animated } from 'react-native';
 import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
@@ -8,82 +8,20 @@ import useAuth from '../../hooks/useAuth';
 
 import createAuthStyles from './stylesAuth';
 import { usePressAnimation } from '../../hooks/usePressAnimation';
-import { useFeedback } from '../../hooks/useFeedback';
 import StatusMessage from '../common/StatusMessage';
+import { useAuthForm } from '../../hooks/useAuthForm';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
-  const { scaleValue, animatePress } = usePressAnimation();
 
+  const { scaleValue, animatePress } = usePressAnimation();
+  const { feedback, formErrors, isLoading, submit } = useAuthForm(setCurrentView);
   const {
     email, password, isLogin, showPassword,
     setEmail, setPassword, setShowPassword,
     toggleAuthMode
   } = useAuth();
-  const { showFeedback, feedback } = useFeedback();
-
-  const [isLoading, setIsLoading] = useState(false);
-  const [formErrors, setFormErrors] = useState({
-    email: '',
-    password: '',
-    general: ''
-  });
-
-  const validateForm = () => {
-    const errors = {};
-    let isValid = true;
-
-    if (!email) {
-      errors.email = 'Email é obrigatório';
-      isValid = false;
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      errors.email = 'Por favor, insira um email válido';
-      isValid = false;
-    }
-
-    if (isLogin) {
-      if (!password) {
-        errors.password = 'Senha é obrigatória';
-        isValid = false;
-      } else if (password.length < 6) {
-        errors.password = 'Senha deve ter pelo menos 6 caracteres';
-        isValid = false;
-      }
-    }
-
-    setFormErrors(errors);
-    return isValid;
-  };
-
-  const handleSubmit = async () => {
-    if (!validateForm()) return;
-
-    try {
-      setIsLoading(true);
-
-      // Simulação de chamada de API
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      if (isLogin) {
-        // Login bem-sucedido
-        showFeedback('Login realizado com sucesso!', 'success');
-        setCurrentView('scanner');
-      } else {
-        // Cadastro bem-sucedido
-        showFeedback('Cadastro realizado com sucesso!', 'success');
-        toggleAuthMode(); // Alterna para modo de login após cadastro
-      }
-    } catch (error) {
-      showFeedback(error.message || 'Falha na autenticação', 'error');
-      setFormErrors({
-        ...formErrors,
-        general: error.message || 'Ocorreu um erro. Tente novamente.'
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <KeyboardAvoidingView
@@ -185,7 +123,7 @@ const AuthScreen = ({ setCurrentView }) => {
           <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
             <TouchableOpacity disabled={isLoading} activeOpacity={0.8}
               style={[styles.submitButton, isLoading && styles.disabledButton]}
-              onPress={() => { animatePress(); handleSubmit(); }} >
+              onPress={() => { animatePress(); submit(); }} >
               {isLoading
                 ? (<ActivityIndicator color={colors.text.onPrimary} />)
                 : (

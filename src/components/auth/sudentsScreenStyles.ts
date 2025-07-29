@@ -266,6 +266,7 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
     studentName: {
       fontSize: 16,
       fontWeight: '500',
+      color: colors.text.primary,
     },
     studentRegNumber: {
       fontSize: 14,

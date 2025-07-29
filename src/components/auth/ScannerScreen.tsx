@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+
 import { useTheme } from '../../context/ThemeContext';
+
+import { useScanner } from '../../hooks/useScanner';
+
+import MainButtons from '../common/MainButtons';
+
 import QRGuide from './QRGuide';
 import BarcodeGuide from './BarcodeGuide';
 import ManualGuide from './ManualGuide';
 import BottomBar from './BottomBar';
-import MainButtons from '../common/MainButtons';
-import { Ionicons } from '@expo/vector-icons';
-import { useScanner } from '../../hooks/useScanner';
+import { Camera, PermissionStatus } from 'expo-camera';
+import PermissionRequestCard from './PermissionRequestCard';
+
 
 interface ScannerProps {
   setCurrentView: (view: string) => void;
@@ -42,14 +49,46 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     handleManualSubmit,
     mockScan
   } = useScanner();
+  const [permissionStatus, setPermissionStatus] = useState('undetermined');
 
   // Efeito para lidar com a autenticação quando um código é escaneado
-  React.useEffect(() => {
+  useEffect(() => {
     if (scannedCode) {
       setIsAuthenticated(true);
       setCurrentView('students');
     }
   }, [scannedCode]);
+
+
+  const requestPermission = async () => {
+    try {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setPermissionStatus(status === 'granted' ? 'granted' : 'denied');
+    } catch (error) {
+      setPermissionStatus('denied');
+    }
+  };
+
+
+  if (permissionStatus === 'denied') {
+    return (
+      <PermissionRequestCard
+        onRequestPermission={requestPermission}
+        onBack={() => setCurrentView('auth')}
+        isError={true}
+      />
+    );
+  }
+
+  if (permissionStatus === 'undetermined') {
+    return (
+      <PermissionRequestCard
+        onRequestPermission={requestPermission}
+        onBack={() => setCurrentView('auth')}
+        isError={false}
+      />
+    );
+  }
 
   if (hasPermission === null) {
     return (
@@ -142,7 +181,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   );
 };
 
-// Manter os mesmos estilos do original
 const styles = StyleSheet.create({
   container: {
     flex: 1,

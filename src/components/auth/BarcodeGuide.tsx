@@ -1,10 +1,12 @@
-// components/auth/BarcodeGuide.tsx
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
-import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { useTheme } from '../../context/ThemeContext';
-import ScannerCamera from '../common/ScannerCamera';
+import { MaterialIcons } from '@expo/vector-icons';
 import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
+
+import { useTheme } from '../../context/ThemeContext';
+
+import ScannerCamera from '../common/ScannerCamera';
+import { useToast } from '../../hooks/useToast';
 
 interface BarcodeGuideProps {
   setActiveMode: (mode: null) => void;
@@ -26,6 +28,26 @@ const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
   onMockScan,
 }) => {
   const { colors } = useTheme();
+  const { showToast } = useToast();
+
+const handleMockScan = (type: 'valid' | 'invalid') => {
+  onMockScan(type);
+  showToast({
+    type: type === 'valid' ? 'success' : 'error',
+    message: type === 'valid' 
+      ? 'Código válido detectado!' 
+      : 'Código inválido. Por favor, tente novamente.',
+    duration: 3000
+  });
+};
+
+const handleUpload = () => {
+  showToast({
+    type: 'info',
+    message: 'Funcionalidade de upload em desenvolvimento',
+    duration: 2000
+  });
+};
 
   return (
     <View style={styles.container}>
@@ -38,12 +60,12 @@ const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
             [
               {
                 text: 'Código Válido',
-                onPress: () => onMockScan('valid'),
+                onPress: () => handleMockScan('valid'),
                 style: 'default'
               },
               {
                 text: 'Código Inválido',
-                onPress: () => onMockScan('invalid'),
+                onPress: () => handleMockScan('invalid'),
                 style: 'destructive'
               },
               {

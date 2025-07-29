@@ -84,13 +84,30 @@ export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
       lineHeight: 20,
       fontWeight: '500' as const,
     },
-    // Adicione o estilo label que está faltando
     label: {
       fontSize: Typography.fontSize.sm,
       fontWeight: Typography.fontWeight.semibold,
       color: colors.text.primary,
       marginBottom: Spacing.xs,
-    }
+    },
+    errorBorder: {
+      borderColor: colors.feedback.error,
+    },
+
+    errorBackground: {
+      backgroundColor: `${colors.feedback.error}10`,
+    },
+
+    errorText: {
+      color: colors.feedback.error,
+      fontSize: Typography.fontSize.xs,
+      marginTop: Spacing.xxs,
+    },
+
+    errorIcon: {
+      color: colors.feedback.error,
+      marginRight: Spacing.xs,
+    },
   };
 };
 
@@ -413,6 +430,9 @@ export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
     contentContainer: {
       width: '100%',
       alignItems: 'center' as const,
+      maxWidth: 400,
+      padding: 24,
+      borderRadius: 16,
     },
     title: {
       ...baseStyles.heading2,
@@ -424,6 +444,7 @@ export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
       ...baseStyles.body,
       textAlign: 'center' as const,
       marginBottom: Spacing.xl,
+      lineHeight: 24
     },
     buttonsContainer: {
       width: '100%',

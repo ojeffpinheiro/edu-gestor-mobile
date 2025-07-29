@@ -10,12 +10,9 @@ import { useStudents } from '../../hooks/useStudents';
 import { Student } from '../../types/newTypes';
 
 import Button from '../common/Button';
-import Checkbox from '../common/Checkbox';
 
-import SelectableListItem from '../SelectableListItem';
 import SectionHeader from '../common/SectionHeader';
 
-import { AnimationHelpers } from '../../styles/animations';
 import { createStudentsScreenStyles } from './sudentsScreenStyles';
 
 interface StudentsScreenProps {

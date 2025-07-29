@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, TextInput } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 
 interface ManualGuideProps {
@@ -33,8 +33,18 @@ const ManualGuide: React.FC<ManualGuideProps> = ({
       <View style={[styles.scannerBox, styles.manualBox, { backgroundColor: colors.component.card, borderColor: colors.border.medium }]}>
         <View style={[styles.manualBarcodePlaceholder, { backgroundColor: colors.component.disabled }]} />
 
+
         {showError && (
-          <Text style={[styles.errorMessage, { color: colors.feedback.error }]}>Código incorreto</Text>
+          <View style={[styles.errorContainer, { backgroundColor: `${colors.feedback.error}10` }]}>
+            <MaterialIcons
+              name="error-outline"
+              size={16}
+              color={colors.feedback.error}
+            />
+            <Text style={[styles.errorMessage, { color: colors.feedback.error }]}>
+              Código inválido. Verifique o formato (XXX-X-XX-XXXXXX-X)
+            </Text>
+          </View>
         )}
 
         <TextInput
@@ -108,6 +118,8 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
     marginBottom: 8,
+    marginLeft: 4,
+    fontSize: 12,
   },
   manualInput: {
     width: '100%',
@@ -127,6 +139,15 @@ const styles = StyleSheet.create({
   scanButtonText: {
     fontWeight: '600',
     fontSize: 16,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 4,
+    alignSelf: 'flex-start',
   },
 });
 

@@ -2,9 +2,11 @@ import React from 'react';
 import { View, Text } from 'react-native';
 import { BookOpen } from 'lucide-react-native';
 import { useTheme } from '../../context/ThemeContext';
+
 import Card from '../common/Card';
 import Button from '../common/Button';
 import InfoBox from '../common/InfoBox';
+
 import { createHomeScreenStyles } from './styles';
 
 const HomeScreen = ({ setCurrentView }) => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { MaterialCommunityIcons, MaterialIcons } from '@expo/vector-icons';
 
 import { useTheme } from '../../context/ThemeContext';
 
@@ -10,12 +10,64 @@ import createAuthStyles from './stylesAuth';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
-  const { 
-    email, password, isLogin, showPassword, 
-    setEmail, setPassword, setShowPassword, handleSubmit,
-     toggleAuthMode 
+  const {
+    email, password, isLogin, showPassword,
+    setEmail, setPassword, setShowPassword,
+    toggleAuthMode
   } = useAuth();
+
   const styles = createAuthStyles(colors);
+
+  const [formErrors, setFormErrors] = useState({
+    email: '',
+    password: '',
+    general: ''
+  });
+
+  const validateForm = () => {
+    const errors = {};
+    let isValid = true;
+
+    if (!email) {
+      errors.email = 'Email é obrigatório';
+      isValid = false;
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      errors.email = 'Por favor, insira um email válido';
+      isValid = false;
+    }
+
+    if (isLogin && !password) {
+      errors.password = 'Senha é obrigatória';
+      isValid = false;
+    } else if (isLogin && password.length < 6) {
+      errors.password = 'Senha deve ter pelo menos 6 caracteres';
+      isValid = false;
+    }
+
+    setFormErrors(errors);
+    return isValid;
+  };
+
+
+  const handleSubmit = async (setCurrentView) => {
+    if (!validateForm()) return;
+
+    try {
+      if (isLogin) {
+        // Chamada API para login
+        setCurrentView('scanner');
+        showSuccess('Login bem-sucedido!');
+      } else {
+        // Chamada API para cadastro
+        showSuccess('Cadastro realizado com sucesso!');
+      }
+    } catch (error) {
+      setFormErrors({
+        ...formErrors,
+        general: error.message || 'Ocorreu um erro. Tente novamente.'
+      });
+    }
+  };
 
   return (
     <KeyboardAvoidingView
@@ -46,9 +98,12 @@ const AuthScreen = ({ setCurrentView }) => {
 
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Email</Text>
-            <View style={styles.inputWrapper}>
+            <View style={[styles.inputWrapper, formErrors.email && styles.inputWrapperError]}>
               <TextInput
-                style={styles.input}
+                style={[
+                  styles.input,
+                  formErrors.email && styles.errorInput
+                ]}
                 placeholder="yourname@email.com"
                 placeholderTextColor={colors.text.secondary}
                 value={email}
@@ -64,6 +119,17 @@ const AuthScreen = ({ setCurrentView }) => {
                 >
                   <Text style={styles.clearIcon}>×</Text>
                 </TouchableOpacity>
+              )}
+
+              {formErrors.email && (
+                <Text style={styles.errorText}>
+                  <MaterialIcons
+                    name="error-outline"
+                    size={14}
+                    style={styles.errorIcon}
+                  />
+                  {formErrors.email}
+                </Text>
               )}
             </View>
           </View>
@@ -135,6 +201,14 @@ const AuthScreen = ({ setCurrentView }) => {
               </TouchableOpacity>
             )}
           </View>
+
+          {formErrors.general && (
+            <StatusMessage
+              variant="error"
+              message={formErrors.general}
+              style={styles.generalError}
+            />
+          )}
         </View>
 
         <View style={styles.footer}>

@@ -177,6 +177,28 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
         color: colors.text.secondary,
         fontSize: 12,
     },
+    errorInput: {
+        borderColor: colors.feedback.error,
+        backgroundColor: `${colors.feedback.error}10`, // 10% de opacidade
+    },
+
+    errorText: {
+        color: colors.feedback.error,
+        fontSize: 12,
+        marginTop: 4,
+        marginLeft: 4,
+    },
+
+    generalError: {
+        marginTop: 16,
+        marginBottom: 8,
+    },
+
+    // Para o container de input com erro
+    inputWrapperError: {
+        position: 'relative',
+        marginBottom: 4, // Espaço extra para a mensagem de erro
+    },
 });
 
 export default createAuthStyles;

@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 const useAuth = () => {
   const [isLogin, setIsLogin] = useState(true);
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('example@mail.com');
+  const [password, setPassword] = useState('123456');
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleAuthMode = () => {

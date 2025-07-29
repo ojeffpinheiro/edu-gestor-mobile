@@ -1,53 +1,53 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
+import { BarcodeType } from 'expo-camera';
 
-import { useTheme } from '../../context/ThemeContext';
+import { useTheme } from '../../../context/ThemeContext';
 
-import ScannerCamera from '../common/ScannerCamera';
-import { useToast } from '../../hooks/useToast';
+import ScannerCamera from '../../common/ScannerCamera';
+import { useToast } from '../../../hooks/useToast';
 
-interface BarcodeGuideProps {
+interface QRGuideProps {
   setActiveMode: (mode: null) => void;
   isScanning: boolean;
-  handleBarcodeScanned: (result: BarcodeScanningResult) => void;
+  handleBarcodeScanned: (result: { data: string }) => void;
   barcodeTypes: BarcodeType[];
   torchOn: boolean;
   scanLineAnimation: any;
   onMockScan: (type: 'valid' | 'invalid') => void;
 }
 
-const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
+const QRGuide: React.FC<QRGuideProps> = ({
   setActiveMode,
   isScanning,
   handleBarcodeScanned,
   barcodeTypes,
   torchOn,
   scanLineAnimation,
-  onMockScan,
+  onMockScan
 }) => {
   const { colors } = useTheme();
   const { showToast } = useToast();
 
-const handleMockScan = (type: 'valid' | 'invalid') => {
-  onMockScan(type);
-  showToast({
-    type: type === 'valid' ? 'success' : 'error',
-    message: type === 'valid' 
-      ? 'Código válido detectado!' 
-      : 'Código inválido. Por favor, tente novamente.',
-    duration: 3000
-  });
-};
+  const handleMockScan = (type: 'valid' | 'invalid') => {
+    onMockScan(type);
+    showToast({
+      type: type === 'valid' ? 'success' : 'error',
+      message: type === 'valid'
+        ? 'Código válido detectado!'
+        : 'Código inválido. Por favor, tente novamente.',
+      duration: 3000
+    });
+  };
 
-const handleUpload = () => {
-  showToast({
-    type: 'info',
-    message: 'Funcionalidade de upload em desenvolvimento',
-    duration: 2000
-  });
-};
+  const handleUpload = () => {
+    showToast({
+      type: 'info',
+      message: 'Funcionalidade de upload em desenvolvimento',
+      duration: 2000
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -88,12 +88,9 @@ const handleUpload = () => {
         barcodeTypes={barcodeTypes}
         torchOn={torchOn}
         scanLineAnimation={scanLineAnimation}
-        borderColor={colors.feedback.error}
+        borderColor={colors.accent[2]}
         cornerColor={colors.feedback.error}
-        scanLineColor={colors.feedback.error}
-        showHeader
-        headerTitle="Scan Bar Code"
-        headerSubtitle="Point your camera at a bar code"
+        scanLineColor={colors.accent[2]}
       />
 
       <TouchableOpacity
@@ -147,4 +144,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BarcodeGuide;
+export default QRGuide;

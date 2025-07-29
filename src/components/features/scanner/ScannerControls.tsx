@@ -1,10 +1,10 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View } from 'react-native';
 import { ScanLine, Flashlight, X, Zap } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import Button from '../common/Button';
-import { AnimationHelpers } from '../../styles/animations';
-import { createScannerControlsStyles } from './styles';
+import { useTheme } from '../../../context/ThemeContext';
+import Button from '../../common/Button';
+import { AnimationHelpers } from '../../../styles/animations';
+import { createScannerControlsStyles } from '../../auth/styles';
 
 interface ScannerControlsProps {
   isActive: boolean;

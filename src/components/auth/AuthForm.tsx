@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import createAuthStyles from './stylesAuth';
+import createAuthStyles from './authStyles';
 import { useAuthForm } from '../../hooks/useAuthForm';
 
 const AuthScreen = ({ setCurrentView }) => {

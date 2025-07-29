@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { View } from 'react-native';
 import AuthForm from '../components/auth/AuthForm';
-import ScannerScreen from '../components/auth/ScannerScreen';
-import StudentsScreen from '../components/auth/StudentsScreen';
-import HomeScreen from '../components/auth/HomeScreen';
+import ScannerScreen from '../components/views/ScannerScreen';
 import { AuthView } from '../types/newTypes';
+import StudentsScreen from '../components/views/StudentsScreen';
+import HomeScreen from '../components/views/HomeScreen';
 
 const AuthScreen = () => {
   const [currentView, setCurrentView] = useState<AuthView>('home');

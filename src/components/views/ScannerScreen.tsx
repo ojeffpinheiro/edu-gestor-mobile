@@ -8,12 +8,12 @@ import { useScanner } from '../../hooks/useScanner';
 
 import MainButtons from '../common/MainButtons';
 
-import QRGuide from './QRGuide';
-import BarcodeGuide from './BarcodeGuide';
-import ManualGuide from './ManualGuide';
-import BottomBar from './BottomBar';
+import QRGuide from '../features/scanner/QRGuide';
+import BarcodeGuide from '../features/scanner/BarcodeGuide';
+import ManualGuide from '../features/scanner/ManualGuide';
+import BottomBar from '../common/layout/BottomBar';
 import { Camera } from 'expo-camera';
-import PermissionRequestCard from './PermissionRequestCard';
+import PermissionRequestCard from '../features/scanner/PermissionRequestCard';
 import { AuthView } from '../../types/newTypes';
 
 interface ScannerProps {

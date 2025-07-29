@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, Animated, StyleSheet } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
-import { createScannerOverlayStyles } from './styles';
+import { useTheme } from '../../../context/ThemeContext';
+import { createScannerOverlayStyles } from '../../auth/styles';
 
 interface ScannerOverlayProps {
   scanLineAnimation: Animated.Value;

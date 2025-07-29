@@ -1,7 +1,6 @@
 import React from 'react';
 import { View, Text, TouchableOpacity, StyleProp, ViewStyle, Animated } from 'react-native';
 import { useTheme } from '../context/ThemeContext';
-import { createSelectableListItemStyles } from './auth/sudentsScreenStyles';
 import { Student } from '../types/newTypes';
 import { CheckCircle } from 'lucide-react-native';
 import { Shadow } from '../styles/designTokens';

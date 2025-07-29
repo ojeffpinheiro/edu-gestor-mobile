@@ -1,31 +1,29 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { BarcodeType } from 'expo-camera';
+import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
+import { useTheme } from '../../../context/ThemeContext';
+import { useToast } from '../../../hooks/useToast';
+import ScannerCamera from '../../common/ScannerCamera';
 
-import { useTheme } from '../../context/ThemeContext';
-
-import ScannerCamera from '../common/ScannerCamera';
-import { useToast } from '../../hooks/useToast';
-
-interface QRGuideProps {
+interface BarcodeGuideProps {
   setActiveMode: (mode: null) => void;
   isScanning: boolean;
-  handleBarcodeScanned: (result: { data: string }) => void;
+  handleBarcodeScanned: (result: BarcodeScanningResult) => void;
   barcodeTypes: BarcodeType[];
   torchOn: boolean;
   scanLineAnimation: any;
   onMockScan: (type: 'valid' | 'invalid') => void;
 }
 
-const QRGuide: React.FC<QRGuideProps> = ({
+const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
   setActiveMode,
   isScanning,
   handleBarcodeScanned,
   barcodeTypes,
   torchOn,
   scanLineAnimation,
-  onMockScan
+  onMockScan,
 }) => {
   const { colors } = useTheme();
   const { showToast } = useToast();
@@ -88,9 +86,12 @@ const QRGuide: React.FC<QRGuideProps> = ({
         barcodeTypes={barcodeTypes}
         torchOn={torchOn}
         scanLineAnimation={scanLineAnimation}
-        borderColor={colors.accent[2]}
+        borderColor={colors.feedback.error}
         cornerColor={colors.feedback.error}
-        scanLineColor={colors.accent[2]}
+        scanLineColor={colors.feedback.error}
+        showHeader
+        headerTitle="Scan Bar Code"
+        headerSubtitle="Point your camera at a bar code"
       />
 
       <TouchableOpacity
@@ -144,4 +145,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default QRGuide;
+export default BarcodeGuide;

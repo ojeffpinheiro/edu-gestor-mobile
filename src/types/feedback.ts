@@ -1,5 +1,6 @@
 
 export type FeedbackType = 'success' | 'error' | 'info' | 'warning';
+export type FeedbackPosition = 'top' | 'bottom' | 'center';
 
 export interface FeedbackOptions {
   duration?: number;
@@ -9,4 +10,12 @@ export interface FeedbackOptions {
     text: string;
     onPress: () => void;
   }>;
+}
+
+export interface FeedbackOptions {
+  type: FeedbackType;
+  position?: FeedbackPosition;
+  duration?: number;
+  title?: string;
+  message: string;
 }

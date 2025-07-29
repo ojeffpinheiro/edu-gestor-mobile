@@ -22,8 +22,8 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   // Estado do formulário
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [formState, setFormState] = useState<AuthFormState>({
-    email: '',
-    password: '',
+    email: 'test@mail.com',
+    password: '123456',
     showPassword: false
   });
   const [errors, setErrors] = useState<AuthFormErrors>({
@@ -178,43 +178,51 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
-      showFeedback('Por favor, corrija os erros no formulário', 'error');
+      showFeedback({
+        message: 'Por favor, corrija os erros no formulário',
+        type: 'error'
+      });
       return false;
     }
+    console.log('Tentando login com:', formState.email, formState.password);
 
     setIsLoading(true);
     try {
       if (mode === 'login') {
         await authService.login(formState.email, formState.password);
-        showFeedback('Login realizado com sucesso!', 'success');
+        showFeedback({
+          message: 'Login realizado com sucesso!',
+          type: 'success'
+        });
+        return true;
       } else {
         await authService.register(formState.email, formState.password);
-        showFeedback('Cadastro realizado com sucesso!', 'success');
-        toggleAuthMode(); // Volta para login após cadastro
+        showFeedback({
+          message: 'Cadastro realizado com sucesso!',
+          type: 'success'
+        });
+        return true;
       }
-      return true;
     } catch (error) {
-      let errorCode = 'default';
-      let message = 'Ocorreu um erro';
+      let message = 'Credenciais inválidas';
 
       if (error instanceof Error) {
-        message = error.message || message;
-        // Mapeamento de códigos de erro comuns
-        if (message.includes('email-already-in-use')) {
-          errorCode = 'email_already_in_use';
-        } else if (message.includes('wrong-password') || message.includes('invalid-credentials')) {
-          errorCode = 'invalid_credentials';
-        } else if (message.includes('weak-password')) {
-          errorCode = 'weak_password';
+        if (error.message.includes('invalid-credentials')) {
+          message = 'E-mail ou senha incorretos';
+        } else if (error.message.includes('weak-password')) {
+          message = 'Senha deve ter pelo menos 6 caracteres';
         }
       }
 
-      showError(errorCode, error);
+      showFeedback({
+        message,
+        type: 'error'
+      });
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [formState, mode, validateForm, showFeedback, toggleAuthMode, showError]);
+  }, [formState, mode, validateForm]);
 
   // Toggle visibilidade da senha
   const toggleShowPassword = useCallback(() => {

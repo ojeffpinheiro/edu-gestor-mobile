@@ -4,10 +4,14 @@ import { useTheme } from '../../context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import createAuthStyles from './authStyles';
 import { useAuthForm } from '../../hooks/useAuthForm';
+import { useFeedback } from '../../hooks/useFeedback';
+import Feedback from '../common/Feedback';
 
 const AuthScreen = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
+
+  const { feedback, showFeedback, setFeedback } = useFeedback();
 
   const {
     mode, formState, errors, passwordErrors, touched, isLoading,
@@ -15,9 +19,19 @@ const AuthScreen = ({ setCurrentView }) => {
   } = useAuthForm();
 
   const handleFormSubmit = async () => {
-    const success = await handleSubmit();
-    if (success && mode === 'login') {
-      setCurrentView('scanner');
+    try {
+
+      const success = await handleSubmit();
+      if (success && mode === 'login') {
+        setTimeout(() => setCurrentView('scanner'), 1500);
+      }
+    } catch (error) {
+      showFeedback({
+        type: 'error',
+        message: 'Erro ao fazer login. Tente novamente.',
+        position: 'bottom',
+        duration: 3000
+      });
     }
   };
 
@@ -176,6 +190,12 @@ const AuthScreen = ({ setCurrentView }) => {
             </TouchableOpacity>
           </View>
         </View>
+
+        <Feedback
+          visible={feedback.visible}
+          options={feedback.options}
+          onHide={() => setFeedback(prev => ({ ...prev, visible: false }))}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );

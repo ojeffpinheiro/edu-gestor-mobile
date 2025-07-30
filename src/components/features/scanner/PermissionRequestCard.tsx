@@ -11,7 +11,7 @@ import StatusIcon from '../../StatusIcon';
 import { createPermissionRequestCardStyles } from '../../auth/styles';
 
 interface PermissionRequestCardProps {
-  onRequestPermission: () => Promise<void>;
+  onRequestPermission: () => void;
   onBack: () => void;
   isError?: boolean;
 }

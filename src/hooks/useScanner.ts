@@ -6,9 +6,16 @@ import * as Haptics from 'expo-haptics';
 import { mockBarcodes, mockQRcodes } from '../mocks/scannerMocks';
 import { useUserFeedback } from './useUserFeedback';
 
+enum ScannerError {
+  INVALID_CODE = 'INVALID_CODE',
+  CAMERA_UNAVAILABLE = 'CAMERA_UNAVAILABLE',
+  PERMISSION_DENIED = 'PERMISSION_DENIED',
+  SCANNING_FAILED = 'SCANNING_FAILED'
+}
+
 export const useScanner = () => {
   const { showFeedback } = useUserFeedback();
-
+  const [isProcessing, setIsProcessing] = useState(false);
   const [activeMode, setActiveMode] = useState<'qr' | 'barcode' | 'manual' | null>(null);
   const [manualInput, setManualInput] = useState('');
   const [showError, setShowError] = useState(false);
@@ -63,6 +70,17 @@ export const useScanner = () => {
     getCameraPermissions();
   }, []);
 
+  useEffect(() => {
+    return () => {
+      // Parar qualquer animação em andamento
+      scanLineAnimation.stopAnimation();
+      // Desligar a lanterna se estiver ligada
+      if (torchOn) {
+        setTorchOn(false);
+      }
+    };
+  }, []);
+
   const toggleTorch = async () => {
     try {
       const { status } = await Camera.requestCameraPermissionsAsync();
@@ -97,30 +115,34 @@ export const useScanner = () => {
   };
 
   const handleBarcodeScanned = (result: BarcodeScanningResult) => {
+    setIsProcessing(true);
     console.log('Barcode scanned:', result.data);
+    try {
+      const isValid = validateScannedCode(result.data, activeMode);
 
-    const isValid = validateScannedCode(result.data, activeMode);
-
-    if (isValid) {
-      console.log('Code is valid, proceeding...');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-      showFeedback({
-        type: 'success',
-        message: 'Código escaneado com sucesso!',
-        haptic: true
-      });
-      setScannedCode(result.data);
-      setIsScanning(false);
-      return true;
-    } else {
-      console.log('CÓDIGO INVÁLIDO');
-      showFeedback({
-        type: 'error',
-        message: 'O código ISBN escaneado é inválido. Verifique o formato (XXX-X-XX-XXXXXX-X) e tente novamente.',
-        haptic: true
-      });
-      setIsScanning(false);
-      return false;
+      if (isValid) {
+        console.log('Code is valid, proceeding...');
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        showFeedback({
+          type: 'success',
+          message: 'Código escaneado com sucesso!',
+          haptic: true
+        });
+        setScannedCode(result.data);
+        setIsScanning(false);
+        return true;
+      } else {
+        console.log('CÓDIGO INVÁLIDO');
+        showFeedback({
+          type: 'error',
+          message: 'O código ISBN escaneado é inválido. Verifique o formato (XXX-X-XX-XXXXXX-X) e tente novamente.',
+          haptic: true
+        });
+        setIsScanning(false);
+        return false;
+      }
+    } finally {
+      setIsProcessing(false);
     }
   };
 
@@ -197,6 +219,7 @@ export const useScanner = () => {
       }
     };
   };
+
   const mockScan = (type: 'valid' | 'invalid') => {
     setIsScanning(true);
     const code = generateMockCode(type);
@@ -215,6 +238,32 @@ export const useScanner = () => {
     }
   };
 
+  const getErrorMessage = (code: string, mode: string) => {
+    const messages = {
+      qr: 'O QR code escaneado não é válido. Certifique-se de que é um código QR gerado pelo sistema.',
+      barcode: `O código de barras "${code}" não está no formato ISBN válido (XXX-X-XX-XXXXXX-X).`,
+      manual: 'Por favor, insira um código ISBN no formato correto (XXX-X-XX-XXXXXX-X).',
+      empty: 'Por favor, insira ou escaneie um código para continuar.'
+    };
+
+    return messages[mode as keyof typeof messages] || messages.empty;
+  };
+
+  const handleError = (errorType: ScannerError, additionalInfo = {}) => {
+    const errorMessages = {
+      [ScannerError.INVALID_CODE]: 'O código escaneado é inválido',
+      [ScannerError.CAMERA_UNAVAILABLE]: 'A câmera não está disponível',
+      [ScannerError.PERMISSION_DENIED]: 'A permissão para acessar a câmera foi negada',
+      [ScannerError.SCANNING_FAILED]: 'O escaneamento falhou',
+    };
+
+    showFeedback({
+      type: 'error',
+      message: errorMessages[errorType],
+      ...additionalInfo
+    });
+  };
+
   return {
     activeMode,
     setActiveMode,
@@ -229,6 +278,8 @@ export const useScanner = () => {
     barcodeTypes,
     scannedCode,
     permissionStatus,
+    isProcessing,
+    getErrorMessage,
     requestPermission,
     setScannedCode,
     toggleTorch,

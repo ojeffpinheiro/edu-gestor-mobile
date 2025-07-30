@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Camera } from 'expo-camera';
+import React, { useEffect, useRef, useState } from 'react';
+import { View, StyleSheet, Animated, Easing, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, Animated, Easing } from 'react-native';
 
 import { useTheme } from '../../context/ThemeContext';
-
-import { useScanner } from '../../hooks/useScanner';
-
-import { AuthView } from '../../types/newTypes';
+import { useScannerUIState } from '../../hooks/useScannerUIState';
+import { useCameraPermission } from '../../hooks/useCameraPermission';
+import { useScannerEngine } from '../../hooks/useScannerEngine';
+import { useValidation } from '../../hooks/useValidation';
 
 import MainButtons from '../common/MainButtons';
-import BottomBar from '../common/layout/BottomBar';
-
 import QRGuide from '../features/scanner/QRGuide';
 import BarcodeGuide from '../features/scanner/BarcodeGuide';
 import ManualGuide from '../features/scanner/ManualGuide';
 import PermissionRequestCard from '../features/scanner/PermissionRequestCard';
+import BottomBar from '../common/layout/BottomBar';
+import { AuthView } from '../../types/newTypes';
+import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 interface ScannerProps {
   setCurrentView: (view: AuthView) => void;
@@ -29,28 +29,53 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   isAuthenticated
 }) => {
   const { colors } = useTheme();
+
+  // Gerenciamento de estado da UI
   const {
     activeMode,
     setActiveMode,
-    manualInput,
-    setManualInput,
-    showError,
-    setShowError,
-    hasPermission,
-    isScanning,
     torchOn,
-    scanLineAnimation,
-    barcodeTypes,
-    scannedCode,
-    setScannedCode,
     toggleTorch,
-    handleBarcodeScanned,
+    isScanning,
     startScanning,
     stopScanning,
-    handleManualSubmit,
+    showError,
+    setShowError,
+    manualInput,
+    setManualInput
+  } = useScannerUIState();
+
+  // Permissões da câmera
+  const {
+    status: permissionStatus,
+    requestPermission,
+    openSettings,
+    hasPermission
+  } = useCameraPermission();
+
+  // Lógica de escaneamento
+  const {
+    scannedCode,
+    isValidating,
+    handleBarcodeScanned,
+    resetScanner,
     mockScan
-  } = useScanner();
-  const [permissionStatus, setPermissionStatus] = useState('undetermined');
+  } = useScannerEngine({ activeMode });
+
+  // Validação
+  const {
+    validateISBN,
+    validateQRCode
+  } = useValidation();
+
+  // Animação
+  const scanLineAnimation = useRef(new Animated.Value(0)).current;
+
+  // Tipos de códigos de barras suportados
+  const barcodeTypes: BarcodeType[] = [
+    'qr', 'pdf417', 'ean13', 'ean8', 'code128', 'code39', 'code93',
+    'codabar', 'itf14', 'upc_a', 'upc_e', 'aztec', 'datamatrix'
+  ];
 
   // Efeito para lidar com a autenticação quando um código é escaneado
   useEffect(() => {
@@ -60,6 +85,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     }
   }, [scannedCode]);
 
+  // Efeito para animação da linha de scan
   useEffect(() => {
     if (isScanning) {
       Animated.loop(
@@ -77,18 +103,40 @@ const ScannerScreen: React.FC<ScannerProps> = ({
           }),
         ])
       ).start();
+    } else {
+      scanLineAnimation.stopAnimation();
     }
   }, [isScanning]);
 
-  const requestPermission = async () => {
-    try {
-      const { status } = await Camera.requestCameraPermissionsAsync();
-      setPermissionStatus(status === 'granted' ? 'granted' : 'denied');
-    } catch (error) {
-      setPermissionStatus('denied');
+  // Função para lidar com envio manual
+  const handleManualSubmit = () => {
+    const validation = validateISBN(manualInput);
+    if (!validation.isValid) {
+      setShowError(true);
+      return false;
     }
+
+    // Se válido, simular um scan
+    const mockResult: BarcodeScanningResult = {
+      data: manualInput,
+      type: 'ean13',
+      cornerPoints: [
+        { x: 0, y: 0 },
+        { x: 100, y: 0 },
+        { x: 100, y: 100 },
+        { x: 0, y: 100 }
+      ],
+      bounds: {
+        origin: { x: 0, y: 0 },
+        size: { width: 100, height: 100 }
+      }
+    };
+
+    handleBarcodeScanned(mockResult, 'manual');
+    return true;
   };
 
+  // Renderização condicional baseada no status da permissão
   if (permissionStatus === 'denied') {
     return (
       <PermissionRequestCard
@@ -112,7 +160,9 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   if (hasPermission === null) {
     return (
       <View style={[styles.permissionContainer, { backgroundColor: colors.background.primary }]}>
-        <Text style={[styles.permissionText, { color: colors.text.primary }]}>Solicitando permissão para a câmera...</Text>
+        <Text style={[styles.permissionText, { color: colors.text.primary }]}>
+          Solicitando permissão para a câmera...
+        </Text>
       </View>
     );
   }
@@ -120,12 +170,16 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   if (hasPermission === false) {
     return (
       <View style={[styles.permissionContainer, { backgroundColor: colors.background.primary }]}>
-        <Text style={[styles.permissionText, { color: colors.text.primary }]}>Permissão para câmera negada</Text>
+        <Text style={[styles.permissionText, { color: colors.text.primary }]}>
+          Permissão para câmera negada
+        </Text>
         <TouchableOpacity
           style={[styles.permissionButton, { backgroundColor: colors.component.primaryButton }]}
-          onPress={() => Linking.openSettings()}
+          onPress={openSettings}
         >
-          <Text style={[styles.permissionButtonText, { color: colors.text.onPrimary }]}>Abrir Configurações</Text>
+          <Text style={[styles.permissionButtonText, { color: colors.text.onPrimary }]}>
+            Abrir Configurações
+          </Text>
         </TouchableOpacity>
       </View>
     );
@@ -137,7 +191,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
         <QRGuide
           setActiveMode={setActiveMode}
           isScanning={isScanning}
-          handleBarcodeScanned={handleBarcodeScanned}
+          handleBarcodeScanned={(result) => handleBarcodeScanned(result, 'qr')}
           barcodeTypes={barcodeTypes}
           torchOn={torchOn}
           scanLineAnimation={scanLineAnimation}
@@ -148,7 +202,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
         <BarcodeGuide
           setActiveMode={setActiveMode}
           isScanning={isScanning}
-          handleBarcodeScanned={handleBarcodeScanned}
+          handleBarcodeScanned={(result) => handleBarcodeScanned(result, 'barcode')}
           barcodeTypes={barcodeTypes}
           torchOn={torchOn}
           scanLineAnimation={scanLineAnimation}
@@ -167,9 +221,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
       )
     };
 
-    return activeMode
-      ? modeComponents[activeMode]
-      : <MainButtons setActiveMode={setActiveMode} />;
+    return activeMode ? modeComponents[activeMode] : null;
   };
 
   return (
@@ -193,7 +245,10 @@ const ScannerScreen: React.FC<ScannerProps> = ({
       {__DEV__ && (
         <View style={styles.mockTooltip}>
           <Ionicons name="information-circle" size={24} color={colors.feedback.info} />
-          <Text style={[styles.mockTooltipText, { color: colors.text.primary, backgroundColor: colors.background.secondary, }]}>
+          <Text style={[styles.mockTooltipText, {
+            color: colors.text.primary,
+            backgroundColor: colors.background.secondary
+          }]}>
             Modo desenvolvimento ativo - use os botões de teste
           </Text>
         </View>
@@ -224,21 +279,6 @@ const styles = StyleSheet.create({
   },
   permissionButtonText: {
     fontSize: 16,
-    fontWeight: 'bold',
-  },
-  devButtons: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    zIndex: 100,
-  },
-  devButton: {
-    padding: 10,
-    borderRadius: 5,
-    marginVertical: 5,
-  },
-  devButtonText: {
-    color: 'white',
     fontWeight: 'bold',
   },
   mockTooltip: {

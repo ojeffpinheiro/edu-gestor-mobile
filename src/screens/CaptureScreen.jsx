@@ -255,6 +255,11 @@ export const createCaptureScreenStyles = (colors) => {
       ...buttons.primary,
       width: '100%',
       marginBottom: Spacing.md,
+      borderRadius: 12,
+      paddingVertical: 16,
+      paddingHorizontal: 24,
+      minWidth: 160,
+      alignItems: 'center',
     },
     cameraButton: {
       backgroundColor: colors.primary.main,

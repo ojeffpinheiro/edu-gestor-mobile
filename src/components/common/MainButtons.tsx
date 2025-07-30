@@ -12,18 +12,29 @@ const MainButtons: React.FC<MainButtonsProps> = ({ setActiveMode }) => {
   return (
     <View style={[styles.header, { backgroundColor: colors.background.secondary }]}>
       <TouchableOpacity
+        accessibilityLabel="Escanear via QR Code"
+        accessibilityHint="Abre a câmera para escanear um código QR"
+        accessibilityRole="button"
         style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
         onPress={() => setActiveMode('qr')}
       >
         <Text style={[styles.buttonText, { color: colors.text.primary }]}>Escanear via QR Code</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
+        accessibilityLabel="Escanear via Código de Barras"
+        accessibilityHint="Abre a câmera para escanear um código de barras"
+        accessibilityRole="button"
         style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
         onPress={() => setActiveMode('barcode')}
       >
         <Text style={[styles.buttonText, { color: colors.text.primary }]}>Escanear via Código de Barras</Text>
       </TouchableOpacity>
+
       <TouchableOpacity
+        accessibilityLabel="Escanear manualmente"
+        accessibilityHint="Abre a tela de entrada de código manual"
+        accessibilityRole="button"
         style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
         onPress={() => setActiveMode('manual')}
       >

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
-import { BarcodeType } from 'expo-camera';
+import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 import { useTheme } from '../../../context/ThemeContext';
 
@@ -11,7 +11,7 @@ import { useUserFeedback } from '../../../hooks/useUserFeedback';
 interface QRGuideProps {
   setActiveMode: (mode: null) => void;
   isScanning: boolean;
-  handleBarcodeScanned: (result: { data: string }) => void;
+  handleBarcodeScanned: (result: BarcodeScanningResult) => void;
   barcodeTypes: BarcodeType[];
   torchOn: boolean;
   scanLineAnimation: any;

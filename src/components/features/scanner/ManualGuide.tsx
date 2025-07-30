@@ -23,11 +23,29 @@ const ManualGuide: React.FC<ManualGuideProps> = ({
   const { colors } = useTheme();
 
   const validateISBN = (code: string) => {
-    // Regex para ISBN válido
-    const isbnRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
+    // Remove hífens para validação
+    const cleanCode = code.replace(/-/g, '');
 
-    if (!code) return { valid: false, message: 'Please enter an ISBN code' };
-    if (!isbnRegex.test(code)) return { valid: false, message: 'Invalid ISBN format' };
+    // Verifica se tem 13 dígitos (ISBN-13)
+    if (cleanCode.length !== 13) {
+      return { valid: false, message: 'O ISBN deve ter 13 dígitos' };
+    }
+
+    // Verifica se são apenas números
+    if (!/^\d+$/.test(cleanCode)) {
+      return { valid: false, message: 'O ISBN deve conter apenas números' };
+    }
+
+    // Cálculo do dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+      sum += parseInt(cleanCode[i]) * (i % 2 === 0 ? 1 : 3);
+    }
+    const checkDigit = (10 - (sum % 10)) % 10;
+
+    if (parseInt(cleanCode[12]) !== checkDigit) {
+      return { valid: false, message: 'Dígito verificador inválido' };
+    }
 
     return { valid: true };
   };

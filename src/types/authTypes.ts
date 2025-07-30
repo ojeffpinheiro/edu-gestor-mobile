@@ -16,3 +16,5 @@ export interface AuthFormErrors {
 }
 
 export type AuthFormFields = keyof AuthFormState;
+
+export type ScanType = 'qr' | 'barcode' | 'manual';

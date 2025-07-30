@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { Ionicons } from '@expo/vector-icons';
-import { View, StyleSheet, Text, TouchableOpacity, Linking, Alert, Animated, Easing } from 'react-native';
+import { View, StyleSheet, Text, TouchableOpacity, Linking, Animated, Easing } from 'react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 

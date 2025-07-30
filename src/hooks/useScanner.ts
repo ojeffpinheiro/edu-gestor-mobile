@@ -113,10 +113,10 @@ export const useScanner = () => {
       setIsScanning(false);
       return true;
     } else {
-      console.log('Invalid code');
+      console.log('CÓDIGO INVÁLIDO');
       showFeedback({
         type: 'error',
-        message: 'Código inválido. Por favor, tente novamente.',
+        message: 'O código ISBN escaneado é inválido. Verifique o formato (XXX-X-XX-XXXXXX-X) e tente novamente.',
         haptic: true
       });
       setIsScanning(false);

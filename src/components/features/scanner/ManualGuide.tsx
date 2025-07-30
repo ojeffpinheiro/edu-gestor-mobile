@@ -22,6 +22,16 @@ const ManualGuide: React.FC<ManualGuideProps> = ({
 }) => {
   const { colors } = useTheme();
 
+  const validateISBN = (code: string) => {
+    // Regex para ISBN válido
+    const isbnRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
+
+    if (!code) return { valid: false, message: 'Please enter an ISBN code' };
+    if (!isbnRegex.test(code)) return { valid: false, message: 'Invalid ISBN format' };
+
+    return { valid: true };
+  };
+
   return (
     <View style={[styles.manualGuideContainer, { backgroundColor: colors.background.primary }]}>
       <TouchableOpacity style={styles.closeButton} onPress={() => setActiveMode(null)}>
@@ -32,7 +42,6 @@ const ManualGuide: React.FC<ManualGuideProps> = ({
 
       <View style={[styles.scannerBox, styles.manualBox, { backgroundColor: colors.component.card, borderColor: colors.border.medium }]}>
         <View style={[styles.manualBarcodePlaceholder, { backgroundColor: colors.component.disabled }]} />
-
 
         {showError && (
           <View style={[styles.errorContainer, { backgroundColor: `${colors.feedback.error}10` }]}>

@@ -1,6 +1,13 @@
 import PermissionRequestCard from "./PermissionRequestCard";
 
-const ScannerRouter = ({ permissionStatus, colors }) => {
+const ScannerRouter = ({ status, colors, ...props }) => {
+  const routes = {
+    denied: <PermissionRequestCard isError />,
+    undetermined: <PermissionRequestCard isError={false} />,
+    granted: <ScannerMainView {...props} />,
+    loading: <LoadingView colors={colors} />
+  };
+  
   switch (permissionStatus) {
     case 'denied':
       return <PermissionRequestCard isError />;

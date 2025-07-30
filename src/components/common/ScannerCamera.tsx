@@ -1,8 +1,9 @@
 // components/common/ScannerCamera.tsx
 import React from 'react';
-import { View, StyleSheet, Animated, Text } from 'react-native';
+import { View, StyleSheet, Animated, Text, ActivityIndicator } from 'react-native';
 import { CameraView, BarcodeScanningResult, BarcodeType } from 'expo-camera';
 import { useTheme } from '../../context/ThemeContext';
+import { createContainerStyles } from '../../styles/globalStyles';
 
 interface ScannerCameraProps {
   isScanning: boolean;
@@ -33,9 +34,16 @@ const ScannerCamera: React.FC<ScannerCameraProps> = ({
 }) => {
   const { colors } = useTheme();
   const camera = React.useRef(null);
+  const container = createContainerStyles(colors);
 
   return (
     <View style={styles.guideContainer}>
+      {isScanning && (
+        <View style={container.fullScreenOverlay}>
+          <ActivityIndicator size="large" color={colors.feedback.info} />
+          <Text style={{ color: colors.text.onPrimary }}>Validando código...</Text>
+        </View>
+      )}
       {showHeader && (
         <View style={styles.header}>
           <Text style={[styles.title, { color: colors.text.primary }]}>{headerTitle}</Text>

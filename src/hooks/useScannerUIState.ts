@@ -7,20 +7,20 @@ export const useScannerUIState = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [showError, setShowError] = useState(false);
   const [manualInput, setManualInput] = useState('');
-
+  
   const toggleTorch = useCallback(() => {
     setTorchOn(prev => !prev);
   }, []);
-
+  
   const startScanning = useCallback(() => {
     setIsScanning(true);
     setShowError(false);
   }, []);
-
+  
   const stopScanning = useCallback(() => {
     setIsScanning(false);
   }, []);
-
+  
   const resetUIState = useCallback(() => {
     setActiveMode(null);
     setTorchOn(false);

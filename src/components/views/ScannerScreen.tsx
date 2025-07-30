@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Animated, Easing, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 import { useTheme } from '../../context/ThemeContext';
 import { useScannerUIState } from '../../hooks/useScannerUIState';
@@ -8,14 +9,14 @@ import { useCameraPermission } from '../../hooks/useCameraPermission';
 import { useScannerEngine } from '../../hooks/useScannerEngine';
 import { useValidation } from '../../hooks/useValidation';
 
+import { AuthView } from '../../types/newTypes';
+
 import MainButtons from '../common/MainButtons';
 import QRGuide from '../features/scanner/QRGuide';
 import BarcodeGuide from '../features/scanner/BarcodeGuide';
 import ManualGuide from '../features/scanner/ManualGuide';
 import PermissionRequestCard from '../features/scanner/PermissionRequestCard';
 import BottomBar from '../common/layout/BottomBar';
-import { AuthView } from '../../types/newTypes';
-import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 interface ScannerProps {
   setCurrentView: (view: AuthView) => void;
@@ -29,8 +30,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
   isAuthenticated
 }) => {
   const { colors } = useTheme();
-
-  // Gerenciamento de estado da UI
   const {
     activeMode,
     setActiveMode,

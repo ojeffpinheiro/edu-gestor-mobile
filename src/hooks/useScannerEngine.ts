@@ -10,6 +10,7 @@ interface UseScannerEngineProps {
 
 export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
   const { showFeedback } = useUserFeedback();
+
   const [scannedCode, setScannedCode] = useState<string>('');
   const [isValidating, setIsValidating] = useState<boolean>(false);
   const scanTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -25,28 +26,25 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
     }
 
     setIsValidating(true);
+    try {
+      scanTimeoutRef.current = setTimeout(() => {
+        const isValid = validateScannedCode(result.data, type);
 
-    scanTimeoutRef.current = setTimeout(() => {
-      const isValid = validateScannedCode(result.data, type);
-
-      if (isValid) {
-        setScannedCode(result.data);
-        showFeedback({
-          type: 'success',
-          message: 'Code scanned successfully!',
-          haptic: true
-        });
-      } else {
-        showFeedback({
-          type: 'error',
-          message: `Invalid ${type} code. Please try again.`,
-          haptic: true
-        });
-      }
-
+        if (!isValid) {
+          handleError('invalid_code');
+          return;
+        } else {
+          setScannedCode(result.data);
+          showFeedback({ type: 'success', message: 'Sucesso!' });
+        }
+        setIsValidating(false);
+      }, 500);
+    } catch (error) {
+      handleError('validation_failed');
+    } finally {
       setIsValidating(false);
-    }, 500);
-  }, [validateScannedCode, showFeedback]);
+    }
+  }, [validateScannedCode, showFeedback, isValidating]);
 
   const resetScanner = useCallback(() => {
     setScannedCode('');
@@ -81,6 +79,7 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
 
     handleBarcodeScanned(mockResult, activeMode);
   }, [activeMode, handleBarcodeScanned]);
+
   useEffect(() => {
     return () => {
       if (scanTimeoutRef.current) {
@@ -88,6 +87,20 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
       }
     };
   }, []);
+
+  const handleError = useCallback((errorType: 'invalid_code' | 'camera_unavailable' | 'validation_failed') => {
+    const messages = {
+      invalid_code: 'Código inválido. Por favor, tente novamente.',
+      camera_unavailable: 'Câmera indisponível. Verifique as permissões.',
+      validation_failed: 'Falha na validação do código.'
+    };
+
+    showFeedback({
+      type: 'error',
+      message: messages[errorType],
+      haptic: true
+    });
+  }, [showFeedback]);
 
   return {
     scannedCode,

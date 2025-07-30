@@ -6,22 +6,29 @@ type ValidationResult = {
 };
 
 export const useValidation = () => {
-  const validateISBN = useMemo(() => (code: string): ValidationResult => {
-    if (!code.trim()) {
-      return { isValid: false, message: 'Please enter a code' };
+  const validateISBN = (code: string) => {
+    // Remover caracteres não numéricos
+    const cleanCode = code.replace(/[^\dX]/gi, '');
+
+    // Verificar comprimento
+    if (cleanCode.length !== 13) {
+      return { isValid: false, message: 'ISBN deve ter 13 dígitos' };
     }
 
-    // Validação básica de ISBN
-    const isbnRegex = /^(?=(?:\D*\d){10}(?:(?:\D*\d){3})?$)[\d-]+$/;
-    if (!isbnRegex.test(code)) {
-      return { 
-        isValid: false, 
-        message: 'Invalid ISBN format. Expected format: XXX-X-XX-XXXXXX-X' 
-      };
+    // Cálculo do dígito verificador
+    let sum = 0;
+    for (let i = 0; i < 12; i++) {
+      const digit = parseInt(cleanCode[i]);
+      sum += (i % 2 === 0) ? digit : digit * 3;
+    }
+
+    const checkDigit = (10 - (sum % 10)) % 10;
+    if (parseInt(cleanCode[12]) !== checkDigit) {
+      return { isValid: false, message: 'Dígito verificador inválido' };
     }
 
     return { isValid: true };
-  }, []);
+  };
 
   const validateQRCode = useMemo(() => (code: string): ValidationResult => {
     if (!code.trim()) {

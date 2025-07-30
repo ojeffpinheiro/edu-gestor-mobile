@@ -15,16 +15,8 @@ const InfoBox = ({ title, items, variant = 'primary', style }: InfoBoxProps) => 
   const color = colors.feedback[variant] || colors.primary.main;
 
   return (
-    <View style={[
-      styles.container, 
-      { 
-        backgroundColor: color + '10',
-      }, 
-      style
-    ]}>
-      {title && (
-        <Text style={[styles.title, { color }]}>{title}</Text>
-      )}
+    <View style={[styles.container, { backgroundColor: color + '10'}, style]}>
+      {title && (<Text style={[styles.title, { color }]}>{title}</Text>)}
       {items.map((item, i) => (
         <Text key={i} style={[styles.item, { color: colors.text.primary }]}>
           • {item}
@@ -38,7 +30,6 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: BorderRadius.md,
     padding: Spacing.md,
-    marginBottom: Spacing.lg,
   },
   title: {
     fontWeight: Typography.fontWeight.semibold,

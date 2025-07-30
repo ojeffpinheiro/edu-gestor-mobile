@@ -114,6 +114,7 @@ export const createBaseStyles = (colors: ColorScheme): BaseStyles => {
 // HomeScreen Styles
 export const createHomeScreenStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
+  const buttons = createButtonStyles(colors);
 
   return StyleSheet.create({
     centeredContainer: {
@@ -147,7 +148,8 @@ export const createHomeScreenStyles = (colors: ColorScheme) => {
       borderColor: colors.primary.main,
     },
     button: {
-      marginTop: Spacing.md,
+      ...buttons.primary,
+      marginBottom: Spacing.md
     },
   });
 };
@@ -420,6 +422,7 @@ export const createScannerControlsStyles = (colors: ColorScheme) => {
 
 export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
   const baseStyles = createBaseStyles(colors);
+  const buttons = createButtonStyles(colors);
 
   return StyleSheet.create({
     permissionCard: {
@@ -451,6 +454,7 @@ export const createPermissionRequestCardStyles = (colors: ColorScheme) => {
       gap: Spacing.sm,
     },
     mainButton: {
+      ...buttons.primary,
       marginBottom: Spacing.sm,
     },
   });

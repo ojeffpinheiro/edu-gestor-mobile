@@ -15,6 +15,13 @@ interface ErrorMapping {
   };
 }
 
+interface ShowErrorOptions {
+  useToast?: boolean;
+  useFeedback?: boolean;
+  retry?: () => Promise<void> | void;
+  retryCount?: number;
+}
+
 const useErrorHandling = () => {
   const { showFeedback, showToast } = useUserFeedback();
 
@@ -155,15 +162,21 @@ const useErrorHandling = () => {
       ]
     },
 
-    processing_error: {
-      title: 'Erro na correção',
-      message: 'Ocorreu um erro durante o processamento:',
+    network_error: {
+      title: 'Problema de conexão',
+      message: 'Não foi possível conectar ao servidor.',
+      actions: [
+        {
+          text: 'Tentar novamente',
+          onPress: () => { } // Será substituído na showError
+        }
+      ],
       troubleshooting: [
-        'Verifique a conexão com a internet',
-        'Tente novamente com um gabarito diferente',
-        'Se o problema persistir, contate o suporte'
+        'Verifique sua conexão com a internet',
+        'Se estiver usando Wi-Fi, tente se aproximar do roteador',
+        'Desative o modo avião se estiver ativado'
       ]
-    }
+    },
   };
 
   const getErrorConfig = (errorCode: string) => {
@@ -182,7 +195,6 @@ const useErrorHandling = () => {
       error,
       troubleshooting: config.troubleshooting
     });
-
 
     // Monta os botões de ação
     const buttons = [

@@ -8,12 +8,16 @@ interface UseStudentsProps {
   initialSelectedStudents?: Student[];
 }
 
+const PAGE_SIZE = 10;
+
 export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps = {}) => {
   const [students, setStudents] = useState<Student[]>([]);
   const [selectedStudents, setSelectedStudents] = useState<Student[]>(initialSelectedStudents);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
+  const [hasMore, setHasMore] = useState<boolean>(true);
+  const [currentPage, setCurrentPage] = useState<number>(1);
   const { showFeedback } = useUserFeedback();
 
   // Carrega os alunos (mock ou API)
@@ -93,6 +97,42 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   // Limpa seleção
   const clearSelection = () => {
     setSelectedStudents([]);
+  };
+
+  const fetchStudents = async (page: number): Promise<Student[]> => {
+    try {
+      // Simulando chamada à API com paginação
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Filtra os mockStudents para simular paginação
+      const startIndex = (page - 1) * PAGE_SIZE;
+      const endIndex = startIndex + PAGE_SIZE;
+      return mockStudents.slice(startIndex, endIndex);
+    } catch (error) {
+      throw error;
+    }
+  };
+
+  const loadMoreStudents = async () => {
+    if (!hasMore || isLoading) return;
+
+    setIsLoading(true);
+    try {
+      const nextPage = currentPage + 1;
+      const newStudents = await fetchStudents(nextPage);
+
+      setStudents(prev => [...prev, ...newStudents]);
+      setCurrentPage(nextPage);
+      setHasMore(newStudents.length === PAGE_SIZE);
+    } catch (error) {
+      showFeedback({
+        type: 'error',
+        message: 'Falha ao carregar mais alunos',
+        useAlert: true
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return {

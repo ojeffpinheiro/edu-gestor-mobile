@@ -1,14 +1,14 @@
-import React, { useMemo, useRef } from 'react';
-import { 
-  View, Text, Animated, ScrollView, 
-  StatusBar, TouchableOpacity, TextInput, 
-  FlatList, Platform, 
-  UIManager, LayoutAnimation 
+import React, { useEffect, useMemo, useRef } from 'react';
+import {
+  View, Text, Animated, ScrollView,
+  StatusBar, TouchableOpacity, TextInput,
+  FlatList, Platform,
+  UIManager, LayoutAnimation
 } from 'react-native';
-import { 
-  CheckCircle, Users, Sparkles, 
-  ArrowRight, ChevronLeft, 
-  SearchIcon, X, Check 
+import {
+  CheckCircle, Users, Sparkles,
+  ArrowRight, ChevronLeft,
+  SearchIcon, X, Check
 } from 'lucide-react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -16,10 +16,15 @@ import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../../context/ThemeContext';
 import { useStudents } from '../../hooks/useStudents';
+
 import { AuthView, Student } from '../../types/newTypes';
+
 import Button from '../common/Button';
 import SectionHeader from '../common/SectionHeader';
+
 import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
+import { useAnimation } from '../../hooks/useAnimation';
+import { useUserFeedback } from '../../hooks/useUserFeedback';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -45,7 +50,11 @@ const StudentsScreen = ({
   setCurrentView
 }: StudentsScreenProps) => {
   const navigation = useNavigation();
-  const scaleValue = useRef(new Animated.Value(1)).current;
+  const { showFeedback } = useUserFeedback();
+  const { opacity, scale, animateIn, animateOut } = useAnimation({
+    initialOpacity: 0,
+    initialScale: 0.9
+  });
 
   const { colors } = useTheme();
   const styles = createStudentsScreenStyles(colors);
@@ -62,6 +71,14 @@ const StudentsScreen = ({
     hasSelection, clearSelection
   } = useStudents();
 
+  useEffect(() => {
+    if (students.length > 0) {
+      animateIn();
+    } else {
+      animateOut();
+    }
+  }, [students]);
+
   const handleStudentSelect = (student: Student) => {
     Haptics.selectionAsync();
     toggleStudentSelection(student);
@@ -74,14 +91,19 @@ const StudentsScreen = ({
     }
 
     // Animação mais suave
-    scaleValue.setValue(0.95);
+    scale.setValue(0.95);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    Animated.spring(scaleValue, {
+    Animated.spring(scale, {
       toValue: 1,
       friction: 7,
       tension: 40,
       useNativeDriver: true,
     }).start();
+    showFeedback({
+      type: 'success',
+      message: `${student.name} ${selectedStudents.some(s => s.id === student.id) ? 'removido' : 'selecionado'}`,
+      duration: 1000
+    });
   };
 
   const selectedStudentData = useMemo(() =>
@@ -96,7 +118,7 @@ const StudentsScreen = ({
         style={[
           styles.studentCard,
           isSelected && styles.selectedCard,
-          { transform: [{ scale: scaleValue }] }
+          { transform: [{ scale: scale }] }
         ]}>
         <TouchableOpacity
           onPress={() => handleStudentSelect(item)}
@@ -135,6 +157,24 @@ const StudentsScreen = ({
         <Text style={{ color: colors.text.primary }}>Carregando alunos...</Text>
       </View>
     );
+  }
+
+  const validateSearchInput = (text: string) => {
+    if (text.length > 50) {
+      showFeedback({
+        type: 'warning',
+        message: 'Busca muito longa (máx. 50 caracteres)',
+        duration: 2000
+      });
+      return false;
+    }
+    return true;
+  };
+
+  const handleSearch = (text: string) => {
+    if (validateSearchInput(text)) {
+      setSearchTerm(text);
+    }
   }
 
   if (students.length === 0) {
@@ -213,7 +253,7 @@ const StudentsScreen = ({
                 placeholder="Buscar por nome ou turma..."
                 placeholderTextColor={colors.text.tertiary}
                 value={searchTerm}
-                onChangeText={setSearchTerm}
+                onChangeText={handleSearch}
               />
               {searchTerm ? (
                 <TouchableOpacity onPress={() => setSearchTerm('')} style={styles.clearSearchButton}>
@@ -223,7 +263,7 @@ const StudentsScreen = ({
             </View>
           </View>
 
-          {/* Código Escaneado - Card Moderno */}
+          {/* Código Escaneado */}
           {scannedCode && (
             <Animated.View style={[styles.codeCard, { opacity: 1 }]}>
               <LinearGradient
@@ -267,7 +307,15 @@ const StudentsScreen = ({
                 data={students}
                 renderItem={renderItem}
                 keyExtractor={item => item.id}
-                contentContainerStyle={styles.listContent}
+                getItemLayout={(data, index) => ({
+                  length: STUDENT_LIST_CONFIG.itemHeight,
+                  offset: STUDENT_LIST_CONFIG.itemHeight * index,
+                  index,
+                })}
+                initialNumToRender={10}
+                maxToRenderPerBatch={5}
+                windowSize={5}
+                updateCellsBatchingPeriod={50}
               />
             </View>
           </View>
@@ -294,7 +342,7 @@ const StudentsScreen = ({
             </Animated.View>
           )}
 
-          {/* Botões com Design Moderno */}
+          {/* Botões */}
           <View style={styles.actionsContainer}>
             <LinearGradient
               colors={

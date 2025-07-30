@@ -343,6 +343,18 @@ const createAuthStyles = (colors: ColorScheme) => StyleSheet.create({
     testButtonText: {
         color: colors.text.secondary,
         fontSize: 12
+    }, rememberContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 15,
+    },
+    rememberCheckbox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    rememberText: {
+        marginLeft: 8,
+        color: colors.text.primary,
     },
 });
 

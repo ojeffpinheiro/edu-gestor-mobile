@@ -1,30 +1,112 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import { AuthFormErrors, AuthFormState, AuthMode } from '../types/authTypes';
 import { authService } from '../services/authService';
 import { useUserFeedback } from './useUserFeedback';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type ErrorAction = {
   text: string;
   onPress: () => void;
+  style?: 'primary' | 'secondary';
 };
 
-interface ErrorMapping {
-  [key: string]: {
-    title: string;
-    message: string;
-    actions?: ErrorAction[];
-    troubleshooting?: string[];
-  };
+interface ErrorMappingItem {
+  title: string;
+  message: string;
+  actions?: ErrorAction[];
+  troubleshooting?: string[];
+  severity?: 'low' | 'medium' | 'high';
+  autoHide?: boolean;
 }
+
+interface ErrorMapping {
+  [key: string]: ErrorMappingItem;
+}
+
+const ERROR_MAPPINGS: ErrorMapping = {
+  default: {
+    title: 'Ocorreu um erro',
+    message: 'Algo inesperado aconteceu. Por favor, tente novamente.',
+    severity: 'medium',
+    troubleshooting: [
+      'Verifique sua conexão com a internet',
+      'Reinicie o aplicativo',
+      'Atualize para a versão mais recente'
+    ]
+  },
+  invalid_credentials: {
+    title: 'Credenciais inválidas',
+    message: 'E-mail ou senha incorretos. Verifique seus dados e tente novamente.',
+    severity: 'high',
+    actions: [
+      {
+        text: 'Recuperar senha',
+        onPress: () => { }, // Será sobrescrito no uso
+        style: 'secondary'
+      }
+    ]
+  },
+  email_already_in_use: {
+    title: 'E-mail já cadastrado',
+    message: 'Este e-mail já está sendo usado. Deseja fazer login?',
+    severity: 'medium',
+    actions: [
+      {
+        text: 'Fazer login',
+        onPress: () => { }, // Será sobrescrito
+        style: 'primary'
+      }
+    ]
+  },
+  weak_password: {
+    title: 'Senha fraca',
+    message: 'Sua senha não atende aos requisitos mínimos de segurança:',
+    severity: 'medium',
+    autoHide: false
+  },
+  network_error: {
+    title: 'Sem conexão',
+    message: 'Não foi possível conectar ao servidor. Verifique sua internet.',
+    severity: 'high',
+    troubleshooting: [
+      'Verifique seu Wi-Fi ou dados móveis',
+      'Tente novamente quando tiver conexão'
+    ]
+  },
+  too_many_requests: {
+    title: 'Muitas tentativas',
+    message: 'Você tentou muitas vezes. Espere alguns minutos ou reset sua senha.',
+    severity: 'high',
+    actions: [
+      {
+        text: 'Resetar senha',
+        onPress: () => { },
+        style: 'primary'
+      }
+    ]
+  },
+  user_not_found: {
+    title: 'Conta não encontrada',
+    message: 'Nenhuma conta encontrada com este e-mail. Deseja se cadastrar?',
+    severity: 'medium',
+    actions: [
+      {
+        text: 'Cadastrar',
+        onPress: () => { },
+        style: 'primary'
+      }
+    ]
+  }
+};
 
 export const useAuthForm = (initialMode: AuthMode = 'login') => {
   // Estado do formulário
   const [mode, setMode] = useState<AuthMode>(initialMode);
   const [formState, setFormState] = useState<AuthFormState>({
-    email: 'test@mail.com',
-    password: '123456',
+    email: '',
+    password: '',
     showPassword: false
   });
   const [errors, setErrors] = useState<AuthFormErrors>({
@@ -37,8 +119,46 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     password: false
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [rememberUser, setRememberUser] = useState(false);
 
   const { showFeedback } = useUserFeedback();
+
+  useEffect(() => {
+    const loadSavedCredentials = async () => {
+      try {
+        const savedCredentials = await AsyncStorage.getItem('userCredentials');
+        if (savedCredentials) {
+          const { email, remember } = JSON.parse(savedCredentials);
+          setFormState(prev => ({ ...prev, email }));
+          setRememberUser(remember);
+
+          showFeedback({
+            type: 'info',
+            message: `Bem-vindo de volta, ${email}`,
+            duration: 2000,
+            position: 'top'
+          });
+        }
+      } catch (error) {
+        console.error('Failed to load credentials', error);
+      }
+    };
+
+    loadSavedCredentials();
+  }, []);
+
+  // Função para salvar credenciais
+  const saveCredentials = async (email: string, remember: boolean) => {
+    try {
+      if (remember) {
+        await AsyncStorage.setItem('userCredentials', JSON.stringify({ email, remember }));
+      } else {
+        await AsyncStorage.removeItem('userCredentials');
+      }
+    } catch (error) {
+      console.error('Failed to save credentials', error);
+    }
+  };
 
   // Mapeamento de erros
   const errorMappings: ErrorMapping = {
@@ -158,32 +278,53 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   }, [formState, validateEmail, validatePassword]);
 
   // Mostrar erro
-  const showError = useCallback((errorCode: string, error?: Error) => {
-    const config = errorMappings[errorCode] || errorMappings.default;
-    const errorMessage = typeof error === 'string' ? error : error?.message;
+  const showError = useCallback((errorCode: string = 'default', error?: Error, context?: any) => {
+    const mapping = ERROR_MAPPINGS[errorCode] || ERROR_MAPPINGS.default;
+    let finalMessage = mapping.message;
 
-    console.error(`[${errorCode}] ${errorMessage || config.message}`, {
-      error,
-      troubleshooting: config.troubleshooting
+    // Adiciona detalhes específicos para alguns erros
+    if (errorCode === 'weak_password' && context?.passwordErrors) {
+      finalMessage += `\n\n• ${context.passwordErrors.join('\n• ')}`;
+    }
+    // Prepara ações com contexto
+    const actionsWithContext = mapping.actions?.map(action => {
+      if (action.text === 'Fazer login') {
+        return { ...action, onPress: () => setMode('login') };
+      }
+      if (action.text === 'Cadastrar') {
+        return { ...action, onPress: () => setMode('register') };
+      }
+      return action;
+    });
+    // Mostra feedback visual
+    showFeedback({
+      type: mapping.severity === 'high' ? 'error' :
+        mapping.severity === 'medium' ? 'warning' : 'info',
+      title: mapping.title,
+      message: finalMessage,
+      actions: actionsWithContext,
+      persistent: !mapping.autoHide,
+      haptic: true
     });
 
-    setErrors(prev => ({ ...prev, general: errorMessage || config.message }));
 
-    Alert.alert(
-      config.title,
-      errorMessage || config.message,
-      [{ text: 'OK', onPress: () => { } }]
-    );
-  }, []);
+    // Atualiza estado de erros
+    setErrors(prev => ({
+      ...prev,
+      general: finalMessage.split('\n')[0] // Pega apenas a primeira linha para o formulário
+    }));
+    console.error(`[${errorCode}] ${error?.message || mapping.message}`, {
+      error,
+      context,
+      troubleshooting: mapping.troubleshooting
+    });
+  }, [showFeedback]);
 
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      showFeedback({
-        message: 'Por favor, corrija os erros no formulário',
-        type: 'error'
-      });
+      showError('validation_failed');
       return false;
     }
 
@@ -191,47 +332,73 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     try {
       if (mode === 'login') {
         await authService.login(formState.email, formState.password);
+        await saveCredentials(formState.email, rememberUser);
+
         showFeedback({
-          message: 'Login realizado com sucesso!',
-          type: 'success'
+          type: 'success',
+          title: 'Login realizado!',
+          message: `Bem-vindo de volta, ${formState.email}`,
+          duration: 2000
         });
         return true;
       } else {
         await authService.register(formState.email, formState.password);
+
         showFeedback({
-          message: 'Cadastro realizado com sucesso!',
-          type: 'success'
+          type: 'success',
+          title: 'Cadastro concluído!',
+          message: 'Sua conta foi criada com sucesso',
+          actions: [
+            {
+              text: 'Fazer login agora',
+              onPress: () => setMode('login'),
+              style: 'primary'
+            }
+          ],
+          persistent: true
         });
         return true;
       }
     } catch (error) {
-      let message = 'Credenciais inválidas';
-      let errorCode = 'invalid_credentials';
+      let errorCode = 'default';
+      let context = {};
 
       if (error instanceof Error) {
-        if (error.message.includes('invalid-credentials')) {
-          message = 'E-mail ou senha incorretos';
+        if (error.message.includes('invalid-credential') ||
+          error.message.includes('wrong-password')) {
           errorCode = 'invalid_credentials';
         } else if (error.message.includes('weak-password')) {
-          message = 'Senha deve ter pelo menos 6 caracteres';
           errorCode = 'weak_password';
+          context = { passwordErrors: getPasswordErrors(formState.password) };
         } else if (error.message.includes('email-already-in-use')) {
-          message = 'Este e-mail já está cadastrado';
           errorCode = 'email_already_in_use';
+        } else if (error.message.includes('user-not-found')) {
+          errorCode = 'user_not_found';
+        } else if (error.message.includes('network-request-failed')) {
+          errorCode = 'network_error';
+        } else if (error.message.includes('too-many-requests')) {
+          errorCode = 'too_many_requests';
         }
       }
 
-      setErrors(prev => ({ ...prev, general: message }));
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      showFeedback({
-        message,
-        type: 'error'
-      });
+      showError(errorCode, error, context);
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [formState, mode, validateForm]);
+  }, [formState, mode, rememberUser, validateForm, showError]);
+
+  const toggleRememberUser = useCallback(() => {
+    setRememberUser(prev => !prev);
+    if (!rememberUser && formState.email) {
+      showFeedback({
+        type: 'info',
+        message: 'Seu e-mail será lembrado',
+        duration: 1500,
+        position: 'top'
+      });
+    }
+  }, [rememberUser, formState.email]);
 
   // Toggle visibilidade da senha
   const toggleShowPassword = useCallback(() => {
@@ -256,6 +423,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     errors,
     touched,
     isLoading,
+    rememberUser,
     passwordErrors: mode === 'register' ? getPasswordErrors(formState.password) : [],
     showError,
     toggleAuthMode,
@@ -263,6 +431,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     handleBlur,
     handleSubmit,
     toggleShowPassword,
+    toggleRememberUser,
     validateField,
     validateEmail,
   };

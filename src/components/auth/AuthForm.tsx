@@ -15,7 +15,8 @@ const AuthForm = ({ setCurrentView }) => {
 
   const {
     mode, formState, errors, touched, isLoading, passwordErrors,
-    toggleAuthMode, handleChange, handleBlur, handleSubmit, toggleShowPassword
+    rememberUser, toggleRememberUser, toggleAuthMode, handleChange,
+    handleBlur, handleSubmit, toggleShowPassword
   } = useAuthForm();
 
   const handleFormSubmit = async () => {
@@ -207,6 +208,17 @@ const AuthForm = ({ setCurrentView }) => {
                 />
               </TouchableOpacity>
             </View>
+            <View style={styles.rememberContainer}>
+              <TouchableOpacity onPress={toggleRememberUser} style={styles.rememberCheckbox}>
+                <Ionicons
+                  name={rememberUser ? "checkbox-outline" : "square-outline"}
+                  size={24}
+                  color={colors.primary.main}
+                />
+                <Text style={styles.rememberText}>Lembrar do meu e-mail</Text>
+              </TouchableOpacity>
+            </View>
+
             {touched.password && errors.password && (
               <Text style={styles.errorText}>{errors.password}</Text>
             )}

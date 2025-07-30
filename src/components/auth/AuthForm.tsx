@@ -2,10 +2,13 @@ import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import createAuthStyles from './authStyles';
+
 import { useAuthForm } from '../../hooks/useAuthForm';
-import Feedback from '../common/Feedback';
 import { useUserFeedback } from '../../hooks/useUserFeedback';
+
+import Feedback from '../common/Feedback';
+
+import createAuthStyles from './authStyles';
 
 const AuthForm = ({ setCurrentView }) => {
   const { colors } = useTheme();
@@ -186,10 +189,7 @@ const AuthForm = ({ setCurrentView }) => {
             <Text style={styles.label}>Senha</Text>
             <View style={styles.passwordContainer}>
               <TextInput
-                style={[
-                  styles.passwordInput,
-                  touched.password && errors.password && styles.errorInput
-                ]}
+                style={[styles.passwordInput, touched.password && errors.password && styles.errorInput]}
                 value={formState.password}
                 onChangeText={(text) => handleChange('password', text)}
                 onBlur={() => handleBlur('password')}
@@ -199,7 +199,7 @@ const AuthForm = ({ setCurrentView }) => {
               />
               <TouchableOpacity
                 style={styles.eyeButton}
-                onPress={toggleShowPassword}
+                onPress={() => handleChange('showPassword', !formState.showPassword)}
               >
                 <MaterialIcons
                   name={formState.showPassword ? 'visibility-off' : 'visibility'}
@@ -215,7 +215,7 @@ const AuthForm = ({ setCurrentView }) => {
                   size={24}
                   color={colors.primary.main}
                 />
-                <Text style={styles.rememberText}>Lembrar do meu e-mail</Text>
+                <Text style={styles.rememberText}>Lembre-se de mim</Text>
               </TouchableOpacity>
             </View>
 

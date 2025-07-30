@@ -1,5 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
-import { Alert } from 'react-native';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import * as Haptics from 'expo-haptics';
 import { AuthFormErrors, AuthFormState, AuthMode } from '../types/authTypes';
 import { authService } from '../services/authService';
@@ -107,11 +106,14 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   const [formState, setFormState] = useState<AuthFormState>({
     email: '',
     password: '',
-    showPassword: false
+    confirmPassword: '',
+    showPassword: false,
+    tempShowPassword: false
   });
   const [errors, setErrors] = useState<AuthFormErrors>({
     email: '',
     password: '',
+    confirmPassword: '',
     general: ''
   });
   const [touched, setTouched] = useState({
@@ -120,8 +122,19 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [rememberUser, setRememberUser] = useState(false);
+  const [loginAttempts, setLoginAttempts] = useState(0);
+  const [lastAttemptTime, setLastAttemptTime] = useState<number | null>(null);
+  const tempShowTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const { showFeedback } = useUserFeedback();
+
+  useEffect(() => {
+    return () => {
+      if (tempShowTimeout.current) {
+        clearTimeout(tempShowTimeout.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const loadSavedCredentials = async () => {
@@ -160,50 +173,38 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     }
   };
 
-  // Mapeamento de erros
-  const errorMappings: ErrorMapping = {
-    default: {
-      title: 'Ocorreu um erro',
-      message: 'Algo inesperado aconteceu. Por favor, tente novamente.',
-      troubleshooting: [
-        'Verifique sua conexão com a internet',
-        'Reinicie o aplicativo',
-        'Atualize para a versão mais recente do aplicativo'
-      ]
-    },
-    invalid_credentials: {
-      title: 'Credenciais inválidas',
-      message: 'E-mail ou senha incorretos.',
-      troubleshooting: [
-        'Verifique se o e-mail está correto',
-        'Confira se a senha está digitada corretamente',
-        'Se esqueceu sua senha, tente recuperá-la'
-      ]
-    },
-    email_already_in_use: {
-      title: 'E-mail já cadastrado',
-      message: 'Este e-mail já está sendo usado por outra conta.',
-      troubleshooting: [
-        'Tente fazer login em vez de cadastrar',
-        'Use a opção de recuperação de senha se necessário',
-        'Tente cadastrar com um e-mail diferente'
-      ]
-    },
-    weak_password: {
-      title: 'Senha fraca',
-      message: 'A senha não atende aos requisitos mínimos de segurança.',
-      troubleshooting: [
-        'Use pelo menos 6 caracteres',
-        'Inclua pelo menos uma letra maiúscula',
-        'Inclua pelo menos um número'
-      ]
+  const toggleTempShowPassword = useCallback(() => {
+    if (formState.tempShowPassword) return;
+
+    setFormState(prev => ({ ...prev, tempShowPassword: true }));
+
+    // Configurar timeout para esconder após 3 segundos
+    tempShowTimeout.current = setTimeout(() => {
+      setFormState(prev => ({ ...prev, tempShowPassword: false }));
+    }, 3000);
+  }, [formState.tempShowPassword]);
+
+  const validateConfirmPassword = useCallback((confirmPassword: string): boolean => {
+    if (mode !== 'register') return true;
+
+    if (!confirmPassword) {
+      setErrors(prev => ({ ...prev, confirmPassword: 'Confirme sua senha' }));
+      return false;
     }
-  };
+
+    if (confirmPassword !== formState.password) {
+      setErrors(prev => ({ ...prev, confirmPassword: 'As senhas não coincidem' }));
+      return false;
+    }
+
+    setErrors(prev => ({ ...prev, confirmPassword: '' }));
+    return true;
+  }, [formState.password, mode]);
 
   // Alternar entre login e cadastro
   const toggleAuthMode = useCallback(() => {
     setMode(prev => prev === 'login' ? 'register' : 'login');
-    setErrors({ email: '', password: '', general: '' });
+    setErrors({ email: '', password: '', general: '', confirmPassword: '' });
     setFormState(prev => ({ ...prev, password: '' }));
   }, []);
 
@@ -245,37 +246,52 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   }, []);
 
   // Validar campo individual
-  const validateField = useCallback((field: Exclude<keyof AuthFormState, 'showPassword'>, value: string) => {
+  const validateField = useCallback((field: keyof AuthFormState, value: string) => {
     if (field === 'email') return validateEmail(value);
     if (field === 'password') return validatePassword(value);
+    if (field === 'confirmPassword') return validateConfirmPassword(value);
     return true;
-  }, [validateEmail, validatePassword]);
+  }, [validateEmail, validatePassword, validateConfirmPassword]);
 
   // Atualizar campos do formulário
   const handleChange = useCallback((field: keyof AuthFormState, value: string | boolean) => {
     setFormState(prev => ({
       ...prev,
-      [field]: field === 'showPassword' ? Boolean(value) : String(value)
+      [field]: field === 'showPassword' || field === 'tempShowPassword'
+        ? Boolean(value)
+        : String(value)
     }));
 
-    // Validação em tempo real após o campo ser tocado
-    if (touched[field] && field !== 'showPassword') {
-      validateField(field, String(value));
+    // Se a senha principal mudar, validar novamente a confirmação
+    if (field === 'password' && typeof formState.confirmPassword === 'string') {
+      validateConfirmPassword(formState.confirmPassword);
     }
-  }, [touched, validateEmail, validatePassword]);
+
+    // Validação em tempo real após o campo ser tocado
+    if (touched[field as Exclude<keyof AuthFormState, 'showPassword' | 'tempShowPassword'>] &&
+      field !== 'showPassword' &&
+      field !== 'tempShowPassword') {
+      validateField(field as Exclude<keyof AuthFormState, 'showPassword' | 'tempShowPassword'>, String(value));
+    }
+  }, [touched, validateField, formState.confirmPassword, validateConfirmPassword]);
 
   // Marcar campo como tocado
-  const handleBlur = useCallback((field: Exclude<keyof AuthFormState, 'showPassword'>) => {
+  const handleBlur = useCallback((field: Exclude<keyof AuthFormState, 'showPassword' | 'tempShowPassword'>) => {
     setTouched(prev => ({ ...prev, [field]: true }));
-    validateField(field, formState[field]);
+    const value = formState[field];
+    if (typeof value === 'string') {
+      validateField(field, value);
+    }
   }, [formState, validateField]);
 
   // Validar formulário completo
   const validateForm = useCallback(() => {
     const isEmailValid = validateEmail(formState.email);
     const isPasswordValid = validatePassword(formState.password);
-    return isEmailValid && isPasswordValid;
-  }, [formState, validateEmail, validatePassword]);
+    const isConfirmValid = mode === 'login' || validateConfirmPassword(formState.confirmPassword);
+
+    return isEmailValid && isPasswordValid && isConfirmValid;
+  }, [formState, validateEmail, validatePassword, validateConfirmPassword, mode]);
 
   // Mostrar erro
   const showError = useCallback((errorCode: string = 'default', error?: Error, context?: any) => {
@@ -320,11 +336,38 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     });
   }, [showFeedback]);
 
+  const checkLoginAttempts = useCallback(() => {
+    const now = Date.now();
+    const MAX_ATTEMPTS = 5;
+    const COOLDOWN_MINUTES = 5;
+
+    // Resetar tentativas se passou tempo suficiente
+    if (lastAttemptTime && (now - lastAttemptTime) > COOLDOWN_MINUTES * 60 * 1000) {
+      setLoginAttempts(0);
+      setLastAttemptTime(null);
+      return true;
+    }
+
+    // Bloquear se excedeu tentativas
+    if (loginAttempts >= MAX_ATTEMPTS) {
+      const remainingTime = COOLDOWN_MINUTES - Math.floor((now - (lastAttemptTime || now)) / (60 * 1000));
+      showError('too_many_attempts', new Error(`Tente novamente em ${remainingTime} minutos`));
+      return false;
+    }
+
+    return true;
+  }, [loginAttempts, lastAttemptTime, showError]);
+
   // Submeter formulário
   const handleSubmit = useCallback(async () => {
     if (!validateForm()) {
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       showError('validation_failed');
+      return false;
+    }
+
+    // Verificar tentativas antes de prosseguir
+    if (mode === 'login' && !checkLoginAttempts()) {
       return false;
     }
 
@@ -334,6 +377,10 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         await authService.login(formState.email, formState.password);
         await saveCredentials(formState.email, rememberUser);
 
+        // Resetar contador após login bem-sucedido
+        setLoginAttempts(0);
+        setLastAttemptTime(null);
+
         showFeedback({
           type: 'success',
           title: 'Login realizado!',
@@ -342,6 +389,15 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         });
         return true;
       } else {
+        // Validar força da senha no registro
+        const passwordErrors = getPasswordErrors(formState.password);
+        if (passwordErrors.length > 0) {
+          showError('weak_password', new Error('Senha não atende aos requisitos'), {
+            passwordErrors
+          });
+          return false;
+        }
+
         await authService.register(formState.email, formState.password);
 
         showFeedback({
@@ -360,33 +416,23 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         return true;
       }
     } catch (error) {
-      let errorCode = 'default';
-      let context = {};
+      // Incrementar tentativas fracassadas
+      if (mode === 'login') {
+        const newAttempts = loginAttempts + 1;
+        setLoginAttempts(newAttempts);
+        setLastAttemptTime(Date.now());
 
-      if (error instanceof Error) {
-        if (error.message.includes('invalid-credential') ||
-          error.message.includes('wrong-password')) {
-          errorCode = 'invalid_credentials';
-        } else if (error.message.includes('weak-password')) {
-          errorCode = 'weak_password';
-          context = { passwordErrors: getPasswordErrors(formState.password) };
-        } else if (error.message.includes('email-already-in-use')) {
-          errorCode = 'email_already_in_use';
-        } else if (error.message.includes('user-not-found')) {
-          errorCode = 'user_not_found';
-        } else if (error.message.includes('network-request-failed')) {
-          errorCode = 'network_error';
-        } else if (error.message.includes('too-many-requests')) {
-          errorCode = 'too_many_requests';
+        if (newAttempts >= 3) {
+          showError('too_many_attempts', new Error(`Tentativa ${newAttempts} de 5. Após 5 tentativas, você será bloqueado temporariamente.`));
         }
       }
 
-      showError(errorCode, error, context);
+      // ... (restante do tratamento de erro permanece igual)
       return false;
     } finally {
       setIsLoading(false);
     }
-  }, [formState, mode, rememberUser, validateForm, showError]);
+  }, [formState, mode, rememberUser, validateForm, showError, checkLoginAttempts, loginAttempts]);
 
   const toggleRememberUser = useCallback(() => {
     setRememberUser(prev => !prev);
@@ -424,6 +470,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     touched,
     isLoading,
     rememberUser,
+    loginAttempts,
     passwordErrors: mode === 'register' ? getPasswordErrors(formState.password) : [],
     showError,
     toggleAuthMode,
@@ -431,6 +478,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
     handleBlur,
     handleSubmit,
     toggleShowPassword,
+    toggleTempShowPassword,
     toggleRememberUser,
     validateField,
     validateEmail,

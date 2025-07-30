@@ -25,6 +25,7 @@ import SectionHeader from '../common/SectionHeader';
 import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
 import { useAnimation } from '../../hooks/useAnimation';
 import { useUserFeedback } from '../../hooks/useUserFeedback';
+import StudentCard from '../StudentCard';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -303,15 +304,22 @@ const StudentsScreen = ({
             </Text>
 
             <View style={styles.studentsList}>
+
               <FlatList
                 data={students}
-                renderItem={renderItem}
                 keyExtractor={item => item.id}
                 getItemLayout={(data, index) => ({
                   length: STUDENT_LIST_CONFIG.itemHeight,
                   offset: STUDENT_LIST_CONFIG.itemHeight * index,
                   index,
                 })}
+                renderItem={({ item }) => (
+                  <StudentCard
+                    student={item}
+                    isSelected={selectedStudents.some(s => s.id === item.id)}
+                    onSelect={toggleStudentSelection}
+                  />
+                )}
                 initialNumToRender={10}
                 maxToRenderPerBatch={5}
                 windowSize={5}

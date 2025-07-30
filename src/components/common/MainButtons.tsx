@@ -2,44 +2,43 @@ import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 
+type ModeTypes = 'qr' | 'barcode' | 'manual';
+
+type Props = {
+  id: ModeTypes;
+  label: string;
+  icon: 'qr-code' | 'barcode' | 'keyboard';
+  hint: string;
+}
+
 interface MainButtonsProps {
-  setActiveMode: (mode: 'qr' | 'barcode' | 'manual' | null) => void;
+  setActiveMode: (mode: ModeTypes) => void;
 }
 
 const MainButtons: React.FC<MainButtonsProps> = ({ setActiveMode }) => {
   const { colors } = useTheme();
 
+  const modes: Props[] = [
+    { id: 'qr', label: 'Escanear via QR Code',
+      icon: 'qr-code', hint: 'Abre a câmera para escanear um código QR' },
+    { id: 'barcode', label: 'Escanear via Código de Barras',
+       icon: 'barcode', hint: 'Abre a câmera para escanear um código de barras' },
+    { id: 'manual', label: 'Digitar o Código',
+      icon: 'keyboard', hint: 'Abre a tela de entrada de código manual' },
+  ];
+
   return (
     <View style={[styles.header, { backgroundColor: colors.background.secondary }]}>
-      <TouchableOpacity
-        accessibilityLabel="Escanear via QR Code"
-        accessibilityHint="Abre a câmera para escanear um código QR"
-        accessibilityRole="button"
-        style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
-        onPress={() => setActiveMode('qr')}
-      >
-        <Text style={[styles.buttonText, { color: colors.text.primary }]}>Escanear via QR Code</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        accessibilityLabel="Escanear via Código de Barras"
-        accessibilityHint="Abre a câmera para escanear um código de barras"
-        accessibilityRole="button"
-        style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
-        onPress={() => setActiveMode('barcode')}
-      >
-        <Text style={[styles.buttonText, { color: colors.text.primary }]}>Escanear via Código de Barras</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        accessibilityLabel="Escanear manualmente"
-        accessibilityHint="Abre a tela de entrada de código manual"
-        accessibilityRole="button"
-        style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
-        onPress={() => setActiveMode('manual')}
-      >
-        <Text style={[styles.buttonText, { color: colors.text.primary }]}>Digitar o Código</Text>
-      </TouchableOpacity>
+      {modes.map(mode => (
+        <TouchableOpacity key={mode.id} accessibilityRole="button"
+          accessibilityHint={mode.hint} accessibilityLabel={mode.label}
+          style={[styles.mainButton, { backgroundColor: colors.component.secondaryButton }]}
+          onPress={() => setActiveMode(mode.id)}>
+          <Text style={[styles.buttonText, { color: colors.text.primary }]}>
+            {mode.label}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </View>
   );
 };

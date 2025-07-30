@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Easing, Text, TouchableOpacity } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, StyleSheet, Animated, Easing } from 'react-native';
 import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
 
 import { useTheme } from '../../context/ThemeContext';
@@ -12,11 +11,10 @@ import { useValidation } from '../../hooks/useValidation';
 import { AuthView } from '../../types/newTypes';
 
 import MainButtons from '../common/MainButtons';
-import QRGuide from '../features/scanner/QRGuide';
-import BarcodeGuide from '../features/scanner/BarcodeGuide';
-import ManualGuide from '../features/scanner/ManualGuide';
-import PermissionRequestCard from '../features/scanner/PermissionRequestCard';
 import BottomBar from '../common/layout/BottomBar';
+import PermissionStatusView from '../PermissionStatusView';
+import ScannerModeRenderer from '../features/scanner/ScannerRouter';
+import DevTooltip from '../features/scanner/DevTooltip';
 
 interface ScannerProps {
   setCurrentView: (view: AuthView) => void;
@@ -44,7 +42,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     setManualInput
   } = useScannerUIState();
 
-  // Permissões da câmera
   const {
     status: permissionStatus,
     requestPermission,
@@ -52,7 +49,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     hasPermission
   } = useCameraPermission();
 
-  // Lógica de escaneamento
   const {
     scannedCode,
     isValidating,
@@ -61,22 +57,15 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     mockScan
   } = useScannerEngine({ activeMode });
 
-  // Validação
-  const {
-    validateISBN,
-    validateQRCode
-  } = useValidation();
+  const { validateISBN } = useValidation();
 
-  // Animação
   const scanLineAnimation = useRef(new Animated.Value(0)).current;
 
-  // Tipos de códigos de barras suportados
   const barcodeTypes: BarcodeType[] = [
     'qr', 'pdf417', 'ean13', 'ean8', 'code128', 'code39', 'code93',
     'codabar', 'itf14', 'upc_a', 'upc_e', 'aztec', 'datamatrix'
   ];
 
-  // Efeito para lidar com a autenticação quando um código é escaneado
   useEffect(() => {
     if (scannedCode) {
       setIsAuthenticated(true);
@@ -84,7 +73,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     }
   }, [scannedCode]);
 
-  // Efeito para animação da linha de scan
   useEffect(() => {
     if (isScanning) {
       Animated.loop(
@@ -107,7 +95,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     }
   }, [isScanning]);
 
-  // Função para lidar com envio manual
   const handleManualSubmit = () => {
     const validation = validateISBN(manualInput);
     if (!validation.isValid) {
@@ -115,7 +102,6 @@ const ScannerScreen: React.FC<ScannerProps> = ({
       return false;
     }
 
-    // Se válido, simular um scan
     const mockResult: BarcodeScanningResult = {
       data: manualInput,
       type: 'ean13',
@@ -135,99 +121,42 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     return true;
   };
 
-  // Renderização condicional baseada no status da permissão
-  if (permissionStatus === 'denied') {
+  // Handle permission states
+  if (permissionStatus === 'denied' || permissionStatus === 'undetermined' || 
+      hasPermission === null || hasPermission === false) {
     return (
-      <PermissionRequestCard
+      <PermissionStatusView
+        status={
+          permissionStatus === 'denied' ? 'denied' :
+          permissionStatus === 'undetermined' ? 'undetermined' :
+          hasPermission === null ? 'null' : 'false'
+        }
         onRequestPermission={requestPermission}
         onBack={() => setCurrentView('auth')}
-        isError={true}
+        openSettings={openSettings}
       />
     );
   }
-
-  if (permissionStatus === 'undetermined') {
-    return (
-      <PermissionRequestCard
-        onRequestPermission={requestPermission}
-        onBack={() => setCurrentView('auth')}
-        isError={false}
-      />
-    );
-  }
-
-  if (hasPermission === null) {
-    return (
-      <View style={[styles.permissionContainer, { backgroundColor: colors.background.primary }]}>
-        <Text style={[styles.permissionText, { color: colors.text.primary }]}>
-          Solicitando permissão para a câmera...
-        </Text>
-      </View>
-    );
-  }
-
-  if (hasPermission === false) {
-    return (
-      <View style={[styles.permissionContainer, { backgroundColor: colors.background.primary }]}>
-        <Text style={[styles.permissionText, { color: colors.text.primary }]}>
-          Permissão para câmera negada
-        </Text>
-        <TouchableOpacity
-          style={[styles.permissionButton, { backgroundColor: colors.component.primaryButton }]}
-          onPress={openSettings}
-        >
-          <Text style={[styles.permissionButtonText, { color: colors.text.onPrimary }]}>
-            Abrir Configurações
-          </Text>
-        </TouchableOpacity>
-      </View>
-    );
-  }
-
-  const renderMode = () => {
-    const modeComponents = {
-      qr: (
-        <QRGuide
-          setActiveMode={setActiveMode}
-          isScanning={isScanning}
-          handleBarcodeScanned={(result) => handleBarcodeScanned(result, 'qr')}
-          barcodeTypes={barcodeTypes}
-          torchOn={torchOn}
-          scanLineAnimation={scanLineAnimation}
-          onMockScan={mockScan}
-        />
-      ),
-      barcode: (
-        <BarcodeGuide
-          setActiveMode={setActiveMode}
-          isScanning={isScanning}
-          handleBarcodeScanned={(result) => handleBarcodeScanned(result, 'barcode')}
-          barcodeTypes={barcodeTypes}
-          torchOn={torchOn}
-          scanLineAnimation={scanLineAnimation}
-          onMockScan={mockScan}
-        />
-      ),
-      manual: (
-        <ManualGuide
-          setActiveMode={setActiveMode}
-          manualInput={manualInput}
-          setManualInput={setManualInput}
-          showError={showError}
-          setShowError={setShowError}
-          handleManualSubmit={handleManualSubmit}
-        />
-      )
-    };
-
-    return activeMode ? modeComponents[activeMode] : null;
-  };
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
       {!activeMode && <MainButtons setActiveMode={setActiveMode} />}
 
-      {renderMode()}
+      <ScannerModeRenderer
+        activeMode={activeMode}
+        setActiveMode={setActiveMode}
+        isScanning={isScanning}
+        handleBarcodeScanned={handleBarcodeScanned}
+        barcodeTypes={barcodeTypes}
+        torchOn={torchOn}
+        scanLineAnimation={scanLineAnimation}
+        onMockScan={mockScan}
+        manualInput={manualInput}
+        setManualInput={setManualInput}
+        showError={showError}
+        setShowError={setShowError}
+        handleManualSubmit={handleManualSubmit}
+      />
 
       <BottomBar
         activeMode={activeMode}
@@ -241,17 +170,7 @@ const ScannerScreen: React.FC<ScannerProps> = ({
         setShowError={setShowError}
       />
 
-      {__DEV__ && (
-        <View style={styles.mockTooltip}>
-          <Ionicons name="information-circle" size={24} color={colors.feedback.info} />
-          <Text style={[styles.mockTooltipText, {
-            color: colors.text.primary,
-            backgroundColor: colors.background.secondary
-          }]}>
-            Modo desenvolvimento ativo - use os botões de teste
-          </Text>
-        </View>
-      )}
+      <DevTooltip />
     </View>
   );
 };
@@ -260,40 +179,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'space-between',
-  },
-  permissionContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  permissionText: {
-    fontSize: 18,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  permissionButton: {
-    padding: 15,
-    borderRadius: 10,
-  },
-  permissionButtonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  mockTooltip: {
-    position: 'absolute',
-    bottom: 60,
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    borderRadius: 8,
-    gap: 8,
-  },
-  mockTooltipText: {
-    fontSize: 14,
-    flex: 1,
   },
 });
 

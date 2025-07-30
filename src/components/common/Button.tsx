@@ -12,6 +12,7 @@ import {
 import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
 import { ColorScheme } from '../../styles/colors';
+import { useAnimation } from '../../hooks/useAnimation';
 
 type ButtonVariant =
   | 'primary'       // Ação principal
@@ -98,6 +99,17 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const { colors } = useTheme();
   const styles = useMemo(() => createButtonStyles(colors), [colors]);
+  const { pressAnimation, triggerHapticFeedback } = useAnimation({
+    pressScale: 0.97,
+    enableHapticFeedback: true
+  });
+
+  const handlePress = () => {
+    pressAnimation({
+      hapticType: 'light',
+      onPress: onPress
+    });
+  };
 
   // Estilo base do botão
   const buttonStyle = [
@@ -171,7 +183,7 @@ const Button: React.FC<ButtonProps> = ({
   return (
     <TouchableOpacity
       style={buttonStyle}
-      onPress={onPress}
+      onPress={handlePress}
       disabled={disabled || loading}
       activeOpacity={0.7}
       accessibilityLabel={accessibility?.label}

@@ -16,6 +16,7 @@ export const useScanner = () => {
   const [isScanning, setIsScanning] = useState(false);
   const [torchOn, setTorchOn] = useState(false);
   const [scannedCode, setScannedCode] = useState('');
+  const [permissionStatus, setPermissionStatus] = useState<'undetermined' | 'granted' | 'denied'>('undetermined');
   const scanLineAnimation = useRef(new Animated.Value(0)).current;
 
   const barcodeTypes: BarcodeType[] = [
@@ -42,6 +43,25 @@ export const useScanner = () => {
       ).start();
     } else {
       scanLineAnimation.setValue(0);
+    }
+  }, [isScanning]);
+
+  useEffect(() => {
+    if (!isScanning) {
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scanLineAnimation, {
+            toValue: 0.3,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scanLineAnimation, {
+            toValue: 0.7,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
     }
   }, [isScanning]);
 
@@ -133,6 +153,16 @@ export const useScanner = () => {
   };
 
   const handleManualSubmit = () => {
+    if (!manualInput.trim()) {
+      showFeedback({
+        type: 'error',
+        message: 'Por favor, insira um código válido',
+        haptic: true
+      });
+      setShowError(true);
+      return false;
+    }
+
     if (manualInput.length > 0) {
       const isValid = validateScannedCode(manualInput, 'manual');
 
@@ -141,13 +171,12 @@ export const useScanner = () => {
         setShowError(false);
         return true;
       } else {
-        setShowError(true);
         showFeedback({
           type: 'error',
           message: 'Código inválido. Por favor, verifique e tente novamente.',
           haptic: true
         });
-        Alert.alert('Erro', 'Código inválido. Por favor, verifique e tente novamente.');
+        setShowError(true);
         return false;
       }
     } else {
@@ -156,17 +185,14 @@ export const useScanner = () => {
     }
   };
 
-  const mockScan = (type: 'valid' | 'invalid') => {
-    console.log('MockScan called with type:', type);
-    setIsScanning(true);
-
-    const code = activeMode === 'qr'
+  const generateMockCode = (type: 'valid' | 'invalid') => {
+    return activeMode === 'qr'
       ? mockQRcodes[type][Math.floor(Math.random() * mockQRcodes[type].length)]
       : mockBarcodes[type][Math.floor(Math.random() * mockBarcodes[type].length)];
+  };
 
-    console.log('Generated mock code:', code);
-
-    const mockResult: BarcodeScanningResult = {
+  const createMockResult = (code: string): BarcodeScanningResult => {
+    return {
       data: code,
       type: activeMode === 'qr' ? 'qr' : 'ean13',
       cornerPoints: [
@@ -180,9 +206,23 @@ export const useScanner = () => {
         size: { width: 100, height: 100 }
       }
     };
-
-    console.log('Calling handleBarcodeScanned with:', mockResult);
+  };
+  const mockScan = (type: 'valid' | 'invalid') => {
+    setIsScanning(true);
+    const code = generateMockCode(type);
+    const mockResult = createMockResult(code);
     return handleBarcodeScanned(mockResult);
+  };
+
+  const requestPermission = async () => {
+    try {
+      const { status } = await Camera.requestCameraPermissionsAsync();
+      setPermissionStatus(status === 'granted' ? 'granted' : 'denied');
+      setHasPermission(status === 'granted');
+    } catch (error) {
+      setPermissionStatus('denied');
+      setHasPermission(false);
+    }
   };
 
   return {
@@ -198,6 +238,8 @@ export const useScanner = () => {
     scanLineAnimation,
     barcodeTypes,
     scannedCode,
+    permissionStatus,
+    requestPermission,
     setScannedCode,
     toggleTorch,
     handleBarcodeScanned,

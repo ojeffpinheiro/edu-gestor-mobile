@@ -14,6 +14,13 @@ interface FeedbackOptions {
   useToast?: boolean;
   useAlert?: boolean;
   haptic?: boolean;
+  title?: string;
+  actions?: {
+    text: string;
+    onPress: () => void;
+    style?: 'primary' | 'secondary';
+  }[];
+  persistent?: boolean;
 }
 
 interface ToastConfig {
@@ -33,19 +40,24 @@ export const useUserFeedback = () => {
       message: '',
       duration: 3000,
       position: 'bottom' as FeedbackPosition,
+      title: '',
+      actions: [],
     },
   });
-  
-  
+
+
   const showFeedback = useCallback((options: FeedbackOptions) => {
-    const { 
-      type = 'info', 
-      message, 
-      duration = 3000, 
+    const {
+      type = 'info',
+      message,
+      duration = 3000,
       position = 'bottom',
       useToast = false,
       useAlert = false,
       haptic = true,
+      title,
+      actions,
+      persistent = false,
     } = options;
 
     if (haptic) {
@@ -66,13 +78,17 @@ export const useUserFeedback = () => {
 
     // Decidir o método de exibição
     if (useToast || Platform.OS === 'android') {
-      showToast(message, type, duration);
+      showToast(message, type, persistent ? 0 : duration);
     } else if (useAlert) {
       showAlert(message, type);
     } else {
       setFeedbackConfig({
         visible: true,
-        options: { type, message, duration, position },
+        options: { 
+          type, message,
+          duration: persistent ? 0 : duration,
+          position, title, actions
+        },
       });
     }
   }, []);
@@ -107,7 +123,7 @@ export const useUserFeedback = () => {
     );
   };
 
-  
+
   const hideFeedback = useCallback(() => {
     setFeedbackConfig(prev => ({ ...prev, visible: false }));
     setToastConfig(null);

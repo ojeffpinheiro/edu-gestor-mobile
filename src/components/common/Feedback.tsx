@@ -1,8 +1,14 @@
-import React, { useEffect } from 'react';
-import { View, Text, StyleSheet, Animated } from 'react-native';
+import React, { useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, Easing, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { FeedbackPosition, FeedbackType } from '../../types/feedback';
 import { useTheme } from '../../context/ThemeContext';
+
+interface FeedbackAction {
+  text: string;
+  onPress: () => void;
+  style?: 'primary' | 'secondary';
+}
 
 interface FeedbackProps {
   visible: boolean;
@@ -12,6 +18,7 @@ interface FeedbackProps {
     duration?: number;
     title?: string;
     message: string;
+    actions?: FeedbackAction[];
   };
   onHide: () => void;
 }
@@ -32,8 +39,10 @@ const iconNameMap: Record<FeedbackType, keyof typeof Ionicons.glyphMap> = {
 
 const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
   const { colors } = useTheme();
-  const opacity = React.useRef(new Animated.Value(0)).current;
-  const translateY = React.useRef(new Animated.Value(30)).current;
+  const opacity = useRef(new Animated.Value(0.5)).current;
+  const translateY = useRef(new Animated.Value(30)).current;
+  const scale = useRef(new Animated.Value(0.95)).current;
+
 
   const positionStyles = {
     top: { top: 60 },
@@ -48,26 +57,50 @@ const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
     info: colors.feedback.info,
   };
 
+  const actionButtonStyles = {
+    primary: {
+      backgroundColor: variantColors[options.type],
+      borderColor: variantColors[options.type],
+    },
+    secondary: {
+      backgroundColor: 'transparent',
+      borderColor: variantColors[options.type],
+    }
+  };
+
   useEffect(() => {
     if (visible) {
       Animated.parallel([
         Animated.timing(opacity, {
           toValue: 1,
           duration: 300,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
         Animated.timing(translateY, {
           toValue: 0,
           duration: 300,
+          easing: Easing.out(Easing.cubic),
+          useNativeDriver: true,
+        }),
+        Animated.timing(scale, {
+          toValue: 1,
+          duration: 300,
+          easing: Easing.out(Easing.cubic),
           useNativeDriver: true,
         }),
       ]).start();
 
-      const timer = setTimeout(() => {
-        hideFeedback();
-      }, options.duration || 3000);
+      let timer: NodeJS.Timeout;
+      if (options.duration !== 0) {
+        timer = setTimeout(() => {
+          hideFeedback();
+        }, options.duration || 3000);
+      }
 
-      return () => clearTimeout(timer);
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
     }
   }, [visible]);
 
@@ -76,14 +109,27 @@ const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
       Animated.timing(opacity, {
         toValue: 0,
         duration: 200,
+        easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
       Animated.timing(translateY, {
         toValue: 30,
         duration: 200,
+        easing: Easing.in(Easing.cubic),
+        useNativeDriver: true,
+      }),
+      Animated.timing(scale, {
+        toValue: 0.95,
+        duration: 200,
+        easing: Easing.in(Easing.cubic),
         useNativeDriver: true,
       }),
     ]).start(() => onHide());
+  };
+
+  const handlePressAction = (action: FeedbackAction) => {
+    action.onPress();
+    hideFeedback();
   };
 
   if (!visible) return null;
@@ -99,30 +145,62 @@ const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
         positionStyles[position],
         {
           opacity,
-          transform: [{ translateY }],
+          transform: [{ translateY }, { scale }],
           backgroundColor: variantColors[options.type] + '20',
           borderLeftColor: variantColors[options.type],
         }
       ]}
     >
-      <View style={styles.content}>
-        <IconComponent
-          name={iconName}
-          size={24}
-          color={variantColors[options.type]}
-          style={styles.icon}
-        />
-        <View style={styles.textContainer}>
-          {options.title && (
-            <Text style={[styles.title, { color: variantColors[options.type] }]}>
-              {options.title}
+      <TouchableOpacity
+        activeOpacity={0.8}
+        onPress={hideFeedback}
+        style={styles.touchableContainer}
+      >
+        <View style={styles.content}>
+          <IconComponent
+            name={iconName}
+            size={24}
+            color={variantColors[options.type]}
+            style={styles.icon}
+          />
+          <View style={styles.textContainer}>
+            {options.title && (
+              <Text style={[styles.title, { color: variantColors[options.type] }]}>
+                {options.title}
+              </Text>
+            )}
+            <Text style={[styles.message, { color: colors.text.primary }]}>
+              {options.message}
             </Text>
-          )}
-          <Text style={[styles.message, { color: colors.text.primary }]}>
-            {options.message}
-          </Text>
+          </View>
         </View>
-      </View>
+
+        {options.actions && options.actions.length > 0 && (
+          <View style={styles.actionsContainer}>
+            {options.actions.map((action, index) => (
+              <TouchableOpacity
+                key={index}
+                onPress={() => handlePressAction(action)}
+                style={[
+                  styles.actionButton,
+                  actionButtonStyles[action.style || 'primary'],
+                  { borderColor: variantColors[options.type] }
+                ]}
+              >
+                <Text style={[
+                  styles.actionText,
+                  {
+                    color: action.style === 'secondary' ?
+                      variantColors[options.type] : colors.text.onPrimary
+                  }
+                ]}>
+                  {action.text}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
+        )}
+      </TouchableOpacity>
     </Animated.View>
   );
 };
@@ -142,12 +220,16 @@ const styles = StyleSheet.create({
     elevation: 3,
     zIndex: 1000,
   },
+  touchableContainer: {
+    flex: 1,
+  },
   content: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
   },
   icon: {
     marginRight: 12,
+    marginTop: 2,
   },
   textContainer: {
     flex: 1,
@@ -159,6 +241,25 @@ const styles = StyleSheet.create({
   },
   message: {
     fontSize: 14,
+    lineHeight: 20,
+  },
+  actionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 12,
+    gap: 8,
+  },
+  actionButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 4,
+    borderWidth: 1,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  actionText: {
+    fontSize: 14,
+    fontWeight: '500',
   },
 });
 

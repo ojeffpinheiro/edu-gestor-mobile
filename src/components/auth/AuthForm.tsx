@@ -7,7 +7,7 @@ import { useAuthForm } from '../../hooks/useAuthForm';
 import Feedback from '../common/Feedback';
 import { useUserFeedback } from '../../hooks/useUserFeedback';
 
-const AuthScreen = ({ setCurrentView }) => {
+const AuthForm = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
 
@@ -20,14 +20,99 @@ const AuthScreen = ({ setCurrentView }) => {
 
   const handleFormSubmit = async () => {
     try {
-
       const success = await handleSubmit();
       if (success && mode === 'login') {
+        // Feedback com título e fechamento automático
+        showFeedback({
+          type: 'success',
+          title: 'Bem-vindo!',
+          message: 'Login realizado com sucesso',
+          duration: 2000,
+          haptic: true
+        });
         setTimeout(() => setCurrentView('scanner'), 1500);
+      } else if (success && mode === 'register') {
+        // Feedback persistente que requer ação do usuário
+        showFeedback({
+          type: 'success',
+          title: 'Cadastro concluído!',
+          message: 'Sua conta foi criada com sucesso. Deseja fazer login agora?',
+          persistent: true,
+          actions: [
+            {
+              text: 'Fazer login',
+              onPress: () => {
+                toggleAuthMode();
+                hideFeedback();
+              },
+              style: 'primary'
+            },
+            {
+              text: 'Mais tarde',
+              onPress: hideFeedback,
+              style: 'secondary'
+            }
+          ]
+        });
       }
     } catch (error) {
-      showFeedback({ message: 'Hello', type: 'info' });
+      // Feedback de erro com ações
+      showFeedback({
+        type: 'error',
+        title: 'Erro',
+        message: error.message || 'Ocorreu um erro durante a autenticação',
+        actions: [
+          {
+            text: 'Entendi',
+            onPress: hideFeedback,
+            style: 'primary'
+          },
+          {
+            text: 'Ajuda',
+            onPress: () => {
+              // Navegar para tela de ajuda
+              hideFeedback();
+              setCurrentView('help');
+            },
+            style: 'secondary'
+          }
+        ]
+      });
     }
+  };
+
+  const handleTestCredentials = () => {
+    handleChange('email', 'usuario@teste.com');
+    handleChange('password', 'Senha123');
+
+    // Feedback informativo com toque para fechar
+    showFeedback({
+      type: 'info',
+      message: 'Dados de teste preenchidos. Toque para fechar.',
+      position: 'top',
+      duration: 0, // Persistente até o usuário tocar
+      haptic: true
+    });
+  };
+
+  const handleForgotPassword = () => {
+    // Feedback com ação única
+    showFeedback({
+      type: 'warning',
+      title: 'Esqueceu sua senha?',
+      message: 'Deseja redefinir sua senha agora?',
+      actions: [
+        {
+          text: 'Redefinir',
+          onPress: () => {
+            hideFeedback();
+            setCurrentView('resetPassword');
+          },
+          style: 'primary'
+        }
+      ],
+      persistent: true
+    });
   };
 
   return (
@@ -36,6 +121,11 @@ const AuthScreen = ({ setCurrentView }) => {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <Feedback
+          visible={feedbackConfig.visible}
+          options={feedbackConfig.options}
+          onHide={hideFeedback}
+        />
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
             <Text style={styles.logoText}>TECHNO</Text>
@@ -70,7 +160,16 @@ const AuthScreen = ({ setCurrentView }) => {
               {formState.email ? (
                 <TouchableOpacity
                   style={styles.clearButton}
-                  onPress={() => handleChange('email', '')}
+                  onPress={() => {
+                    handleChange('email', '');
+                    // Feedback rápido ao limpar campo
+                    showFeedback({
+                      type: 'info',
+                      message: 'Campo limpo',
+                      duration: 1000,
+                      position: 'top'
+                    });
+                  }}
                 >
                   <Ionicons name="close-circle" size={20} color={colors.text.secondary} />
                 </TouchableOpacity>
@@ -112,74 +211,85 @@ const AuthScreen = ({ setCurrentView }) => {
               <Text style={styles.errorText}>{errors.password}</Text>
             )}
 
-            {/* Mostrar todos os erros de senha durante o cadastro */}
-            {mode === 'register' && passwordErrors.length > 0 && (
-              <View style={styles.passwordRequirements}>
-                {passwordErrors.map((error, index) => (
-                  <Text key={index} style={styles.passwordErrorText}>
-                    • {error}
-                  </Text>
+            {/* Link para esqueci a senha */}
+            {mode === 'login' && (
+              <TouchableOpacity
+                style={styles.forgotPassword}
+                onPress={handleForgotPassword}
+              >
+                <Text style={styles.linkText}>Esqueceu sua senha?</Text>
+              </TouchableOpacity>
+            )}
+
+            {mode === 'register' && (
+              <View style={styles.passwordStrengthContainer}>
+                {[1, 2, 3].map((i) => (
+                  <View
+                    key={i}
+                    style={[
+                      styles.strengthBar,
+                      passwordErrors.length <= i && styles.strengthBarActive
+                    ]}
+                  />
                 ))}
               </View>
             )}
-          </View>
-          <TouchableOpacity
-            style={styles.testButton}
-            onPress={() => {
-              handleChange('email', 'usuario@teste.com');
-              handleChange('password', 'Senha123');
-            }}
-          >
-            <Text style={styles.testButtonText}>Preencher dados de teste</Text>
-          </TouchableOpacity>
 
-          {/* Submit Button */}
-          <TouchableOpacity
-            style={[styles.button, (isLoading || !formState.email || !formState.password) && styles.buttonDisabled]}
-            onPress={handleFormSubmit}
-            disabled={isLoading || !formState.email || !formState.password}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.text.onPrimary} />
-            ) : (
-              <Text style={styles.buttonText}>
-                {mode === 'login' ? 'Entrar' : 'Cadastrar'}
+            <TouchableOpacity
+              style={styles.testButton}
+              onPress={handleTestCredentials}
+            >
+              <Text style={styles.testButtonText}>Preencher dados de teste</Text>
+            </TouchableOpacity>
+
+            {/* Submit Button */}
+            <TouchableOpacity
+              style={[styles.button, (isLoading || !formState.email || !formState.password) && styles.buttonDisabled]}
+              onPress={handleFormSubmit}
+              disabled={isLoading || !formState.email || !formState.password}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={colors.text.onPrimary} />
+              ) : (
+                <Text style={styles.buttonText}>
+                  {mode === 'login' ? 'Entrar' : 'Cadastrar'}
+                </Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Toggle Auth Mode */}
+            <TouchableOpacity onPress={toggleAuthMode}>
+              <Text style={styles.toggleText}>
+                {mode === 'login'
+                  ? 'Não tem uma conta? Cadastre-se'
+                  : 'Já tem uma conta? Faça login'}
               </Text>
+            </TouchableOpacity>
+
+            {/* Error Message */}
+            {errors.general && (
+              <Text style={styles.generalErrorText}>{errors.general}</Text>
             )}
-          </TouchableOpacity>
 
-          {/* Toggle Auth Mode */}
-          <TouchableOpacity onPress={toggleAuthMode}>
-            <Text style={styles.toggleText}>
-              {mode === 'login'
-                ? 'Não tem uma conta? Cadastre-se'
-                : 'Já tem uma conta? Faça login'}
-            </Text>
-          </TouchableOpacity>
+            {/* Social Login Options */}
+            <View style={styles.separator}>
+              <View style={styles.separatorLine} />
+              <Text style={styles.separatorText}>ou</Text>
+              <View style={styles.separatorLine} />
+            </View>
 
-          {/* Error Message */}
-          {errors.general && (
-            <Text style={styles.generalErrorText}>{errors.general}</Text>
-          )}
-
-          {/* Social Login Options */}
-          <View style={styles.separator}>
-            <View style={styles.separatorLine} />
-            <Text style={styles.separatorText}>ou</Text>
-            <View style={styles.separatorLine} />
-          </View>
-
-          <View style={styles.socialButtonsContainer}>
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonText}>
-                {mode === 'login' ? 'Entrar' : 'Cadastrar'} com Google
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.socialButton}>
-              <Text style={styles.socialButtonText}>
-                {mode === 'login' ? 'Entrar' : 'Cadastrar'} com GitHub
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.socialButtonsContainer}>
+              <TouchableOpacity style={styles.socialButton}>
+                <Text style={styles.socialButtonText}>
+                  {mode === 'login' ? 'Entrar' : 'Cadastrar'} com Google
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <Text style={styles.socialButtonText}>
+                  {mode === 'login' ? 'Entrar' : 'Cadastrar'} com GitHub
+                </Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
 
@@ -197,14 +307,9 @@ const AuthScreen = ({ setCurrentView }) => {
         </View>
 
 
-        <Feedback
-          visible={feedbackConfig.visible}
-          options={feedbackConfig.options}
-          onHide={hideFeedback}
-        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
 };
 
-export default AuthScreen;
+export default AuthForm;

@@ -2,8 +2,11 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Alert, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { BarcodeScanningResult, BarcodeType } from 'expo-camera';
+
 import { useTheme } from '../../../context/ThemeContext';
+
 import { useUserFeedback } from '../../../hooks/useUserFeedback';
+
 import ScannerCamera from '../../common/ScannerCamera';
 
 interface BarcodeGuideProps {

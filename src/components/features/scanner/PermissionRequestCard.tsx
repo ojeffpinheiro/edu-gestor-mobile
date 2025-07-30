@@ -1,9 +1,13 @@
 import React from 'react';
 import { View, Text, Linking } from 'react-native';
 import { Camera, X, Settings } from 'lucide-react-native';
+
 import { useTheme } from '../../../context/ThemeContext';
+
 import Button from '../../common/Button';
+
 import StatusIcon from '../../StatusIcon';
+
 import { createPermissionRequestCardStyles } from '../../auth/styles';
 
 interface PermissionRequestCardProps {

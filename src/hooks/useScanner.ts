@@ -25,8 +25,10 @@ export const useScanner = () => {
   ];
 
   useEffect(() => {
+    let animation: Animated.CompositeAnimation;
+
     if (isScanning) {
-      Animated.loop(
+      animation = Animated.loop(
         Animated.sequence([
           Animated.timing(scanLineAnimation, {
             toValue: 1,
@@ -40,29 +42,17 @@ export const useScanner = () => {
             useNativeDriver: true,
           }),
         ])
-      ).start();
+      );
+      animation.start();
     } else {
       scanLineAnimation.setValue(0);
     }
-  }, [isScanning]);
 
-  useEffect(() => {
-    if (!isScanning) {
-      Animated.loop(
-        Animated.sequence([
-          Animated.timing(scanLineAnimation, {
-            toValue: 0.3,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-          Animated.timing(scanLineAnimation, {
-            toValue: 0.7,
-            duration: 1000,
-            useNativeDriver: true,
-          }),
-        ])
-      ).start();
-    }
+    return () => {
+      if (animation) {
+        animation.stop();
+      }
+    };
   }, [isScanning]);
 
   useEffect(() => {

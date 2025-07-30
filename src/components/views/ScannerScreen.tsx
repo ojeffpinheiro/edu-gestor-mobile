@@ -131,11 +131,9 @@ const ScannerScreen: React.FC<ScannerProps> = ({
     );
   }
 
-  return (
-    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
-      {!activeMode && <MainButtons setActiveMode={setActiveMode} />}
-
-      {activeMode === 'qr' && (
+  const renderMode = () => {
+    const modeComponents = {
+      qr: (
         <QRGuide
           setActiveMode={setActiveMode}
           isScanning={isScanning}
@@ -145,9 +143,8 @@ const ScannerScreen: React.FC<ScannerProps> = ({
           scanLineAnimation={scanLineAnimation}
           onMockScan={mockScan}
         />
-      )}
-
-      {activeMode === 'barcode' && (
+      ),
+      barcode: (
         <BarcodeGuide
           setActiveMode={setActiveMode}
           isScanning={isScanning}
@@ -157,24 +154,29 @@ const ScannerScreen: React.FC<ScannerProps> = ({
           scanLineAnimation={scanLineAnimation}
           onMockScan={mockScan}
         />
-      )}
-
-      {activeMode === 'manual' && (
+      ),
+      manual: (
         <ManualGuide
           setActiveMode={setActiveMode}
           manualInput={manualInput}
           setManualInput={setManualInput}
           showError={showError}
           setShowError={setShowError}
-          handleManualSubmit={() => {
-            if (handleManualSubmit()) {
-              setIsAuthenticated(true);
-              setCurrentView('students');
-              Alert.alert('Sucesso', 'Código válido inserido!');
-            }
-          }}
+          handleManualSubmit={handleManualSubmit}
         />
-      )}
+      )
+    };
+
+    return activeMode
+      ? modeComponents[activeMode]
+      : <MainButtons setActiveMode={setActiveMode} />;
+  };
+
+  return (
+    <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      {!activeMode && <MainButtons setActiveMode={setActiveMode} />}
+
+      {renderMode()}
 
       <BottomBar
         activeMode={activeMode}

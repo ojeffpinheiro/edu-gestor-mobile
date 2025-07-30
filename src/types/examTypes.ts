@@ -1,5 +1,5 @@
 export interface Exam {
-  id: number;
+  id: string;
   studentName: string;
   studentId: string;
   examDate: string;
@@ -127,4 +127,16 @@ export interface GridDetectionResult {
   grid?: GridInfo;
   error?: string;
   debug?: DebugInfo;
+}
+
+export interface ExamResult {
+  id: string;
+  studentName: string;
+  studentId: string;
+  examDate: string;
+  subject: string;
+  answers: string[];
+  status: 'pending' | 'corrected';
+  score: number | null;
+  totalQuestions: number;
 }

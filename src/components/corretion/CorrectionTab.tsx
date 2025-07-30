@@ -5,18 +5,11 @@ import ExamItem from './ExamItem';
 import { useTheme } from '../../context/ThemeContext';
 import Button from '../common/Button';
 import { createCorrectionTabStyles } from './CorrectionTabStyles';
-import StatusMessage from '../common/StatusMessage';
+import Alert from '../common/Alert';
+import { ExamResult } from '../../types/examTypes';
 
 interface CorrectionTabProps {
-  exams?: Array<{
-    id: string;
-    studentName: string;
-    studentId: string;
-    subject: string;
-    examDate: string;
-    score?: number;
-    status?: string;
-  }>;
+  exams?: ExamResult[];
   isLoading: boolean;
   onExamPress?: (exam: any) => void;
   onProcessAll?: () => void;
@@ -25,8 +18,8 @@ interface CorrectionTabProps {
 const CorrectionTab: React.FC<CorrectionTabProps> = ({
   exams = [],
   isLoading,
-  onExamPress = () => { },
-  onProcessAll = () => { }
+  onExamPress,
+  onProcessAll
 }) => {
   const { colors } = useTheme();
   const styles = createCorrectionTabStyles(colors);
@@ -38,21 +31,23 @@ const CorrectionTab: React.FC<CorrectionTabProps> = ({
   return (
     <View style={styles.tabContent}>
       {!hasPendingExams && (
-        <StatusMessage
-          type="info"
+        <Alert
+          variant="info"
+          style="toast"
           title="Nenhuma prova pendente"
           message="Todas as provas já foram corrigidas."
+          visible={!hasPendingExams}
         />
       )}
       <View style={styles.actionButtons}>
         <Button
-          variant="primary"
-          onPress={onProcessAll}
-          disabled={isLoading || !hasPendingExams}
-          icon={isLoading
-            ? (<ActivityIndicator size="small" color={colors.text.onPrimary} />)
-            : (<CheckCircle size={20} color={colors.text.onPrimary} />)}
-          title={isLoading ? "Processando..." : "Corrigir Todas"}
+      variant="primary"
+      onPress={() => onProcessAll()}
+      disabled={isLoading || !hasPendingExams}
+      icon={isLoading
+        ? (<ActivityIndicator size="small" color={colors.text.onPrimary} />)
+        : (<CheckCircle size={20} color={colors.text.onPrimary} />)}
+      title={isLoading ? "Processando..." : "Corrigir Todas"}
           style={[
             styles.primaryButton,
             (isLoading || !hasPendingExams) && styles.primaryButtonDisabled

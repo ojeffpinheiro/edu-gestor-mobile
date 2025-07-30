@@ -2,18 +2,7 @@ import { useEffect, useState } from "react";
 import { correctExam } from "../utils/examUtils";
 import { initialExams } from "../mocks/scannerMocks";
 import useErrorHandling from "./useErrorHandling";
-
-export interface ExamResult {
-  id: string; // Alterado para string para consistência
-  studentName: string;
-  studentId: string;
-  examDate: string;
-  subject: string;
-  answers: string[];
-  status: 'pending' | 'corrected'; // Tipo específico
-  score: number | null; // Permite null para provas não corrigidas
-  totalQuestions: number;
-}
+import { ExamResult } from "../types/examTypes";
 
 interface ExamError {
   title: string;

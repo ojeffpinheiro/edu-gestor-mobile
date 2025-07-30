@@ -33,7 +33,9 @@ const ScanResultCard = ({ code, onContinue, animation }: ScanResultCardProps) =>
           icon={<CheckCircle size={20} color={colors.text.onPrimary} />}
           iconPosition="left"
           style={styles.button}
-          accessibilityLabel="Continuar para identificação do aluno"
+          accessibility={{
+            label: 'Continuar para identificação do aluno'
+          }}
         />
       </View>
     </StatusCard>

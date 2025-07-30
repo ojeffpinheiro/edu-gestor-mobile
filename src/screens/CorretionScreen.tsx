@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { SafeAreaView, ScrollView, StatusBar, Alert, StyleSheet } from 'react-native';
+import { SafeAreaView, ScrollView, StatusBar, StyleSheet } from 'react-native';
 
 import { correctExam, generateReport } from '../utils/examUtils';
 import { useTheme } from '../context/ThemeContext';
 import { useExams } from '../hooks/useExams';
 
 import { Exam } from '../types/examTypes';
+import SkeletonLoader from '../components/common/SkeletonLoader';
+import AlertComponent from '../components/common/Alert';
+import LoadingOverlay from '../components/LoadingOverlay';
 
-import StatusMessage from '../components/common/StatusMessage';
 
 import ReportsTab from '../components/corretion/ReportsTab';
 import SettingsTab from '../components/corretion/SettingsTab';
@@ -17,7 +19,6 @@ import ExamDetailModal from '../components/corretion/ExamDetailModal';
 import CorrectionTab from '../components/corretion/CorrectionTab';
 
 import { Spacing } from '../styles/designTokens';
-import SkeletonLoader from '../components/common/SkeletonLoader';
 
 const CorrectionScreen = () => {
   const { exams, processAllPendingExams, isLoading, error } = useExams();
@@ -27,6 +28,7 @@ const CorrectionScreen = () => {
   const [selectedExam, setSelectedExam] = useState(null);
   const [activeTab, setActiveTab] = useState('correction');
   const [validationError, setValidationError] = useState('');
+  const [localError, setLocalError] = useState(null);
 
   const { colors } = useTheme();
   const styles = createCorrectionScreenStyles(colors);
@@ -46,19 +48,18 @@ const CorrectionScreen = () => {
     await processAllPendingExams(answerKey);
   };
 
-
   const renderTabContent = () => {
     switch (activeTab) {
       case 'correction':
         return (
           <CorrectionTab
             exams={exams}
-            answerKey={answerKey}
+            isLoading={isLoading}
             onExamPress={(exam) => {
               setSelectedExam(exam);
               setModalVisible(true);
             }}
-            onProcessAll={processAllPendingExams}
+            onProcessAll={() => processAllPendingExams(answerKey)}
           />
         );
       case 'reports':
@@ -76,14 +77,16 @@ const CorrectionScreen = () => {
 
   return (
     <SafeAreaView style={styles.screenContainer}>
-      {processing && <LoadingOverlay />}
+      {processing && <LoadingOverlay visible={processing} />}
 
       {validationError && (
-        <StatusMessage
-          type="error"
+        <AlertComponent
+          variant="error"
+          style="toast"
           title="Erro de validação"
           message={validationError}
           onDismiss={() => setValidationError('')}
+          visible={!!validationError}
         />
       )}
 
@@ -93,23 +96,24 @@ const CorrectionScreen = () => {
 
       {/* Feedback de erro/sucesso */}
       {error && (
-        <StatusMessage
-          type="error"
+        <AlertComponent
+          variant="error"
+          style="toast"
           title="Erro de validação"
-          message={error}
+          message={localError}
           onDismiss={() => setLocalError(null)}
+          visible={!!error}
         />
       )}
 
       {error && (
-        <StatusMessage
-          type="error"
-          title={error.title}
+        <AlertComponent
+          variant="error"
+          style="toast"
+          title={error.title || "Erro"}
           message={error.message}
-          actions={error.actions?.map(action => ({
-            label: action.text,
-            onPress: action.onPress
-          }))}
+          onDismiss={() => setLocalError(null)}
+          visible={!!error}
         />
       )}
 

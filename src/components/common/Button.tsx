@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import {
   TouchableOpacity,
   Text,
@@ -13,8 +13,39 @@ import { useTheme } from '../../context/ThemeContext';
 import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
 import { ColorScheme } from '../../styles/colors';
 
-type ButtonVariant = 'primary' | 'secondary' | 'success' | 'error' | 'warning' | 'info' | 'outline' | 'ghost' | 'floating' | 'text';
-type ButtonSize = 'sm' | 'md' | 'lg';
+type ButtonVariant =
+  | 'primary'       // Ação principal
+  | 'secondary'     // Ação secundária
+  | 'tertiary'      // Ação terciária
+  | 'danger'        // Ações destrutivas
+  | 'success'       // Ações positivas
+  | 'outline'       // Botões com borda
+  | 'ghost'         // Botões sem fundo
+  | 'text';         // Links estilizados como botões
+
+type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'; // Escala consistente
+
+type ButtonStyles = {
+  base: ViewStyle;
+  textBase: TextStyle;
+  fullWidth: ViewStyle;
+  rounded: ViewStyle;
+  roundedFull: ViewStyle;
+  disabled: ViewStyle;
+  iconContainer: ViewStyle;
+  iconLeft: ViewStyle;
+  iconRight: ViewStyle;
+  // Variantes
+  primary: ViewStyle;
+  primaryText: TextStyle;
+  // ... outras variantes
+  // Tamanhos
+  xs: ViewStyle;
+  // ... outros tamanhos
+  // Text sizes
+  xsText: TextStyle;
+  // ... outros tamanhos de texto
+};
 
 interface IconProps {
   color?: string;
@@ -22,70 +53,112 @@ interface IconProps {
 }
 
 interface ButtonProps {
-  title?: string;
+  // Hierarquia de props
+  // 1. Comportamento
   onPress: () => void;
-  variant?: ButtonVariant;
-  size?: ButtonSize;
   disabled?: boolean;
   loading?: boolean;
+
+  // 2. Conteúdo
+  title?: string;
   icon?: React.ReactElement<IconProps>;
   iconPosition?: 'left' | 'right';
+  accessibility?: {
+    label: string;
+    hint?: string;
+  };
+
+  // 3. Aparência
+  variant?: ButtonVariant;
+  size?: ButtonSize;
   fullWidth?: boolean;
+  rounded?: boolean | 'full';
+
+  // 4. Estilos customizados
   style?: StyleProp<ViewStyle>;
   textStyle?: StyleProp<TextStyle>;
-  rounded?: boolean;
-  accessibilityLabel?: string;
-  accessibilityHint?: string;
+  iconStyle?: StyleProp<ViewStyle>;
 }
 
 const Button: React.FC<ButtonProps> = ({
   title,
   onPress,
-  variant = 'primary',
-  size = 'md',
   disabled = false,
   loading = false,
   icon,
   iconPosition = 'left',
+  variant = 'primary',
+  size = 'md',
   fullWidth = false,
+  rounded = false,
+  accessibility,
   style,
   textStyle,
-  rounded = false,
-  accessibilityLabel,
-  accessibilityHint,
+  iconStyle,
 }) => {
   const { colors } = useTheme();
-  const styles = createButtonStyles(colors);
+  const styles = useMemo(() => createButtonStyles(colors), [colors]);
 
-  const buttonStyles: StyleProp<ViewStyle> = [
-    styles.button,
-    variant === 'text' ? styles.textVariant : styles[variant], // Ajuste aqui
+  // Estilo base do botão
+  const buttonStyle = [
+    styles.base,
+    styles[variant],
     styles[size],
-    disabled && styles.disabled,
     fullWidth && styles.fullWidth,
-    rounded && styles.rounded,
+    rounded && (rounded === 'full' ? styles.roundedFull : styles.rounded),
+    disabled && styles.disabled,
     style,
   ];
 
-  const textStyles: StyleProp<TextStyle> = [
-    styles.textStyle,
+  // Estilo do texto
+  const textStyles = [
+    styles.textBase,
     styles[`${variant}Text`],
     styles[`${size}Text`],
     textStyle,
   ];
 
+  // Cor do ícone baseada na variante
   const iconColor = {
     primary: colors.text.onPrimary,
     secondary: colors.text.onPrimary,
+    danger: colors.text.onPrimary,
     success: colors.text.onPrimary,
-    error: colors.text.onPrimary,
-    warning: colors.text.primary,
-    info: colors.text.onPrimary,
     outline: colors.primary.main,
     ghost: colors.primary.main,
     text: colors.text.primary,
-    floating: colors.text.onPrimary,
   }[variant];
+
+  const renderContent = () => {
+    if (loading) {
+      return <ActivityIndicator size="small" color={iconColor} />;
+    }
+
+    return (
+      <>
+        {iconPosition === 'left' && icon && (
+          <View style={[styles.iconContainer, styles.iconLeft, iconStyle]}>
+            {React.cloneElement(icon, {
+              color: icon.props.color || iconColor,
+              size: icon.props.size || styles[`${size}Text`].fontSize,
+            })}
+          </View>
+        )}
+
+        {title && <Text style={textStyles}>{title}</Text>}
+
+        {iconPosition === 'right' && icon && (
+          <View style={[styles.iconContainer, styles.iconRight, iconStyle]}>
+            {React.cloneElement(icon, {
+              color: icon.props.color || iconColor,
+              size: icon.props.size || styles[`${size}Text`].fontSize,
+            })}
+          </View>
+        )}
+      </>
+    );
+  };
+
 
   const renderIcon = () => {
     if (!icon || loading) return null;
@@ -97,35 +170,22 @@ const Button: React.FC<ButtonProps> = ({
 
   return (
     <TouchableOpacity
-      style={buttonStyles}
+      style={buttonStyle}
       onPress={onPress}
       disabled={disabled || loading}
       activeOpacity={0.7}
-      accessibilityLabel={accessibilityLabel}
-      accessibilityHint={accessibilityHint}
+      accessibilityLabel={accessibility?.label}
+      accessibilityHint={accessibility?.hint}
+      accessibilityRole="button"
     >
-      {loading ? (
-        <ActivityIndicator size="small" color={iconColor} />
-      ) : (
-        <>
-          {iconPosition === 'left' && icon && (
-            <View style={styles.iconLeft}>{renderIcon()}</View>
-          )}
-
-          {title && <Text style={textStyles}>{title}</Text>}
-
-          {iconPosition === 'right' && icon && (
-            <View style={styles.iconRight}>{renderIcon()}</View>
-          )}
-        </>
-      )}
+      {renderContent()}
     </TouchableOpacity>
   );
 };
 
 const createButtonStyles = (colors: ColorScheme) => {
-  return StyleSheet.create({
-    button: {
+  const baseStyles: ButtonStyles = {
+    base: {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'center',
@@ -133,141 +193,55 @@ const createButtonStyles = (colors: ColorScheme) => {
       borderWidth: 1,
       borderColor: 'transparent',
     },
-    textStyle: {
+    textBase: {
       fontWeight: Typography.fontWeight.semibold,
     },
     fullWidth: {
       width: '100%',
     },
     rounded: {
+      borderRadius: BorderRadius.lg,
+    },
+    roundedFull: {
       borderRadius: BorderRadius.xxl,
     },
     disabled: {
       opacity: 0.6,
-      backgroundColor: colors.component.disabled
     },
-
-    // Variants
-    primary: {
-      backgroundColor: colors.primary.main,
-      borderColor: colors.primary.main,
-    },
-    primaryText: {
-      color: colors.text.onPrimary,
-    },
-
-    secondary: {
-      backgroundColor: colors.secondary.main,
-      borderColor: colors.secondary.main,
-    },
-    secondaryText: {
-      color: colors.text.onPrimary,
-    },
-
-    success: {
-      backgroundColor: colors.feedback.success,
-      borderColor: colors.feedback.success,
-    },
-    successText: {
-      color: colors.text.onPrimary,
-    },
-
-    error: {
-      backgroundColor: colors.feedback.error,
-      borderColor: colors.feedback.error,
-    },
-    errorText: {
-      color: colors.text.onPrimary,
-    },
-
-    warning: {
-      backgroundColor: colors.feedback.warning,
-      borderColor: colors.feedback.warning,
-    },
-    warningText: {
-      color: colors.text.primary,
-    },
-
-    info: {
-      backgroundColor: colors.feedback.info,
-      borderColor: colors.feedback.info,
-    },
-    infoText: {
-      color: colors.text.onPrimary,
-    },
-
-    outline: {
-      backgroundColor: 'transparent',
-      borderColor: colors.primary.main,
-    },
-    outlineText: {
-      color: colors.primary.main,
-    },
-
-    ghost: {
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-    },
-    ghostText: {
-      color: colors.primary.main,
-    },
-
-    floating: {
-      backgroundColor: colors.gray[900] + 'CC',
-      width: 56,
-      height: 56,
-      borderRadius: 28,
+    iconContainer: {
       justifyContent: 'center',
-      alignItems: 'center',
-      ...Shadow(colors).md,
     },
-    floatingText: {
-      color: colors.text.onPrimary,
-    },
-
-    textVariant: {
-      backgroundColor: 'transparent',
-      borderColor: 'transparent',
-      padding: 0,
-    },
-    textVariantText: {
-      color: colors.text.primary,
-    },
-
-    // Sizes
-    sm: {
-      paddingVertical: Spacing.xs,
-      paddingHorizontal: Spacing.sm,
-    },
-    smText: {
-      fontSize: Typography.fontSize.sm,
-    },
-
-    md: {
-      paddingVertical: Spacing.sm,
-      paddingHorizontal: Spacing.md,
-    },
-    mdText: {
-      fontSize: Typography.fontSize.md,
-    },
-
-    lg: {
-      paddingVertical: Spacing.md,
-      paddingHorizontal: Spacing.lg,
-    },
-    lgText: {
-      fontSize: Typography.fontSize.lg,
-    },
-
-    // Icon positioning
     iconLeft: {
       marginRight: Spacing.sm,
     },
-
     iconRight: {
       marginLeft: Spacing.sm,
     },
-  });
+    primary: {},
+    primaryText: {},
+    xs: {},
+    xsText: {},
+  };
+  baseStyles.primary = {
+    backgroundColor: colors.primary.main,
+    borderColor: colors.primary.main,
+  };
+
+  baseStyles.primaryText = {
+    color: colors.text.onPrimary,
+  };
+
+  baseStyles.xs = {
+    paddingVertical: Spacing.xxs,
+    paddingHorizontal: Spacing.xs,
+    minHeight: 32,
+  };
+
+  baseStyles.xsText = {
+    fontSize: Typography.fontSize.xs,
+  };
+
+  return StyleSheet.create(baseStyles);
 };
 
 export default Button;

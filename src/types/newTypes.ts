@@ -55,6 +55,12 @@ export interface ValidationResults {
   errors: string[];
   warnings: string[];
   isValid: boolean;
+  errorCode?: string;
+  message?: string;
+  details?: {
+    field: string;
+    message: string;
+  }[];
   overallConfidence: number;
   questionsWithIssues: number;
 }

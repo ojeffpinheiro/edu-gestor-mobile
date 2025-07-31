@@ -7,6 +7,7 @@ import {
     CustomErrorOptions
 } from '../types/feedback';
 import { defaultErrorMappings } from '../utils/error/errorMappings';
+import { ValidationResults } from '../types/newTypes';
 
 const DEFAULT_DURATIONS = {
     success: 3000,
@@ -221,7 +222,6 @@ const useErrorSystem = (): ErrorSystemAPI => {
     }, [getErrorConfig, log, showFeedback]);
 
     // Mostrar erro customizado
-
     const showCustomError = useCallback((options: CustomErrorOptions) => {
         const { title, message, actions = [], persistent = false, haptic = true } = options;
         log('error', `[custom_error] ${title}: ${message}`);
@@ -251,6 +251,22 @@ const useErrorSystem = (): ErrorSystemAPI => {
         );
     }, []);
 
+
+    const showValidationError = (validationResult: ValidationResults) => {
+        const config = getErrorConfig(validationResult.errorCode || "validation_error");
+
+        showFeedback({
+            type: config.feedbackType || "error",
+            title: config.title,
+            message: [
+                validationResult.message,
+                ...(validationResult.details?.map(d => `• ${d.field}: ${d.message}`) || [])
+            ].join("\n"),
+            actions: config.actions,
+            persistent: true
+        });
+    };
+
     // Atualizar nível de log
     const setLogLevel = useCallback((level: LogLevel) => {
         logger.level = level;
@@ -258,8 +274,9 @@ const useErrorSystem = (): ErrorSystemAPI => {
 
     // API exposta pelo hook
     return useMemo(() => ({
-        showError,
         retryStatesRef,
+        showValidationError,
+        showError,
         showCustomError,
         registerError,
         updateError,

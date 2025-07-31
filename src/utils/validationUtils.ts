@@ -5,6 +5,8 @@ import * as yup from 'yup';
 interface ValidationResult {
   isValid: boolean;
   message?: string;
+  details?: { field: string; message: string }[];
+  errorCode?: string;
 }
 
 export const validateQuestionCount = (count: number): ValidationResult => {
@@ -83,20 +85,94 @@ const getImageDimensions = (uri: string): Promise<{width: number, height: number
   });
 };
 
+// Mensagens customizadas
+const messages = {
+  required: (field: string) => `🔹 ${field} é obrigatório`,
+  min: (field: string, min: number) => `🔹 ${field} precisa ter no mínimo ${min} caracteres`,
+  max: (field: string, max: number) => `🔹 ${field} não pode ter mais que ${max} caracteres`,
+  matches: (field: string, pattern: string) => `🔹 ${field} contém caracteres inválidos`,
+  email: "🔹 Email inválido",
+  invalid: (field: string) => `🔹 ${field} está incorreto`
+};
+
+// Schema de Aluno Aprimorado
 export const studentSchema = yup.object().shape({
-  id: yup.string().required('ID é obrigatório'),
+  id: yup.string()
+    .required(messages.required("ID do aluno")),
+
   name: yup.string()
-    .required('Nome é obrigatório')
-    .min(3, 'Nome deve ter pelo menos 3 caracteres')
-    .max(100, 'Nome não pode exceder 100 caracteres'),
-  registrationNumber: yup.string()
-    .required('Matrícula é obrigatória')
-    .matches(/^[A-Za-z0-9]+$/, 'Matrícula deve conter apenas letras e números'),
+    .required(messages.required("Nome completo"))
+    .min(3, messages.min("Nome", 3))
+    .max(100, messages.max("Nome", 100))
+    .matches(
+      /^[A-Za-záàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ\s]+$/,
+      messages.matches("Nome", "apenas letras e espaços")
+    )
+    .test(
+      "full-name",
+      "🔹 Informe nome e sobrenome",
+      value => (value?.trim().split(" ")?.length || 0) >= 2
+    ),
+
   class: yup.string()
-    .required('Turma é obrigatória')
-    .max(10, 'Turma não pode exceder 10 caracteres')
+    .required(messages.required("Turma"))
+    .max(10, messages.max("Turma", 10))
+    .matches(
+      /^[A-Za-z0-9]+$/,
+      messages.matches("Turma", "apenas letras e números")
+    )
 });
 
+// Schema de Busca Aprimorado
 export const searchInputSchema = yup.string()
-  .max(50, 'Busca muito longa (máx. 50 caracteres)')
-  .matches(/^[A-Za-z0-9\sáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ]*$/, 'Busca contém caracteres inválidos');
+  .max(50, messages.max("Termo de busca", 50))
+  .matches(
+    /^[A-Za-z0-9\sáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ]*$/,
+    "🔹 Busca deve conter:\n- Apenas letras, números e espaços\n- Mínimo 3 caracteres"
+  )
+  .test(
+    "min-length",
+    "🔹 Digite pelo menos 3 caracteres para buscar",
+    value => !value || value.length >= 3
+  );
+
+// Validação com tratamento detalhado de erros
+export const validateStudent = async (student: any): Promise<ValidationResult> => {
+  try {
+    await studentSchema.validate(student, { abortEarly: false });
+    return { isValid: true };
+  } catch (err) {
+    if (err instanceof yup.ValidationError) {
+      const errorDetails = err.inner.map(e => ({
+        field: e.path,
+        message: e.message
+      }));
+
+      return {
+        isValid: false,
+        message: "Corrija os seguintes campos:",
+        details: errorDetails,
+        errorCode: "student_invalid_data"
+      };
+    }
+    return {
+      isValid: false,
+      message: "Erro desconhecido na validação",
+      errorCode: "validation_error"
+    };
+  }
+};
+
+// Validação de busca com tratamento amigável
+export const validateSearch = (term: string): ValidationResult => {
+  try {
+    searchInputSchema.validateSync(term);
+    return { isValid: true };
+  } catch (err) {
+    return {
+      isValid: false,
+      message: err.message,
+      errorCode: "search_invalid_term"
+    };
+  }
+};

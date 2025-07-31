@@ -58,7 +58,7 @@ export const mockStudents = [
     id: '4',
     name: 'Ana Costa',
     registrationNumber: '901234',
-    class: 'Biologia',
+    class: '3A',
     // Aqui, sem a foto
   },
   {
@@ -71,35 +71,35 @@ export const mockStudents = [
     id: '6',
     name: 'Carla Mendes',
     registrationNumber: '678901',
-    class: 'História',
+    class: '3C',
     photo: 'https://example.com/photos/carla.jpg'
   },
   {
     id: '7',
     name: 'Felipe Rocha',
     registrationNumber: '234567',
-    class: 'Geografia'
+    class: '7A'
     // sem foto
   },
   {
     id: '8',
     name: 'Bruna Almeida',
     registrationNumber: '890123',
-    class: 'Filosofia',
+    class: '3A',
     photo: 'https://example.com/photos/bruna.jpg'
   },
   {
     id: '9',
     name: 'Ricardo Lima',
     registrationNumber: '456789',
-    class: 'Matemática',
+    class: '3B',
     photo: 'https://example.com/photos/ricardo.jpg'
   },
   {
     id: '10',
     name: 'Juliana Martins',
     registrationNumber: '112233',
-    class: 'Sociologia'
+    class: '3C'
     // sem foto
   },
 ];

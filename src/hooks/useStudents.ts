@@ -4,6 +4,7 @@ import { mockStudents } from '../mocks/scannerMocks';
 import { Student } from '../types/newTypes';
 import { useUserFeedback } from './useUserFeedback';
 import { useSelection } from './useSelection';
+import { usePagination } from './usePagination';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -12,12 +13,9 @@ interface UseStudentsProps {
 const PAGE_SIZE = 10;
 
 export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps = {}) => {
-  const [students, setStudents] = useState<Student[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  const [hasMore, setHasMore] = useState<boolean>(true);
-  const [currentPage, setCurrentPage] = useState<number>(1);
   
   const { showFeedback } = useUserFeedback();
   const {
@@ -30,6 +28,18 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   } = useSelection<Student>({
     initialSelectedItems: initialSelectedStudents,
   });
+  const {
+    items: students,
+    currentPage,
+    hasMore,
+    isLoading: isLoadingMore,
+    loadMore: loadMoreStudents,
+    setItems: setStudents,
+  } = usePagination<Student>({ pageSize: 10 });
+
+  const selection = useSelection<Student>({
+    initialSelectedItems: initialSelectedStudents,
+  });
 
   // Carrega os alunos (mock ou API)
   useEffect(() => {
@@ -37,14 +47,14 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
       try {
         setIsLoading(true);
         // Simula chamada assíncrona
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const initialStudents = await fetchStudents(1);
 
         // Aqui viria a chamada real à API
         // const response = await api.get('/students');
         // setStudents(response.data);
 
         // Usando mock por enquanto
-        setStudents(mockStudents);
+        setStudents(initialStudents);
       } catch (err) {
         setError('Falha ao carregar alunos');
         console.error('Error loading students:', err);
@@ -98,29 +108,6 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     }
   };
 
-  const loadMoreStudents = async () => {
-    if (!hasMore || isLoading) return;
-
-    setIsLoading(true);
-    try {
-      const nextPage = currentPage + 1;
-      const newStudents = await fetchStudents(nextPage);
-
-      setStudents(prev => [...prev, ...newStudents]);
-      setCurrentPage(nextPage);
-      setHasMore(newStudents.length === PAGE_SIZE);
-    } catch (error) {
-      showFeedback({
-        type: 'error',
-        message: 'Falha ao carregar mais alunos',
-        useAlert: true
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  
   return {
     students: filteredStudents,
     selectedStudents,

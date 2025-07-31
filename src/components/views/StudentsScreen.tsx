@@ -25,7 +25,6 @@ import { AuthView, Student } from '../../types/newTypes';
 
 import Button from '../common/Button';
 import SectionHeader from '../common/SectionHeader';
-
 import SearchBar from '../common/SearchBar';
 import SelectionBar from '../common/SelectionBar';
 

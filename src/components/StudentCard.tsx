@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { Check } from 'lucide-react-native';
-import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../context/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 import { Student } from '../types/newTypes';
 import { studentSchema } from '../utils/validationUtils';
 import useErrorSystem from '../hooks/useErrorSystem';
+
 interface StudentCardProps {
   student: Student;
   isSelected: boolean;

@@ -10,7 +10,7 @@ import {
   StyleProp
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
-import { Spacing, BorderRadius, Typography, Shadow } from '../../styles/designTokens';
+import { Spacing, BorderRadius, Typography } from '../../styles/designTokens';
 import { ColorScheme } from '../../styles/colors';
 import { useAnimation } from '../../hooks/useAnimation';
 

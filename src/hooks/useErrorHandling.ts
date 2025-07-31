@@ -1,29 +1,53 @@
 import { Alert, Linking, Platform } from 'react-native';
 import { useUserFeedback } from './useUserFeedback';
+import { useState } from 'react';
 
 type ErrorAction = {
   text: string;
   onPress: () => void;
 };
 
-interface ErrorMapping {
-  [key: string]: {
-    title: string;
-    message: string;
-    actions?: ErrorAction[];
-    troubleshooting?: string[];
-  };
+interface ErrorConfig {
+  title: string;
+  message: string;
+  actions?: ErrorAction[];
+  troubleshooting?: string[];
 }
+
+interface ErrorMapping {
+  [key: string]: ErrorConfig;
+}
+
+export type ErrorCode =
+  | 'default'
+  | 'camera_permission_denied'
+  | 'gallery_permission_denied'
+  | 'camera_not_available'
+  | 'image_processing_failed'
+  | 'point_analysis_failed'
+  | 'gallery_access_failed'
+  | 'capture_failed'
+  | 'image_validation'
+  | 'invalid_question_count'
+  | 'invalid_input'
+  | 'no_pending_exams'
+  | 'network_error'
+  | string; // Permite códigos customizados
 
 interface ShowErrorOptions {
   useToast?: boolean;
   useFeedback?: boolean;
   retry?: () => Promise<void> | void;
   retryCount?: number;
+  currentRetry?: number;
 }
 
 const useErrorHandling = () => {
   const { showFeedback, showToast } = useUserFeedback();
+  const [retryStates, setRetryStates] = useState<Record<string, {
+    count: number;
+    current: number;
+  }>>({});
 
   const openAppSettings = () => {
     Linking.openSettings().catch(() => {
@@ -179,79 +203,144 @@ const useErrorHandling = () => {
     },
   };
 
-  const getErrorConfig = (errorCode: string) => {
+  const getErrorConfig = (errorCode: ErrorCode): ErrorConfig => {
     return errorMappings[errorCode] || errorMappings.default;
   };
 
-  const showError = (errorCode: string, error?: Error, options?: {
-    useToast?: boolean;
-    useFeedback?: boolean;
-  }) => {
+  const showError = (
+    errorCode: ErrorCode,
+    error?: Error | string,
+    options?: ShowErrorOptions
+  ) => {
     const config = getErrorConfig(errorCode);
     const errorMessage = typeof error === 'string' ? error : error?.message;
+    const retryCount = options?.retryCount ?? 0;
+    const currentRetry = options?.currentRetry ?? 0;
+
+    // Atualiza estado de retry
+    if (options?.retry) {
+      setRetryStates(prev => ({
+        ...prev,
+        [errorCode]: {
+          count: retryCount,
+          current: currentRetry
+        }
+      }));
+    }
 
     // Log detalhado para desenvolvedores
     console.error(`[${errorCode}] ${errorMessage || config.message}`, {
       error,
-      troubleshooting: config.troubleshooting
+      troubleshooting: config.troubleshooting,
+      retryInfo: options?.retry ? `${currentRetry}/${retryCount}` : undefined
     });
 
+    // Prepara mensagem com contador de retry se aplicável
+    let displayMessage = errorMessage || config.message;
+    if (options?.retry && retryCount > 0) {
+      displayMessage += `\n\n(Tentativa ${currentRetry + 1} de ${retryCount + 1})`;
+    }
+
     // Monta os botões de ação
-    const buttons = [
+    const buttons: ErrorAction[] = [
       ...(config.actions || []),
-      { text: 'Entendi', onPress: () => { } }
+      {
+        text: 'Entendi',
+        onPress: () => { }
+      }
     ];
 
+    // Adiciona ação de retry se disponível
+    if (options?.retry && currentRetry < retryCount) {
+      buttons.unshift({
+        text: 'Tentar novamente',
+        onPress: async () => {
+          try {
+            await options.retry?.();
+          } catch (err) {
+            // Chama recursivamente com contador incrementado
+            showError(errorCode, err as Error, {
+              ...options,
+              currentRetry: currentRetry + 1
+            });
+          }
+        }
+      });
+    }
+
     if (options?.useToast) {
-      showToast(config.message, 'error', 3000);
+      showToast(displayMessage, 'error', 3000);
     } else if (options?.useFeedback) {
       showFeedback({
         type: 'error',
-        message: 'Ocorreu um erro durante o processamento',
+        message: displayMessage,
         useAlert: true
       });
     } else {
       // Mostrar alerta padrão
-    }
+      Alert.alert(
+        config.title,
+        displayMessage,
+        buttons
+      );
 
-    Alert.alert(
-      config.title,
-      errorMessage || config.message,
-      buttons
-    );
-
-    // Para erros mais complexos, mostra um segundo alerta com dicas
-    if (config.troubleshooting && config.troubleshooting.length > 0) {
-      setTimeout(() => {
-        Alert.alert(
-          'Como resolver?',
-          config.troubleshooting!.join('\n\n• '),
-          [{ text: 'OK', onPress: () => { } }]
-        );
-      }, 500);
+      // Para erros mais complexos, mostra um segundo alerta com dicas
+      if (config.troubleshooting && config.troubleshooting.length > 0) {
+        setTimeout(() => {
+          Alert.alert(
+            'Como resolver?',
+            config.troubleshooting!.join('\n\n• '),
+            [{ text: 'OK', onPress: () => { } }]
+          );
+        }, 500);
+      }
     }
   };
 
-  const showCustomError = (title: string, message: string, action?: () => void) => {
+  const showCustomError = (
+    title: string, 
+    message: string, 
+    action?: () => void,
+    options?: {
+      retry?: () => Promise<void> | void;
+      retryCount?: number;
+    }
+  ) => {
     console.error(`[custom_error] ${title}: ${message}`);
 
-    Alert.alert(
-      title,
-      message,
-      [
-        {
-          text: 'OK',
-          onPress: action || (() => { })
+    const buttons = [
+      {
+        text: 'OK',
+        onPress: action || (() => {})
+      }
+    ];
+
+    // Adiciona retry se fornecido
+    if (options?.retry && options.retryCount) {
+      buttons.unshift({
+        text: 'Tentar novamente',
+        onPress: async () => {
+          try {
+            await options.retry?.();
+          } catch (err) {
+            showCustomError(title, message, action, {
+              retry: options.retry,
+              retryCount: options.retryCount ? options.retryCount - 1 : 0
+            });
+          }
         }
-      ]
-    );
+      });
+    }
+
+    Alert.alert(title, message, buttons);
   };
 
   return {
     showError,
     showCustomError,
     errorMappings,
-    getErrorConfig
+    getErrorConfig,
+    retryStates
   };
 };
 

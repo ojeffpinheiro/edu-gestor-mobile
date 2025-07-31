@@ -1,15 +1,15 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import { BarcodeScanningResult } from 'expo-camera';
 import { mockBarcodes, mockQRcodes } from '../mocks/scannerMocks';
-import { useUserFeedback } from './useUserFeedback';
 import { ScanType } from '../types/authTypes';
+import useErrorSystem from './useErrorSystem';
 
 interface UseScannerEngineProps {
   activeMode: ScanType
 }
 
 export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
 
   const [scannedCode, setScannedCode] = useState<string>('');
   const [isValidating, setIsValidating] = useState<boolean>(false);
@@ -35,7 +35,10 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
           return;
         } else {
           setScannedCode(result.data);
-          showFeedback({ type: 'success', message: 'Sucesso!' });
+          errorSystem.showCustomError({
+            title: 'Sucesso!',
+            message: 'Sucesso'
+          });
         }
         setIsValidating(false);
       }, 500);
@@ -44,7 +47,7 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
     } finally {
       setIsValidating(false);
     }
-  }, [validateScannedCode, showFeedback, isValidating]);
+  }, [validateScannedCode, isValidating]);
 
   const resetScanner = useCallback(() => {
     setScannedCode('');
@@ -95,12 +98,11 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
       validation_failed: 'Falha na validação do código.'
     };
 
-    showFeedback({
-      type: 'error',
-      message: messages[errorType],
-      haptic: true
+    errorSystem.showCustomError({
+      title: 'Erro',
+      message: messages[errorType]
     });
-  }, [showFeedback]);
+  }, [errorSystem]);
 
   return {
     scannedCode,

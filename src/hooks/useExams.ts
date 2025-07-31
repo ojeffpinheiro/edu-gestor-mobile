@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { correctExam } from "../utils/examUtils";
 import { initialExams } from "../mocks/scannerMocks";
-import useErrorHandling from "./useErrorHandling";
 import { ExamResult } from "../types/examTypes";
+import useErrorSystem from "./useErrorSystem";
 
 interface ExamError {
   title: string;
@@ -17,7 +17,7 @@ export const useExams = () => {
   const [exams, setExams] = useState<ExamResult[]>(initialExams);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<ExamError | null>(null);
-  const { showError } = useErrorHandling();
+  const { showError } = useErrorSystem();
 
   const processAllPendingExams = async (answerKey: string[]) => {
     if (!validateInputs(answerKey)) return;

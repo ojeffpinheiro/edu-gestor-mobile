@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Camera } from 'expo-camera';
 import { Linking } from 'react-native';
-import { useUserFeedback } from './useUserFeedback';
+import useErrorSystem from './useErrorSystem';
 
 type PermissionStatus = 'undetermined' | 'granted' | 'denied';
 
 export const useCameraPermission = () => {
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
   const [status, setStatus] = useState<PermissionStatus>('undetermined');
   const [isChecking, setIsChecking] = useState(true);
 
@@ -33,26 +33,23 @@ export const useCameraPermission = () => {
       setStatus(newStatus);
       return newStatus;
     } catch (error) {
-      showFeedback({
-        type: 'error',
-        message: 'Failed to request camera permissions',
-        haptic: true
+      errorSystem.showCustomError({
+        title: 'Erro de permissão',
+        message: 'Falha ao solicitar permissões da câmera'
       });
-      setStatus('denied');
       return 'denied';
     } finally {
       setIsChecking(false);
     }
   };
-
+  
   const openSettings = async () => {
     try {
       await Linking.openSettings();
     } catch (error) {
-      showFeedback({
-        type: 'error',
-        message: 'Não foi possível abrir as configurações',
-        haptic: true
+      errorSystem.showCustomError({
+        title: 'Erro',
+        message: 'Não foi possível abrir as configurações'
       });
     }
   };

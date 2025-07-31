@@ -98,6 +98,18 @@ export interface ShowErrorOptions {
   persistent?: boolean;
 }
 
+export interface CustomErrorOptions {
+  title: string;
+  message: string;
+  actions?: Array<{
+    text: string;
+    onPress: () => void;
+    style?: 'default' | 'cancel' | 'destructive';
+  }>;
+  persistent?: boolean;
+  haptic?: boolean;
+}
+
 export type ErrorCode =
   | 'default'
   | 'camera_permission_denied'

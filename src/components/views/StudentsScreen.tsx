@@ -15,21 +15,24 @@ import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../../context/ThemeContext';
+
 import { useStudents } from '../../hooks/useStudents';
+import useErrorSystem from '../../hooks/useErrorSystem';
+import { useAnimation } from '../../hooks/useAnimation';
+import { useSelection } from '../../hooks/useSelection';
 
 import { AuthView, Student } from '../../types/newTypes';
 
 import Button from '../common/Button';
 import SectionHeader from '../common/SectionHeader';
 
-import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
-import { useAnimation } from '../../hooks/useAnimation';
-import { useUserFeedback } from '../../hooks/useUserFeedback';
-import StudentCard from '../StudentCard';
 import SearchBar from '../common/SearchBar';
 import SelectionBar from '../common/SelectionBar';
-import { useSelection } from '../../hooks/useSelection';
+
+import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
 import SelectionCounter from '../features/SelectionCounter';
+
+import StudentCard from '../StudentCard';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -58,7 +61,7 @@ const StudentsScreen = ({
   const { colors } = useTheme();
   const styles = createStudentsScreenStyles(colors);
   const navigation = useNavigation();
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
   const { opacity, scale, animateIn, animateOut } = useAnimation({
     initialOpacity: 0,
     initialScale: 0.9
@@ -111,10 +114,10 @@ const StudentsScreen = ({
       tension: 40,
       useNativeDriver: true,
     }).start();
-    showFeedback({
-      type: 'success',
+    errorSystem.showCustomError({
+      title: 'Seleção',
       message: `${student.name} ${selectedStudents.some(s => s.id === student.id) ? 'removido' : 'selecionado'}`,
-      duration: 1000
+      haptic: true
     });
   };
 
@@ -133,10 +136,9 @@ const StudentsScreen = ({
 
   const validateSearchInput = (text: string) => {
     if (text.length > 50) {
-      showFeedback({
-        type: 'warning',
-        message: 'Busca muito longa (máx. 50 caracteres)',
-        duration: 2000
+      errorSystem.showCustomError({
+        title: 'Aviso',
+        message: 'Busca muito longa (máx. 50 caracteres)'
       });
       return false;
     }

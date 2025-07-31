@@ -10,9 +10,8 @@ import {
 } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Search, X, ChevronLeft } from 'lucide-react-native';
-import { useUserFeedback } from '../../hooks/useUserFeedback';
-import { searchInputSchema } from '../../utils/validationUtils';
 import { useValidation } from '../../hooks/useValidation';
+import useErrorSystem from '../../hooks/useErrorSystem';
 
 interface SearchBarProps {
   placeholder?: string;
@@ -40,7 +39,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   style
 }) => {
   const { colors } = useTheme();
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
   const { validateSearchTerm } = useValidation();
 
   const [isFocused, setIsFocused] = useState(false);
@@ -87,10 +86,10 @@ const SearchBar: React.FC<SearchBarProps> = ({
   const handleChange = async (text: string) => {
     const validation = validateSearchTerm(text);
     if (!validation.isValid) {
-      showFeedback({
-        type: 'error',
+      errorSystem.showCustomError({
+        title: 'Erro na busca',
         message: validation.message || 'Erro na busca',
-        hapticType: 'error',
+        haptic: true
       });
       return;
     }

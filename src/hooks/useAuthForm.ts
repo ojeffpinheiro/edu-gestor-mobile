@@ -1,9 +1,12 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { Alert } from 'react-native';
 import * as Haptics from 'expo-haptics';
-import { AuthFormErrors, AuthFormState, AuthMode } from '../types/authTypes';
-import { authService } from '../services/authService';
-import { useUserFeedback } from './useUserFeedback';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+
+import { AuthFormErrors, AuthFormState, AuthMode } from '../types/authTypes';
+
+import { authService } from '../services/authService';
+import useErrorSystem from './useErrorSystem';
 
 type ErrorAction = {
   text: string;
@@ -125,8 +128,7 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   const [loginAttempts, setLoginAttempts] = useState(0);
   const [lastAttemptTime, setLastAttemptTime] = useState<number | null>(null);
   const tempShowTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
 
   useEffect(() => {
     return () => {
@@ -144,12 +146,9 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
           const { email, remember } = JSON.parse(savedCredentials);
           setFormState(prev => ({ ...prev, email }));
           setRememberUser(remember);
-
-          showFeedback({
-            type: 'info',
-            message: `Bem-vindo de volta, ${email}`,
-            duration: 2000,
-            position: 'top'
+          errorSystem.showCustomError({
+            title: 'Login realizado!',
+            message: `Bem-vindo de volta, ${formState.email}`
           });
         }
       } catch (error) {
@@ -296,45 +295,17 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   // Mostrar erro
   const showError = useCallback((errorCode: string = 'default', error?: Error, context?: any) => {
     const mapping = ERROR_MAPPINGS[errorCode] || ERROR_MAPPINGS.default;
-    let finalMessage = mapping.message;
 
-    // Adiciona detalhes específicos para alguns erros
-    if (errorCode === 'weak_password' && context?.passwordErrors) {
-      finalMessage += `\n\n• ${context.passwordErrors.join('\n• ')}`;
-    }
-    // Prepara ações com contexto
-    const actionsWithContext = mapping.actions?.map(action => {
-      if (action.text === 'Fazer login') {
-        return { ...action, onPress: () => setMode('login') };
-      }
-      if (action.text === 'Cadastrar') {
-        return { ...action, onPress: () => setMode('register') };
-      }
-      return action;
-    });
-    // Mostra feedback visual
-    showFeedback({
-      type: mapping.severity === 'high' ? 'error' :
-        mapping.severity === 'medium' ? 'warning' : 'info',
+    errorSystem.showCustomError({
       title: mapping.title,
-      message: finalMessage,
-      actions: actionsWithContext,
-      persistent: !mapping.autoHide,
-      haptic: true
+      message: mapping.message + (context?.passwordErrors ? `\n\n• ${context.passwordErrors.join('\n• ')}` : ''),
+      actions: mapping.actions?.map(action => ({
+        text: action.text,
+        onPress: action.onPress,
+        style: action.style === 'primary' ? 'default' : 'cancel'
+      }))
     });
-
-
-    // Atualiza estado de erros
-    setErrors(prev => ({
-      ...prev,
-      general: finalMessage.split('\n')[0] // Pega apenas a primeira linha para o formulário
-    }));
-    console.error(`[${errorCode}] ${error?.message || mapping.message}`, {
-      error,
-      context,
-      troubleshooting: mapping.troubleshooting
-    });
-  }, [showFeedback]);
+  }, [errorSystem]);
 
   const checkLoginAttempts = useCallback(() => {
     const now = Date.now();
@@ -381,11 +352,10 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         setLoginAttempts(0);
         setLastAttemptTime(null);
 
-        showFeedback({
-          type: 'success',
+
+        errorSystem.showCustomError({
           title: 'Login realizado!',
-          message: `Bem-vindo de volta, ${formState.email}`,
-          duration: 2000
+          message: `Bem-vindo de volta, ${formState.email}`
         });
         return true;
       } else {
@@ -399,20 +369,22 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         }
 
         await authService.register(formState.email, formState.password);
-
-        showFeedback({
-          type: 'success',
-          title: 'Cadastro concluído!',
-          message: 'Sua conta foi criada com sucesso',
-          actions: [
+        
+        Alert.alert(
+          'Cadastro concluído!',
+          'Sua conta foi criada com sucesso. Deseja fazer login agora?',
+          [
             {
-              text: 'Fazer login agora',
-              onPress: () => setMode('login'),
-              style: 'primary'
+              text: 'Fazer login',
+              onPress: () => toggleAuthMode(),
+              style: 'default'
+            },
+            {
+              text: 'Mais tarde',
+              style: 'cancel'
             }
-          ],
-          persistent: true
-        });
+          ]
+        );
         return true;
       }
     } catch (error) {
@@ -437,11 +409,16 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
   const toggleRememberUser = useCallback(() => {
     setRememberUser(prev => !prev);
     if (!rememberUser && formState.email) {
-      showFeedback({
-        type: 'info',
-        message: 'Seu e-mail será lembrado',
-        duration: 1500,
-        position: 'top'
+      errorSystem.showCustomError({
+        title: 'Cadastro concluído!',
+        message: 'Sua conta foi criada com sucesso',
+        actions: [
+          {
+            text: 'Fazer login agora',
+            onPress: () => setMode('login'),
+            style: 'default'
+          }
+        ]
       });
     }
   }, [rememberUser, formState.email]);

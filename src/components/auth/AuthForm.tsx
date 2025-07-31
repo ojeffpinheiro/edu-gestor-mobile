@@ -1,20 +1,17 @@
 import React from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Platform, KeyboardAvoidingView, ActivityIndicator, Alert } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useAuthForm } from '../../hooks/useAuthForm';
-import { useUserFeedback } from '../../hooks/useUserFeedback';
-
-import Feedback from '../common/Feedback';
+import useErrorSystem from '../../hooks/useErrorSystem';
 
 import createAuthStyles from './authStyles';
 
 const AuthForm = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createAuthStyles(colors);
-
-  const { showFeedback, feedbackConfig, hideFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
 
   const {
     mode, formState, errors, touched, isLoading, passwordErrors,
@@ -27,58 +24,44 @@ const AuthForm = ({ setCurrentView }) => {
       const success = await handleSubmit();
       if (success && mode === 'login') {
         // Feedback com título e fechamento automático
-        showFeedback({
-          type: 'success',
+        errorSystem.showCustomError({
           title: 'Bem-vindo!',
-          message: 'Login realizado com sucesso',
-          duration: 2000,
-          haptic: true
+          message: 'Login realizado com sucesso'
         });
         setTimeout(() => setCurrentView('scanner'), 1500);
       } else if (success && mode === 'register') {
         // Feedback persistente que requer ação do usuário
-        showFeedback({
-          type: 'success',
-          title: 'Cadastro concluído!',
-          message: 'Sua conta foi criada com sucesso. Deseja fazer login agora?',
-          persistent: true,
-          actions: [
+        Alert.alert(
+          'Cadastro concluído!',
+          'Sua conta foi criada com sucesso. Deseja fazer login agora?',
+          [
             {
               text: 'Fazer login',
-              onPress: () => {
-                toggleAuthMode();
-                hideFeedback();
-              },
-              style: 'primary'
+              onPress: () => toggleAuthMode(),
+              style: 'default'
             },
             {
               text: 'Mais tarde',
-              onPress: hideFeedback,
-              style: 'secondary'
+              style: 'cancel'
             }
           ]
-        });
+        );
       }
     } catch (error) {
       // Feedback de erro com ações
-      showFeedback({
-        type: 'error',
+      errorSystem.showCustomError({
         title: 'Erro',
         message: error.message || 'Ocorreu um erro durante a autenticação',
         actions: [
           {
             text: 'Entendi',
-            onPress: hideFeedback,
-            style: 'primary'
+            onPress: () => { },
+            style: 'default'
           },
           {
             text: 'Ajuda',
-            onPress: () => {
-              // Navegar para tela de ajuda
-              hideFeedback();
-              setCurrentView('help');
-            },
-            style: 'secondary'
+            onPress: () => setCurrentView('help'),
+            style: 'destructive'
           }
         ]
       });
@@ -90,32 +73,25 @@ const AuthForm = ({ setCurrentView }) => {
     handleChange('password', 'Senha123');
 
     // Feedback informativo com toque para fechar
-    showFeedback({
-      type: 'info',
-      message: 'Dados de teste preenchidos. Toque para fechar.',
-      position: 'top',
-      duration: 0, // Persistente até o usuário tocar
-      haptic: true
-    });
+    Alert.alert('Informação', 'Dados de teste preenchidos.');
   };
 
   const handleForgotPassword = () => {
     // Feedback com ação única
-    showFeedback({
-      type: 'warning',
+
+    errorSystem.showCustomError({
       title: 'Esqueceu sua senha?',
       message: 'Deseja redefinir sua senha agora?',
       actions: [
         {
           text: 'Redefinir',
           onPress: () => {
-            hideFeedback();
-            setCurrentView('resetPassword');
+            // Implemente sua lógica de redefinição aqui
+            console.log('Redefinir senha');
           },
-          style: 'primary'
+          style: 'default'
         }
-      ],
-      persistent: true
+      ]
     });
   };
 
@@ -125,11 +101,6 @@ const AuthForm = ({ setCurrentView }) => {
       style={styles.container}
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <Feedback
-          visible={feedbackConfig.visible}
-          options={feedbackConfig.options}
-          onHide={hideFeedback}
-        />
         <View style={styles.logoContainer}>
           <View style={styles.logo}>
             <Text style={styles.logoText}>TECHNO</Text>
@@ -166,13 +137,6 @@ const AuthForm = ({ setCurrentView }) => {
                   style={styles.clearButton}
                   onPress={() => {
                     handleChange('email', '');
-                    // Feedback rápido ao limpar campo
-                    showFeedback({
-                      type: 'info',
-                      message: 'Campo limpo',
-                      duration: 1000,
-                      position: 'top'
-                    });
                   }}
                 >
                   <Ionicons name="close-circle" size={20} color={colors.text.secondary} />

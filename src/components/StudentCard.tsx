@@ -7,8 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 import { Student } from '../types/newTypes';
 import { studentSchema } from '../utils/validationUtils';
-import { useUserFeedback } from '../hooks/useUserFeedback';
-
+import useErrorSystem from '../hooks/useErrorSystem';
 interface StudentCardProps {
   student: Student;
   isSelected: boolean;
@@ -24,7 +23,7 @@ const StudentCard: React.FC<StudentCardProps> = ({
 }) => {
   const { colors } = useTheme();
   const { pressAnimation } = useAnimation();
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
 
   const scaleValue = useRef(new Animated.Value(1)).current;
   const borderWidthValue = useRef(new Animated.Value(isSelected ? 2 : 0)).current;
@@ -35,10 +34,10 @@ const StudentCard: React.FC<StudentCardProps> = ({
     pressAnimation({
       scaleTo: 0.9,
       onPress: () => {
-        showFeedback({
-          type: 'success',
+        errorSystem.showCustomError({
+          title: 'Seleção',
           message: 'Aluno selecionado',
-          hapticType: 'light',
+          haptic: true
         });
         onSelect(student);
       },

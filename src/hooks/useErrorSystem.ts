@@ -1,14 +1,18 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
-import { Alert, Linking, Platform } from 'react-native';
+import { Alert } from 'react-native';
 import { triggerHapticFeedback } from '../utils/hapticUtils';
-import { FeedbackType, FeedbackOptions, ErrorCode, ShowErrorOptions, ErrorConfig, ErrorAction, LoggerConfig, LogLevel, ErrorMapping } from '../types/feedback';
+import {
+    FeedbackOptions, ErrorCode, ShowErrorOptions,
+    ErrorConfig, ErrorAction, LoggerConfig, LogLevel,
+    CustomErrorOptions
+} from '../types/feedback';
 import { defaultErrorMappings } from '../utils/error/errorMappings';
 
 const DEFAULT_DURATIONS = {
-  success: 3000,
-  error: 4000,
-  warning: 3500,
-  info: 2500
+    success: 3000,
+    error: 4000,
+    warning: 3500,
+    info: 2500
 };
 
 interface ErrorSystemAPI {
@@ -17,12 +21,7 @@ interface ErrorSystemAPI {
         error?: Error | string,
         options?: ShowErrorOptions
     ) => void;
-    showCustomError: (
-        title: string,
-        message: string,
-        action?: () => void,
-        options?: ShowErrorOptions
-    ) => void;
+    showCustomError: (options: CustomErrorOptions) => void;
     registerError: (code: string, config: ErrorConfig) => void;
     updateError: (code: string, config: Partial<ErrorConfig>) => void;
     setLogLevel: (level: LogLevel) => void;
@@ -31,9 +30,9 @@ interface ErrorSystemAPI {
 
 // --- Implementação ---
 const useErrorSystem = (): ErrorSystemAPI => {
-  const [errorMappings, setErrorMappings] = useState(defaultErrorMappings);
+    const [errorMappings, setErrorMappings] = useState(defaultErrorMappings);
     // Configuração do logger
-    
+
     const [logger] = useState<LoggerConfig>({
         level: __DEV__ ? 'debug' : 'error',
         debug: (...args) => console.debug('[DEBUG]', ...args),
@@ -222,48 +221,35 @@ const useErrorSystem = (): ErrorSystemAPI => {
     }, [getErrorConfig, log, showFeedback]);
 
     // Mostrar erro customizado
-    const showCustomError = useCallback((
-        title: string,
-        message: string,
-        action?: () => void,
-        options?: ShowErrorOptions
-    ) => {
+
+    const showCustomError = useCallback((options: CustomErrorOptions) => {
+        const { title, message, actions = [], persistent = false, haptic = true } = options;
         log('error', `[custom_error] ${title}: ${message}`);
 
-        const buttons: ErrorAction[] = [{
-            text: 'OK',
-            onPress: action || (() => { }),
-            alertStyle: 'default',
-            feedbackStyle: 'secondary'
-        }];
+        if (haptic) triggerHapticFeedback('error');
 
-        // Adiciona retry se fornecido
-        if (options?.retry && options.retryCount && (options.currentRetry || 0) < (options.retryCount || 0)) {
-            buttons.unshift({
-                text: 'Tentar novamente',
-                onPress: async () => {
-                    try {
-                        await options.retry?.();
-                    } catch (err) {
-                        showCustomError(title, message, action, {
-                            ...options,
-                            currentRetry: (options.currentRetry || 0) + 1
-                        });
-                    }
-                },
-                alertStyle: 'destructive',
-                feedbackStyle: 'primary'
+        const alertButtons = actions.map(action => ({
+            text: action.text,
+            onPress: action.onPress,
+            style: action.style || 'default'
+        }));
+
+        // Adiciona botão padrão se não houver ações
+        if (actions.length === 0) {
+            alertButtons.push({
+                text: 'OK',
+                onPress: () => { },
+                style: 'default'
             });
-        };
-        showFeedback({
-            type: options?.method === 'toast' ? 'info' : 'error',
+        }
+
+        Alert.alert(
             title,
             message,
-            actions: buttons,
-            haptic: options?.haptic ?? true,
-            persistent: false
-        });
-    }, [log, showFeedback]);
+            alertButtons,
+            { cancelable: !persistent }
+        );
+    }, []);
 
     // Atualizar nível de log
     const setLogLevel = useCallback((level: LogLevel) => {
@@ -278,7 +264,7 @@ const useErrorSystem = (): ErrorSystemAPI => {
         registerError,
         updateError,
         setLogLevel,
-        getErrorConfig
+        getErrorConfig,
     }), [showError, showCustomError, registerError, updateError, setLogLevel, getErrorConfig]);
 };
 

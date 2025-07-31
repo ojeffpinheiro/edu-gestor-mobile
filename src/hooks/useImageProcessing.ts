@@ -12,7 +12,7 @@ import { ExamTemplate } from '../types/newTypes';
 import { CorrectionResult } from '../types/newTypes';
 import { validateImageFile, validateImageQuality, validateLightingConditions } from '../utils/validationUtils';
 import { useResultCalculations } from './useCorrectionState';
-import useErrorHandling from './useErrorHandling';
+import useErrorSystem from './useErrorSystem';
 
 interface ImageProcessingResult {
   uri: string;
@@ -44,7 +44,7 @@ export const useImageProcessing = (examTemplate: ExamTemplate | null) => {
   const [isLandscape, setIsLandscape] = useState(false);
   const [autoCaptureMode, setAutoCaptureMode] = useState<'OFF' | 'FAST' | 'SLOW'>('OFF');
   
-  const { showError } = useErrorHandling();
+const { showError } = useErrorSystem();
   const { generateRandomAnswers, calculateResults } = useResultCalculations();
 
   // Solicitar permissões

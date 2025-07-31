@@ -1,11 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Alert } from 'react-native';
 import { mockStudents } from '../mocks/scannerMocks';
 import { Student } from '../types/newTypes';
-import { useUserFeedback } from './useUserFeedback';
 import { useSelection } from './useSelection';
 import { usePagination } from './usePagination';
-import { searchInputSchema, studentSchema } from '../utils/validationUtils';
+import { studentSchema } from '../utils/validationUtils';
+import useErrorSystem from './useErrorSystem';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -18,7 +17,8 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  const { showFeedback } = useUserFeedback();
+  const errorSystem = useErrorSystem();
+
   const {
     selectedItems: selectedStudents,
     toggleSelection: toggleStudentSelection,
@@ -81,22 +81,20 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
 
   // Confirma seleção (pode ser usado para navegação ou outras ações)
   const confirmSelection = () => {
+
     if (selectedStudents.length === 0) {
-      showFeedback({
-        type: 'error',
-        message: 'Erro ao confirmar seleção',
-        useAlert: true
+      errorSystem.showCustomError({
+        title: 'Nenhum aluno selecionado',
+        message: 'Por favor, selecione pelo menos um aluno.'
       });
-      Alert.alert('Nenhum aluno selecionado', 'Por favor, selecione pelo menos um aluno.');
       return false;
     }
 
     // Aqui você pode adicionar lógica adicional antes de confirmar
     console.log('Alunos selecionados:', selectedStudents);
-    showFeedback({
-      type: 'success',
-      message: 'Aluno(s) selecionado(s) com sucesso!',
-      haptic: true
+    errorSystem.showCustomError({
+      title: 'Sucesso',
+      message: 'Aluno(s) selecionado(s) com sucesso!'
     });
     return true;
   };
@@ -121,10 +119,9 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
       return true;
     } catch (err) {
       console.error('Erro na validação do aluno:', err.message);
-      showFeedback({
-        type: 'error',
-        message: `Dados inválidos para o aluno ${student.name}: ${err.message}`,
-        useAlert: true
+      errorSystem.showCustomError({
+        title: 'Erro de validação',
+        message: `Dados inválidos para o aluno ${student.name}: ${err.message}`
       });
       return false;
     }

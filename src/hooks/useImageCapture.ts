@@ -1,6 +1,6 @@
 // src/hooks/useImageCapture.ts
 import { useState, useEffect, useCallback } from 'react';
-import { Alert, Dimensions } from 'react-native';
+import { Dimensions } from 'react-native';
 import { CameraCapturedPicture } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
@@ -8,9 +8,8 @@ import * as tf from '@tensorflow/tfjs';
 import * as jpeg from 'jpeg-js';
 import chroma from 'chroma-js';
 import { Buffer } from 'buffer';
-import * as Haptics from 'expo-haptics';
-import useErrorHandling from './useErrorHandling';
 import { validateImageFile, validateImageQuality, validateLightingConditions } from '../utils/validationUtils';
+import useErrorSystem from './useErrorSystem';
 
 interface ImageCaptureResult {
   uri: string;
@@ -37,8 +36,8 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const [analysisResult, setAnalysisResult] = useState<{ correctPoints: number; totalPoints: number } | null>(null);
   const [autoCaptureMode, setAutoCaptureMode] = useState<'OFF' | 'FAST' | 'SLOW'>('OFF');
   const [isLandscape, setIsLandscape] = useState(false);
-
-  const { showError } = useErrorHandling();
+  
+  const { showError } = useErrorSystem();
 
   // Solicitar permissões da câmera e galeria
   useEffect(() => {

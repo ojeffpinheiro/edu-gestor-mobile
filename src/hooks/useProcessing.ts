@@ -3,9 +3,8 @@ import * as tf from '@tensorflow/tfjs';
 import { getTensorFromURI } from "../utils/imageUtils";
 import { sampleExamTemplate, sampleStudents } from "../mocks/scannerMocks";
 import { CorrectionResult, ExamTemplate, Student } from "../types/newTypes";
-import useErrorHandling from "./useErrorHandling";
 import { useCorrectionState } from "./useCorrectionState";
-import useImageProcessing from "./useImageProcessing";
+import { useImageProcessing } from "./useImageProcessing";
 
 interface ProcessingLogic {
     currentScreen: string;
@@ -37,7 +36,6 @@ export const useProcessingLogic = (): ProcessingLogic => {
     
     // Hooks auxiliares
     const { processImage } = useImageProcessing(examTemplate);
-    const { showError } = useErrorHandling();
 
     // Inicialização
     useEffect(() => {

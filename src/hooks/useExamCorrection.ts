@@ -3,8 +3,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { ExamTemplate, CorrectionResult, Student } from '../types/newTypes';
 import { sampleExamTemplate, sampleStudents } from '../mocks/scannerMocks';
 import { useImageProcessing } from './useImageProcessing';
-import useErrorHandling from './useErrorHandling';
 import * as Haptics from 'expo-haptics';
+import useErrorSystem from './useErrorSystem';
 
 type ProcessingStatus = 'idle' | 'capturing' | 'processing' | 'completed' | 'failed';
 type AppScreen = 'home' | 'camera' | 'results' | 'review';
@@ -33,7 +33,7 @@ export const useExamCorrection = () => {
     selectedStudents: []
   });
 
-  const { showError } = useErrorHandling();
+  const { showError } = useErrorSystem();
   const { processCapturedImage, captureImage, selectFromGallery } = useImageProcessing(state.examTemplate);
 
   // Inicialização

@@ -23,11 +23,6 @@ const AuthForm = ({ setCurrentView }) => {
     try {
       const success = await handleSubmit();
       if (success && mode === 'login') {
-        // Feedback com título e fechamento automático
-        errorSystem.showCustomError({
-          title: 'Bem-vindo!',
-          message: 'Login realizado com sucesso'
-        });
         setTimeout(() => setCurrentView('scanner'), 1500);
       } else if (success && mode === 'register') {
         // Feedback persistente que requer ação do usuário

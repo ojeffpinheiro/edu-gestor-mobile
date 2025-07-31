@@ -146,10 +146,6 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
           const { email, remember } = JSON.parse(savedCredentials);
           setFormState(prev => ({ ...prev, email }));
           setRememberUser(remember);
-          errorSystem.showCustomError({
-            title: 'Login realizado!',
-            message: `Bem-vindo de volta, ${formState.email}`
-          });
         }
       } catch (error) {
         console.error('Failed to load credentials', error);
@@ -351,12 +347,6 @@ export const useAuthForm = (initialMode: AuthMode = 'login') => {
         // Resetar contador após login bem-sucedido
         setLoginAttempts(0);
         setLastAttemptTime(null);
-
-
-        errorSystem.showCustomError({
-          title: 'Login realizado!',
-          message: `Bem-vindo de volta, ${formState.email}`
-        });
         return true;
       } else {
         // Validar força da senha no registro

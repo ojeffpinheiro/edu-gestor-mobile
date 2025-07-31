@@ -34,9 +34,7 @@ const BarcodeGuide: React.FC<BarcodeGuideProps> = ({
     onMockScan(type);
     errorSystem.showCustomError({
       title: type === 'valid' ? 'Sucesso' : 'Erro',
-      message: type === 'valid'
-        ? 'Código válido detectado!'
-        : 'Código inválido. Por favor, tente novamente.',
+      message: type === 'valid' && 'Código inválido. Por favor, tente novamente.',
       haptic: true
     });
   };

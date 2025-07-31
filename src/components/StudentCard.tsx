@@ -34,11 +34,7 @@ const StudentCard: React.FC<StudentCardProps> = ({
     pressAnimation({
       scaleTo: 0.9,
       onPress: () => {
-        errorSystem.showCustomError({
-          title: 'Seleção',
-          message: 'Aluno selecionado',
-          haptic: true
-        });
+        console.log(`Aluno selecionado : ${student.name}`);
         onSelect(student);
       },
     });

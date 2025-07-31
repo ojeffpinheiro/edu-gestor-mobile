@@ -35,10 +35,6 @@ export const useScannerEngine = ({ activeMode }: UseScannerEngineProps) => {
           return;
         } else {
           setScannedCode(result.data);
-          errorSystem.showCustomError({
-            title: 'Sucesso!',
-            message: 'Sucesso'
-          });
         }
         setIsValidating(false);
       }, 500);

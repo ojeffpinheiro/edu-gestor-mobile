@@ -3,6 +3,7 @@ import { Alert } from 'react-native';
 import { mockStudents } from '../mocks/scannerMocks';
 import { Student } from '../types/newTypes';
 import { useUserFeedback } from './useUserFeedback';
+import { useSelection } from './useSelection';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -12,13 +13,23 @@ const PAGE_SIZE = 10;
 
 export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps = {}) => {
   const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudents, setSelectedStudents] = useState<Student[]>(initialSelectedStudents);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState<boolean>(true);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  
   const { showFeedback } = useUserFeedback();
+  const {
+    selectedItems: selectedStudents,
+    toggleSelection: toggleStudentSelection,
+    toggleSelectAll,
+    isAllSelected,
+    clearSelection,
+    hasSelection,
+  } = useSelection<Student>({
+    initialSelectedItems: initialSelectedStudents,
+  });
 
   // Carrega os alunos (mock ou API)
   useEffect(() => {
@@ -51,27 +62,6 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     student.registrationNumber.includes(searchTerm)
   );
 
-  // Alterna seleção de aluno
-  const toggleStudentSelection = (student: Student) => {
-    setSelectedStudents(prev => {
-      const isSelected = prev.some(s => s.id === student.id);
-      if (isSelected) {
-        return prev.filter(s => s.id !== student.id);
-      } else {
-        return [...prev, student];
-      }
-    });
-  };
-
-  // Seleção múltipla (para selecionar/desselecionar todos)
-  const toggleSelectAll = () => {
-    if (selectedStudents.length === filteredStudents.length) {
-      setSelectedStudents([]);
-    } else {
-      setSelectedStudents([...filteredStudents]);
-    }
-  };
-
   // Confirma seleção (pode ser usado para navegação ou outras ações)
   const confirmSelection = () => {
     if (selectedStudents.length === 0) {
@@ -92,11 +82,6 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
       haptic: true
     });
     return true;
-  };
-
-  // Limpa seleção
-  const clearSelection = () => {
-    setSelectedStudents([]);
   };
 
   const fetchStudents = async (page: number): Promise<Student[]> => {
@@ -135,23 +120,20 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     }
   };
 
-  const selectAllStudents = () => {
-    setSelectedStudents([...filteredStudents]);
-  };
-
+  
   return {
     students: filteredStudents,
     selectedStudents,
     isLoading,
     error,
     searchTerm,
+    filteredStudents,
     setSearchTerm,
     toggleStudentSelection,
     toggleSelectAll,
     confirmSelection,
-    selectAllStudents,
     clearSelection,
-    isAllSelected: selectedStudents.length === filteredStudents.length && filteredStudents.length > 0,
-    hasSelection: selectedStudents.length > 0,
+    isAllSelected,
+    hasSelection,
   };
 };

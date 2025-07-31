@@ -19,9 +19,9 @@ interface SelectionBarProps {
 const SelectionBar: React.FC<SelectionBarProps> = ({
   selectedCount,
   totalCount,
-  onSelectAll,
   onDeselectAll,
   onConfirm,
+  onSelectAll,
   confirmLabel = 'Confirmar',
   isAllSelected = false,
   style

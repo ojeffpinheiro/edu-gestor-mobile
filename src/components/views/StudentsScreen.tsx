@@ -28,6 +28,7 @@ import { useUserFeedback } from '../../hooks/useUserFeedback';
 import StudentCard from '../StudentCard';
 import SearchBar from '../common/SearchBar';
 import SelectionBar from '../common/SelectionBar';
+import { useSelection } from '../../hooks/useSelection';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -64,17 +65,23 @@ const StudentsScreen = ({
 
   const {
     students,
-    selectedStudents,
     isLoading,
     searchTerm,
+    filteredStudents,
     setSearchTerm,
-    toggleStudentSelection,
-    selectAllStudents,
-    clearSelection,
     confirmSelection,
-    isAllSelected,
-    hasSelection
   } = useStudents();
+
+  const {
+    selectedItems: selectedStudents,
+    toggleSelection: toggleStudentSelection,
+    toggleSelectAll,
+    clearSelection,
+    isAllSelected,
+    hasSelection,
+  } = useSelection<Student>({
+    initialSelectedItems: students,
+  });
 
   useEffect(() => {
     if (students.length > 0) {
@@ -380,11 +387,11 @@ const StudentsScreen = ({
         </ScrollView>
         <SelectionBar
           selectedCount={selectedStudents.length}
-          totalCount={students.length}
-          onSelectAll={selectAllStudents}
+          totalCount={filteredStudents.length}
+          onSelectAll={() => toggleSelectAll(filteredStudents)}
           onDeselectAll={clearSelection}
           onConfirm={confirmSelection}
-          isAllSelected={isAllSelected}
+          isAllSelected={isAllSelected(filteredStudents)}
           confirmLabel="Confirmar seleção"
           style={styles.selectionBar}
         />

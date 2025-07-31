@@ -26,6 +26,7 @@ import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
 import { useAnimation } from '../../hooks/useAnimation';
 import { useUserFeedback } from '../../hooks/useUserFeedback';
 import StudentCard from '../StudentCard';
+import SearchBar from '../common/SearchBar';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -247,21 +248,10 @@ const StudentsScreen = ({
               <Text style={styles.headerTitle}>Seleção de Alunos</Text>
             </View>
 
-            <View style={styles.searchContainer}>
-              <SearchIcon size={20} color={colors.text.secondary} style={styles.searchIcon} />
-              <TextInput
-                style={styles.searchInput}
-                placeholder="Buscar por nome ou turma..."
-                placeholderTextColor={colors.text.tertiary}
-                value={searchTerm}
-                onChangeText={handleSearch}
-              />
-              {searchTerm ? (
-                <TouchableOpacity onPress={() => setSearchTerm('')} style={styles.clearSearchButton}>
-                  <X size={20} color={colors.text.secondary} />
-                </TouchableOpacity>
-              ) : null}
-            </View>
+            <SearchBar
+              value={searchTerm}
+              onChangeText={handleSearch}
+              placeholder="Buscar alunos..." />
           </View>
 
           {/* Código Escaneado */}

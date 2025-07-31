@@ -2,6 +2,15 @@ import { Alert, Linking, Platform } from 'react-native';
 import { useUserFeedback } from './useUserFeedback';
 import { useState } from 'react';
 
+type LogLevel = 'debug' | 'info' | 'warn' | 'error';
+
+interface LoggerConfig {
+  level: LogLevel;
+  debug: (...args: any[]) => void;
+  info: (...args: any[]) => void;
+  warn: (...args: any[]) => void;
+  error: (...args: any[]) => void;
+}
 type ErrorAction = {
   text: string;
   onPress: () => void;
@@ -12,6 +21,7 @@ interface ErrorConfig {
   message: string;
   actions?: ErrorAction[];
   troubleshooting?: string[];
+  logLevel?: LogLevel
 }
 
 interface ErrorMapping {
@@ -40,6 +50,8 @@ interface ShowErrorOptions {
   retry?: () => Promise<void> | void;
   retryCount?: number;
   currentRetry?: number;
+  logLevel?: LogLevel;
+  forceFeedbackMethod?: 'toast' | 'alert' | 'feedback';
 }
 
 const useErrorHandling = () => {
@@ -49,12 +61,34 @@ const useErrorHandling = () => {
     current: number;
   }>>({});
 
+  // Configuração do logger
+  const [logger] = useState<LoggerConfig>({
+    level: __DEV__ ? 'debug' : 'error', // Nível mais verboso em desenvolvimento
+    debug: (...args) => console.debug('[DEBUG]', ...args),
+    info: (...args) => console.info('[INFO]', ...args),
+    warn: (...args) => console.warn('[WARN]', ...args),
+    error: (...args) => console.error('[ERROR]', ...args),
+  });
+
+  // Método para log que respeita o nível configurado
+  const log = (level: LogLevel, ...args: any[]) => {
+    const levels: Record<LogLevel, number> = {
+      debug: 0,
+      info: 1,
+      warn: 2,
+      error: 3
+    };
+
+    if (levels[level] >= levels[logger.level]) {
+      logger[level](...args);
+    }
+  };
+
   const openAppSettings = () => {
     Linking.openSettings().catch(() => {
-      Alert.alert(
-        'Não foi possível abrir as configurações',
-        'Por favor, acesse as configurações do aplicativo manualmente.'
-      );
+      showError('settings_open_failed', 'Não foi possível abrir as configurações', {
+        forceFeedbackMethod: 'alert'
+      });
     });
   };
 
@@ -67,7 +101,8 @@ const useErrorHandling = () => {
         'Verifique sua conexão com a internet',
         'Reinicie o aplicativo',
         'Atualize para a versão mais recente do aplicativo'
-      ]
+      ],
+      logLevel: 'error'
     },
     camera_permission_denied: {
       title: 'Permissão da câmera negada',
@@ -82,7 +117,8 @@ const useErrorHandling = () => {
         'Toque em "Abrir Configurações" para conceder permissão',
         'Na tela de configurações, ative a permissão para a câmera',
         'Reinicie o aplicativo após conceder a permissão'
-      ]
+      ],
+      logLevel: 'warn'
     },
     gallery_permission_denied: {
       title: 'Acesso à galeria negado',
@@ -208,28 +244,18 @@ const useErrorHandling = () => {
   };
 
   const showError = (
-    errorCode: ErrorCode,
-    error?: Error | string,
+    errorCode: ErrorCode, 
+    error?: Error | string, 
     options?: ShowErrorOptions
   ) => {
     const config = getErrorConfig(errorCode);
     const errorMessage = typeof error === 'string' ? error : error?.message;
     const retryCount = options?.retryCount ?? 0;
     const currentRetry = options?.currentRetry ?? 0;
+    const logLevel = options?.logLevel || config.logLevel || 'error';
 
-    // Atualiza estado de retry
-    if (options?.retry) {
-      setRetryStates(prev => ({
-        ...prev,
-        [errorCode]: {
-          count: retryCount,
-          current: currentRetry
-        }
-      }));
-    }
-
-    // Log detalhado para desenvolvedores
-    console.error(`[${errorCode}] ${errorMessage || config.message}`, {
+    // Log com nível apropriado
+    log(logLevel, `[${errorCode}] ${errorMessage || config.message}`, {
       error,
       troubleshooting: config.troubleshooting,
       retryInfo: options?.retry ? `${currentRetry}/${retryCount}` : undefined
@@ -241,12 +267,18 @@ const useErrorHandling = () => {
       displayMessage += `\n\n(Tentativa ${currentRetry + 1} de ${retryCount + 1})`;
     }
 
+    // Determina o método de feedback
+    const feedbackMethod = options?.forceFeedbackMethod || 
+      (options?.useToast ? 'toast' : 
+       options?.useFeedback ? 'feedback' : 
+       'alert');
+
     // Monta os botões de ação
     const buttons: ErrorAction[] = [
       ...(config.actions || []),
-      {
-        text: 'Entendi',
-        onPress: () => { }
+      { 
+        text: 'Entendi', 
+        onPress: () => {} 
       }
     ];
 
@@ -258,7 +290,6 @@ const useErrorHandling = () => {
           try {
             await options.retry?.();
           } catch (err) {
-            // Chama recursivamente com contador incrementado
             showError(errorCode, err as Error, {
               ...options,
               currentRetry: currentRetry + 1
@@ -268,32 +299,44 @@ const useErrorHandling = () => {
       });
     }
 
-    if (options?.useToast) {
-      showToast(displayMessage, 'error', 3000);
-    } else if (options?.useFeedback) {
-      showFeedback({
-        type: 'error',
-        message: displayMessage,
-        useAlert: true
-      });
-    } else {
-      // Mostrar alerta padrão
-      Alert.alert(
-        config.title,
-        displayMessage,
-        buttons
-      );
-
-      // Para erros mais complexos, mostra um segundo alerta com dicas
-      if (config.troubleshooting && config.troubleshooting.length > 0) {
-        setTimeout(() => {
-          Alert.alert(
-            'Como resolver?',
-            config.troubleshooting!.join('\n\n• '),
-            [{ text: 'OK', onPress: () => { } }]
-          );
-        }, 500);
-      }
+    // Exibe o feedback usando o método determinado
+    switch (feedbackMethod) {
+      case 'toast':
+        showToast(displayMessage, 'error', 3000);
+        break;
+        
+      case 'feedback':
+        showFeedback({
+          type: 'error',
+          message: displayMessage,
+          title: config.title,
+          actions: buttons.map(btn => ({
+            text: btn.text,
+            onPress: btn.onPress,
+            style: 'primary'
+          })),
+          persistent: true
+        });
+        break;
+        
+      case 'alert':
+      default:
+        Alert.alert(
+          config.title,
+          displayMessage,
+          buttons
+        );
+        
+        if (config.troubleshooting?.length) {
+          setTimeout(() => {
+            Alert.alert(
+              'Como resolver?',
+              config.troubleshooting!.join('\n\n• '),
+              [{ text: 'OK', onPress: () => { } }]
+            );
+          }, 500);
+        }
+        break;
     }
   };
 
@@ -340,7 +383,10 @@ const useErrorHandling = () => {
     showCustomError,
     errorMappings,
     getErrorConfig,
-    retryStates
+    retryStates,
+    setLogLevel: (level: LogLevel) => {
+      logger.level = level;
+    }
   };
 };
 

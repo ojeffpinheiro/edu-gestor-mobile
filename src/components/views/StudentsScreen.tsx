@@ -20,6 +20,7 @@ import { useStudents } from '../../hooks/useStudents';
 import useErrorSystem from '../../hooks/useErrorSystem';
 import { useAnimation } from '../../hooks/useAnimation';
 import { useSelection } from '../../hooks/useSelection';
+import { useStudentSelection } from '../../hooks/useStudentSelection';
 
 import { AuthView, Student } from '../../types/newTypes';
 
@@ -66,26 +67,15 @@ const StudentsScreen = ({
     initialScale: 0.9
   });
 
-  const {
-    students,
-    isLoading,
-    searchTerm,
-    filteredStudents,
-    setSearchTerm,
-    confirmSelection,
+  const { students, isLoading, searchTerm, filteredStudents,
+    setSearchTerm, confirmSelection, handleSearch
   } = useStudents();
 
-  const {
-    selectedItems: selectedStudents,
-    toggleSelection: toggleStudentSelection,
-    toggleSelectAll,
-    clearSelection,
-    isAllSelected,
-    hasSelection,
-    selectionBatch,
-  } = useSelection<Student>({
-    initialSelectedItems: students,
-  });
+  const { selectedItems: selectedStudents, toggleSelection: toggleStudentSelection,
+    toggleSelectAll, clearSelection, isAllSelected, hasSelection, selectionBatch,
+  } = useSelection<Student>({ initialSelectedItems: students });
+
+  const { handleStudentSelect, handleSelectAll,  } = useStudentSelection(students);
 
   useEffect(() => {
     if (students.length > 0) {
@@ -94,31 +84,6 @@ const StudentsScreen = ({
       animateOut();
     }
   }, [students]);
-
-  const handleStudentSelect = (student: Student) => {
-    Haptics.selectionAsync();
-    toggleStudentSelection(student);
-    // Feedback tátil
-    if (Platform.OS === 'android') {
-      if (UIManager.setLayoutAnimationEnabledExperimental) {
-        UIManager.setLayoutAnimationEnabledExperimental(true);
-      }
-    }
-    // Animação mais suave
-    scale.setValue(0.95);
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
-    Animated.spring(scale, {
-      toValue: 1,
-      friction: 7,
-      tension: 40,
-      useNativeDriver: true,
-    }).start();
-    errorSystem.showCustomError({
-      title: 'Seleção',
-      message: `${student.name} ${selectedStudents.some(s => s.id === student.id) ? 'removido' : 'selecionado'}`,
-      haptic: true
-    });
-  };
 
   const selectedStudentData = useMemo(() =>
     students.find(s => s.id === selectedStudent),
@@ -131,23 +96,6 @@ const StudentsScreen = ({
         <Text style={{ color: colors.text.primary }}>Carregando alunos...</Text>
       </View>
     );
-  }
-
-  const validateSearchInput = (text: string) => {
-    if (text.length > 50) {
-      errorSystem.showCustomError({
-        title: 'Aviso',
-        message: 'Busca muito longa (máx. 50 caracteres)'
-      });
-      return false;
-    }
-    return true;
-  };
-
-  const handleSearch = (text: string) => {
-    if (validateSearchInput(text)) {
-      setSearchTerm(text);
-    }
   }
 
   if (students.length === 0) {

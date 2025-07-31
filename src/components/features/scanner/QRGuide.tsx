@@ -32,13 +32,6 @@ const QRGuide: React.FC<QRGuideProps> = ({
 
   const handleMockScan = (type: 'valid' | 'invalid') => {
     onMockScan(type);
-    errorSystem.showCustomError({
-      title: type === 'valid' ? 'Sucesso' : 'Erro',
-      message: type === 'valid'
-        ? 'Código válido detectado!'
-        : 'Código inválido. Por favor, tente novamente.',
-      haptic: true
-    });
   };
 
   const handleUpload = () => {

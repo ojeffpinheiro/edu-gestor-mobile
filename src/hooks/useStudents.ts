@@ -127,6 +127,23 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     }
   };
 
+    const validateSearchInput = (text: string) => {
+      if (text.length > 50) {
+        errorSystem.showCustomError({
+          title: 'Aviso',
+          message: 'Busca muito longa (máx. 50 caracteres)'
+        });
+        return false;
+      }
+      return true;
+    };
+  
+    const handleSearch = (text: string) => {
+      if (validateSearchInput(text)) {
+        setSearchTerm(text);
+      }
+    }
+
   return {
     students: filteredStudents,
     selectedStudents,
@@ -134,12 +151,13 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     error,
     searchTerm,
     filteredStudents,
+    hasSelection,
     setSearchTerm,
     toggleStudentSelection,
     toggleSelectAll,
     confirmSelection,
     clearSelection,
     isAllSelected,
-    hasSelection,
+    handleSearch
   };
 };

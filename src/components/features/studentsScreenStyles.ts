@@ -14,6 +14,7 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
     scrollContent: {
       flexGrow: 1,
       paddingTop: 60,
+      paddingBottom: 100,
     },
 
     // Header Moderno
@@ -405,6 +406,13 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       backgroundColor: `${colors.primary.main}15`,
       borderWidth: 1,
       borderColor: colors.primary.main,
+    },
+    selectionBar: {
+      position: 'absolute',
+      bottom: 24,
+      left: 24,
+      right: 24,
+      zIndex: 10,
     },
   });
 };

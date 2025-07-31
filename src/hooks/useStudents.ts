@@ -135,6 +135,10 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     }
   };
 
+  const selectAllStudents = () => {
+    setSelectedStudents([...filteredStudents]);
+  };
+
   return {
     students: filteredStudents,
     selectedStudents,
@@ -145,6 +149,7 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     toggleStudentSelection,
     toggleSelectAll,
     confirmSelection,
+    selectAllStudents,
     clearSelection,
     isAllSelected: selectedStudents.length === filteredStudents.length && filteredStudents.length > 0,
     hasSelection: selectedStudents.length > 0,

@@ -27,6 +27,7 @@ import { useAnimation } from '../../hooks/useAnimation';
 import { useUserFeedback } from '../../hooks/useUserFeedback';
 import StudentCard from '../StudentCard';
 import SearchBar from '../common/SearchBar';
+import SelectionBar from '../common/SelectionBar';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -45,12 +46,15 @@ const STUDENT_LIST_CONFIG = {
   itemHeight: 80
 };
 
+
 const StudentsScreen = ({
   scannedCode,
   selectedStudent,
   setSelectedStudent,
   setCurrentView
 }: StudentsScreenProps) => {
+  const { colors } = useTheme();
+  const styles = createStudentsScreenStyles(colors);
   const navigation = useNavigation();
   const { showFeedback } = useUserFeedback();
   const { opacity, scale, animateIn, animateOut } = useAnimation({
@@ -58,8 +62,6 @@ const StudentsScreen = ({
     initialScale: 0.9
   });
 
-  const { colors } = useTheme();
-  const styles = createStudentsScreenStyles(colors);
   const {
     students,
     selectedStudents,
@@ -67,10 +69,11 @@ const StudentsScreen = ({
     searchTerm,
     setSearchTerm,
     toggleStudentSelection,
-    toggleSelectAll,
+    selectAllStudents,
+    clearSelection,
     confirmSelection,
     isAllSelected,
-    hasSelection, clearSelection
+    hasSelection
   } = useStudents();
 
   useEffect(() => {
@@ -235,6 +238,7 @@ const StudentsScreen = ({
 
         <ScrollView
           style={styles.scrollContent}
+          contentContainerStyle={{ paddingBottom: 100 }}
         >
           {/* Header Moderno */}
           <View style={styles.headerContainer}>
@@ -298,7 +302,7 @@ const StudentsScreen = ({
               <FlatList
                 data={students}
                 keyExtractor={item => item.id}
-                getItemLayout={(data, index) => ({
+                getItemLayout={(__, index) => ({
                   length: STUDENT_LIST_CONFIG.itemHeight,
                   offset: STUDENT_LIST_CONFIG.itemHeight * index,
                   index,
@@ -310,6 +314,8 @@ const StudentsScreen = ({
                     onSelect={toggleStudentSelection}
                   />
                 )}
+                scrollEnabled={false}
+                contentContainerStyle={styles.listContent}
                 initialNumToRender={10}
                 maxToRenderPerBatch={5}
                 windowSize={5}
@@ -372,6 +378,16 @@ const StudentsScreen = ({
             />
           </View>
         </ScrollView>
+        <SelectionBar
+          selectedCount={selectedStudents.length}
+          totalCount={students.length}
+          onSelectAll={selectAllStudents}
+          onDeselectAll={clearSelection}
+          onConfirm={confirmSelection}
+          isAllSelected={isAllSelected}
+          confirmLabel="Confirmar seleção"
+          style={styles.selectionBar}
+        />
       </LinearGradient>
     </>
   );

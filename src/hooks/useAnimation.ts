@@ -1,6 +1,8 @@
 import { useRef, useCallback } from 'react';
 import { Animated, Easing } from 'react-native';
-import * as Haptics from 'expo-haptics';
+
+import { FeedbackType } from '../types/feedback';
+import { triggerHapticFeedback } from '../utils/hapticUtils';
 
 interface UseAnimationProps {
   initialOpacity?: number;
@@ -18,7 +20,7 @@ interface UseAnimationProps {
 interface PressAnimationConfig {
   scaleTo?: number;
   onPress?: () => void;
-  hapticType?: 'light' | 'medium' | 'heavy' | 'success' | 'error';
+  hapticType?: FeedbackType;
 }
 
 export const useAnimation = ({
@@ -106,27 +108,6 @@ export const useAnimation = ({
       onPress?.();
     });
   }, [scale, pressScale, pressDuration, releaseDuration, useNativeDriver, enableHapticFeedback]);
-
-  // Feedback tátil
-  const triggerHapticFeedback = useCallback((type: PressAnimationConfig['hapticType'] = 'light') => {
-    switch (type) {
-      case 'light':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-        break;
-      case 'medium':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-        break;
-      case 'heavy':
-        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Heavy);
-        break;
-      case 'success':
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        break;
-      case 'error':
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-        break;
-    }
-  }, []);
 
   // Reset para valores iniciais
   const resetAnimation = useCallback(() => {

@@ -83,7 +83,6 @@ const getImageDimensions = (uri: string): Promise<{width: number, height: number
   });
 };
 
-
 export const studentSchema = yup.object().shape({
   id: yup.string().required('ID é obrigatório'),
   name: yup.string()

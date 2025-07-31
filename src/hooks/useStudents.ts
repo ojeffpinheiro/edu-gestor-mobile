@@ -38,10 +38,6 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
     setItems: setStudents,
   } = usePagination<Student>({ pageSize: 10 });
 
-  const selection = useSelection<Student>({
-    initialSelectedItems: initialSelectedStudents,
-  });
-
   // Carrega os alunos (mock ou API)
   useEffect(() => {
     const loadStudents = async () => {
@@ -67,7 +63,7 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
         // Usando mock por enquanto
         setStudents(validStudents);
       } catch (err) {
-        setError('Falha ao carregar alunos');
+        setError('Não foi possível carregar a lista de alunos. Verifique sua conexão ou tente novamente mais tarde.');
         console.error('Error loading students:', err);
       } finally {
         setIsLoading(false);
@@ -131,26 +127,6 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
         useAlert: true
       });
       return false;
-    }
-  };
-
-  const validateSearchTerm = async (term: string) => {
-    try {
-      await searchInputSchema.validate(term);
-      return true;
-    } catch (err) {
-      showFeedback({
-        type: 'warning',
-        message: err.message,
-        duration: 2000
-      });
-      return false;
-    }
-  };
-
-  const handleSearch = async (text: string) => {
-    if (await validateSearchTerm(text)) {
-      setSearchTerm(text);
     }
   };
 

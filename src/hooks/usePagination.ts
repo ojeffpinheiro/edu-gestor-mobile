@@ -22,7 +22,6 @@ export const usePagination = <T,>({
   const loadMore = useCallback(
     async (fetchFn: (page: number) => Promise<T[]>) => {
       if (!hasMore || isLoading) return;
-
       setIsLoading(true);
       try {
         const nextPage = currentPage + 1;

@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 import { Student } from '../types/newTypes';
 import { studentSchema } from '../utils/validationUtils';
+import { useUserFeedback } from '../hooks/useUserFeedback';
 
 interface StudentCardProps {
   student: Student;
@@ -22,19 +23,25 @@ const StudentCard: React.FC<StudentCardProps> = ({
   disabled = false
 }) => {
   const { colors } = useTheme();
+  const { pressAnimation } = useAnimation();
+  const { showFeedback } = useUserFeedback();
+
   const scaleValue = useRef(new Animated.Value(1)).current;
   const borderWidthValue = useRef(new Animated.Value(isSelected ? 2 : 0)).current;
   const styles = createStyles(colors, isSelected);
-  const { pressAnimation } = useAnimation({
-    pressScale: 0.97,
-    enableHapticFeedback: true
-  });
   const [isValid, setIsValid] = useState(true);
 
   const handlePress = () => {
     pressAnimation({
-      hapticType: 'light',
-      onPress: () => onSelect(student)
+      scaleTo: 0.9,
+      onPress: () => {
+        showFeedback({
+          type: 'success',
+          message: 'Aluno selecionado',
+          hapticType: 'light',
+        });
+        onSelect(student);
+      },
     });
   };
 
@@ -65,7 +72,9 @@ const StudentCard: React.FC<StudentCardProps> = ({
   if (!isValid) {
     return (
       <View style={styles.invalidContainer}>
-        <Text style={styles.invalidText}>Dados do aluno inválidos</Text>
+        <Text style={styles.invalidText}>
+          Dados inválidos para {student.name}. Verifique a matrícula ou turma.
+        </Text>
       </View>
     );
   }
@@ -128,7 +137,7 @@ const createStyles = (colors: any, isSelected: boolean) =>
         ? `${colors.primary.main}10`
         : colors.component.card,
       overflow: 'hidden',
-      borderWidth: 1,
+      borderWidth: isSelected ? 2 : 1,
       borderColor: isSelected
         ? colors.primary.main
         : colors.border.light,

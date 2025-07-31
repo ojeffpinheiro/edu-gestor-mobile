@@ -18,7 +18,8 @@ export const getFeedbackConfig = (options: FeedbackOptions) => {
     duration: persistent ? 0 : duration,
     position,
     title,
-    actions
+    actions,
+    persistent
   };
 };
 

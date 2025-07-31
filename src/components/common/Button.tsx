@@ -99,7 +99,7 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const { colors } = useTheme();
   const styles = useMemo(() => createButtonStyles(colors), [colors]);
-  const { pressAnimation, triggerHapticFeedback } = useAnimation({
+  const { pressAnimation } = useAnimation({
     pressScale: 0.97,
     enableHapticFeedback: true
   });

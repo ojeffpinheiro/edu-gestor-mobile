@@ -6,6 +6,16 @@ type ValidationResult = {
 };
 
 export const useValidation = () => {
+  const validateSearchTerm = useMemo(() => (term: string): ValidationResult => {
+    if (term.length > 50) {
+      return { isValid: false, message: 'Busca muito longa (máx. 50 caracteres)' };
+    }
+    if (!/^[A-Za-z0-9\sáàâãéèêíïóôõöúçñ]+$/i.test(term)) {
+      return { isValid: false, message: 'Use apenas letras, números e espaços' };
+    }
+    return { isValid: true };
+  }, []);
+
   const validateISBN = (code: string) => {
     // Remover caracteres não numéricos
     const cleanCode = code.replace(/[^\dX]/gi, '');
@@ -48,8 +58,8 @@ export const useValidation = () => {
   }, []);
 
   return {
+    validateSearchTerm,
     validateISBN,
-    validateQRCode,
-    validateBarcode: validateISBN
+    validateQRCode: (code: string) => ({ isValid: !!code.trim() }),
   };
 };

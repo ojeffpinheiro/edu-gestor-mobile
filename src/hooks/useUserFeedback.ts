@@ -1,12 +1,13 @@
 
 import { useCallback, useState } from 'react';
-import { Alert, ToastAndroid, Platform } from 'react-native';
-import * as Haptics from 'expo-haptics';
+import { Platform } from 'react-native';
 import { triggerHapticFeedback } from '../utils/hapticUtils';
+import { 
+  FeedbackType, 
+  FeedbackPosition, 
+  FeedbackOptions 
+} from '../types/feedback';
 import { getFeedbackConfig, showPlatformAlert, showPlatformToast } from '../utils/feedbackUtils';
-
-type FeedbackType = 'success' | 'error' | 'info' | 'warning';
-type FeedbackPosition = 'top' | 'bottom' | 'center';
 
 const DEFAULT_DURATIONS = {
   success: 3000,
@@ -14,23 +15,6 @@ const DEFAULT_DURATIONS = {
   warning: 3500,
   info: 2500
 };
-
-interface FeedbackOptions {
-  type: FeedbackType;
-  message: string;
-  duration?: number;
-  position?: FeedbackPosition;
-  useToast?: boolean;
-  useAlert?: boolean;
-  haptic?: boolean;
-  title?: string;
-  actions?: {
-    text: string;
-    onPress: () => void;
-    style?: 'primary' | 'secondary';
-  }[];
-  persistent?: boolean;
-}
 
 interface ToastConfig {
   visible: boolean;
@@ -51,6 +35,7 @@ export const useUserFeedback = () => {
       position: 'bottom' as FeedbackPosition,
       title: '',
       actions: [],
+      persistent: false
     },
   });
 
@@ -100,7 +85,7 @@ export const useUserFeedback = () => {
       // Atualiza o estado para feedback customizado
       setFeedbackConfig({
         visible: true,
-        options: config
+        options: config,
       });
     }
 

@@ -96,14 +96,12 @@ const StudentsScreen = ({
   const handleStudentSelect = (student: Student) => {
     Haptics.selectionAsync();
     toggleStudentSelection(student);
-
     // Feedback tátil
     if (Platform.OS === 'android') {
       if (UIManager.setLayoutAnimationEnabledExperimental) {
         UIManager.setLayoutAnimationEnabledExperimental(true);
       }
     }
-
     // Animação mais suave
     scale.setValue(0.95);
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);

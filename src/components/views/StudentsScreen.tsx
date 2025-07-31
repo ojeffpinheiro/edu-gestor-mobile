@@ -29,6 +29,7 @@ import StudentCard from '../StudentCard';
 import SearchBar from '../common/SearchBar';
 import SelectionBar from '../common/SelectionBar';
 import { useSelection } from '../../hooks/useSelection';
+import SelectionCounter from '../features/SelectionCounter';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -79,6 +80,7 @@ const StudentsScreen = ({
     clearSelection,
     isAllSelected,
     hasSelection,
+    selectionBatch,
   } = useSelection<Student>({
     initialSelectedItems: students,
   });
@@ -122,46 +124,6 @@ const StudentsScreen = ({
     students.find(s => s.id === selectedStudent),
     [selectedStudent, students]
   );
-
-  const renderItem = ({ item }: { item: Student }) => {
-    const isSelected = selectedStudents.some(s => s.id === item.id);
-    return (
-      <Animated.View
-        style={[
-          styles.studentCard,
-          isSelected && styles.selectedCard,
-          { transform: [{ scale: scale }] }
-        ]}>
-        <TouchableOpacity
-          onPress={() => handleStudentSelect(item)}
-          activeOpacity={0.7}
-          accessibilityLabel={`Selecionar aluno ${item.name}`}
-          accessibilityHint={`${selectedStudents.some(s => s.id === item.id) ? 'Desselecionar' : 'Selecionar'} aluno ${item.name} da turma ${item.class}`}
-          accessibilityRole="button"
-        >
-          <View style={styles.studentAvatar}>
-            <Text style={styles.studentInitial}>{item.name.charAt(0)}</Text>
-          </View>
-
-          <View style={styles.studentInfoContainer}>
-            <Text style={styles.studentName}>{item.name}</Text>
-            <Text style={styles.studentDetails}>
-              {item.registrationNumber} • Turma {item.class}
-            </Text>
-          </View>
-
-          <View style={[
-            styles.selectionBadge,
-            selectedStudents.some(s => s.id === item.id) && styles.selectedBadge
-          ]}>
-            {selectedStudents.some(s => s.id === item.id) && (
-              <Check size={16} color="white" />
-            )}
-          </View>
-        </TouchableOpacity>
-      </Animated.View>
-    );
-  };
 
   if (isLoading) {
     return (
@@ -217,7 +179,7 @@ const StudentsScreen = ({
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
-                onPress={() => clearSelection()} // Supondo que tenha essa função
+                onPress={() => clearSelection()}
                 style={styles.emptyActionButton}
               >
                 <Text style={styles.emptyActionText}>Tentar novamente</Text>
@@ -239,7 +201,7 @@ const StudentsScreen = ({
         <SectionHeader
           title="Identificação de Aluno"
           subtitle="Selecione o aluno para esta prova"
-          icon='users'
+          icon={<Users size={24} color={colors.text.primary} />}
           onBack={() => setCurrentView('scanner')}
         />
 
@@ -305,7 +267,10 @@ const StudentsScreen = ({
             </Text>
 
             <View style={styles.studentsList}>
-
+              <SelectionCounter
+                count={selectedStudents.length}
+                total={filteredStudents.length}
+              />
               <FlatList
                 data={students}
                 keyExtractor={item => item.id}
@@ -334,10 +299,7 @@ const StudentsScreen = ({
           {hasSelection && (
             <Animated.View style={[
               styles.floatingActionBar,
-              {
-                backgroundColor: colors.background.secondary,
-                shadowColor: colors.primary.main,
-              }
+              { backgroundColor: colors.background.secondary, shadowColor: colors.primary.main }
             ]}>
               <Text style={styles.selectionCountText}>
                 {selectedStudents.length} selecionado(s)
@@ -361,10 +323,7 @@ const StudentsScreen = ({
                   ? [colors.primary.main, colors.primary.dark]
                   : [colors.component.disabled, colors.component.disabled]
               }
-              style={[
-                styles.primaryButton,
-                !selectedStudent && styles.disabledButton
-              ]}
+              style={[styles.primaryButton, !selectedStudent && styles.disabledButton]}
             >
               <Button
                 title="Continuar Prova"
@@ -385,6 +344,7 @@ const StudentsScreen = ({
             />
           </View>
         </ScrollView>
+
         <SelectionBar
           selectedCount={selectedStudents.length}
           totalCount={filteredStudents.length}
@@ -396,6 +356,13 @@ const StudentsScreen = ({
           style={styles.selectionBar}
         />
       </LinearGradient>
+      {selectionBatch > 1 && (
+        <View style={styles.batchSelectionIndicator}>
+          <Text style={styles.batchSelectionText}>
+            +{selectionBatch}
+          </Text>
+        </View>
+      )}
     </>
   );
 };

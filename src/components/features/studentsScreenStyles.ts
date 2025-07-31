@@ -349,12 +349,15 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       flexDirection: 'row',
       alignItems: 'center',
       justifyContent: 'space-between',
+      backgroundColor: colors.primary.main,
       ...Shadow(colors).md,
+      shadowColor: colors.primary.dark,
       elevation: 8,
     },
     selectionCountText: {
-      fontSize: 14,
-      color: colors.text.secondary,
+      color: colors.text.onPrimary,
+      fontSize: 16,
+      fontWeight: '600',
     },
     confirmButton: {
       backgroundColor: colors.primary.main,
@@ -413,6 +416,19 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       left: 24,
       right: 24,
       zIndex: 10,
+    },
+    batchSelectionIndicator: {
+      position: 'absolute',
+      top: 0,
+      right: 0,
+      backgroundColor: colors.feedback.success,
+      borderRadius: 8,
+      padding: 4,
+    },
+    batchSelectionText: {
+      color: colors.text.onPrimary,
+      fontSize: 12,
+      fontWeight: 'bold',
     },
   });
 };

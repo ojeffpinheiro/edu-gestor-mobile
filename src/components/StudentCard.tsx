@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
-import { TouchableOpacity, View, Text, StyleSheet, Animated } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { TouchableOpacity, View, Text, StyleSheet, Animated, Easing } from 'react-native';
 import { Check } from 'lucide-react-native';
+import * as Haptics from 'expo-haptics';
+
 import { useTheme } from '../context/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 import { Student } from '../types/newTypes';
@@ -20,6 +22,8 @@ const StudentCard: React.FC<StudentCardProps> = ({
   disabled = false
 }) => {
   const { colors } = useTheme();
+  const scaleValue = useRef(new Animated.Value(1)).current;
+  const borderWidthValue = useRef(new Animated.Value(isSelected ? 2 : 0)).current;
   const styles = createStyles(colors, isSelected);
   const { pressAnimation } = useAnimation({
     pressScale: 0.97,
@@ -40,6 +44,24 @@ const StudentCard: React.FC<StudentCardProps> = ({
       .catch(() => setIsValid(false));
   }, [student]);
 
+  useEffect(() => {
+    // Animação ao selecionar/deselecionar
+    Animated.parallel([
+      Animated.spring(scaleValue, {
+        toValue: isSelected ? 1.02 : 1,
+        friction: 5,
+        useNativeDriver: true,
+      }),
+      // Remova a animação de borderWidth ou use useNativeDriver: false
+      Animated.timing(borderWidthValue, {
+        toValue: isSelected ? 2 : 0,
+        duration: 200,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: false, // Alterado para false
+      }),
+    ]).start();
+  }, [isSelected]);
+
   if (!isValid) {
     return (
       <View style={styles.invalidContainer}>
@@ -49,7 +71,14 @@ const StudentCard: React.FC<StudentCardProps> = ({
   }
 
   return (
-    <Animated.View style={[styles.container,]}>
+    <Animated.View style={[
+      styles.container,
+      {
+        transform: [{ scale: scaleValue }],
+        borderWidth: isSelected ? 2 : 0,
+        borderColor: isSelected ? colors.primary.main : 'transparent'
+      }
+    ]}>
       <TouchableOpacity
         onPress={handlePress}
         activeOpacity={0.7}
@@ -96,13 +125,13 @@ const createStyles = (colors: any, isSelected: boolean) =>
       borderRadius: 12,
       marginBottom: 8,
       backgroundColor: isSelected
-        ? `${colors.primary.main}15`
+        ? `${colors.primary.main}10`
         : colors.component.card,
+      overflow: 'hidden',
       borderWidth: 1,
       borderColor: isSelected
         ? colors.primary.main
         : colors.border.light,
-      overflow: 'hidden',
     },
     content: {
       flexDirection: 'row',

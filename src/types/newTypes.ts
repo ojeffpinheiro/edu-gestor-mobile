@@ -85,7 +85,7 @@ export interface AlignmentResult {
   corners?: { x: number; y: number }[];
 }
 
-export interface Student {
+export interface Student extends Record<string, unknown> {
   id: string;
   name: string;
   registrationNumber: string;

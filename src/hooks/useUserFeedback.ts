@@ -1,7 +1,9 @@
-// useUserFeedback.ts
+
 import { useCallback, useState } from 'react';
 import { Alert, ToastAndroid, Platform } from 'react-native';
 import * as Haptics from 'expo-haptics';
+import { triggerHapticFeedback } from '../utils/hapticUtils';
+import { getFeedbackConfig, showPlatformAlert, showPlatformToast } from '../utils/feedbackUtils';
 
 type FeedbackType = 'success' | 'error' | 'info' | 'warning';
 type FeedbackPosition = 'top' | 'bottom' | 'center';
@@ -45,7 +47,7 @@ export const useUserFeedback = () => {
     },
   });
 
-
+  // Função principal para mostrar feedback
   const showFeedback = useCallback((options: FeedbackOptions) => {
     const {
       type = 'info',
@@ -60,86 +62,74 @@ export const useUserFeedback = () => {
       persistent = false,
     } = options;
 
+    // Dispara feedback háptico se necessário
     if (haptic) {
-      switch (type) {
-        case 'success':
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-          break;
-        case 'error':
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-          break;
-        case 'warning':
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-          break;
-        default:
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
+      triggerHapticFeedback(type);
     }
 
-    // Decidir o método de exibição
+    // Obtém configuração padrão do feedback
+    const config = getFeedbackConfig({
+      type,
+      message,
+      duration,
+      position,
+      title,
+      actions,
+      persistent
+    });
+
+    // Decide o método de exibição baseado nas opções
     if (useToast || Platform.OS === 'android') {
-      showToast(message, type, persistent ? 0 : duration);
+      showPlatformToast(message, persistent ? 0 : duration);
     } else if (useAlert) {
-      showAlert(message, type);
-    } else {
-      setFeedbackConfig({
-        visible: true,
-        options: { 
-          type, message,
-          duration: persistent ? 0 : duration,
-          position, title, actions
-        },
-      });
-    }
-  }, []);
-
-  const showToast = (message: string, type: FeedbackType, duration: number) => {
-    if (Platform.OS === 'android') {
-      ToastAndroid.showWithGravity(
+      showPlatformAlert(
+        type === 'error' ? 'Erro' : 
+          type === 'success' ? 'Sucesso' : 
+            type === 'warning' ? 'Aviso' : 'Informação',
         message,
-        duration,
-        ToastAndroid.BOTTOM
+        [{ text: 'OK', onPress: () => {} }]
       );
     } else {
-      // iOS - usar componente customizado
+      // Atualiza o estado para feedback customizado
+      setFeedbackConfig({
+        visible: true,
+        options: config
+      });
+    }
+
+    // Configura toast para iOS (se necessário)
+    if (Platform.OS === 'ios' && useToast) {
       setToastConfig({
         visible: true,
         message,
         type,
-        duration,
+        duration: persistent ? 0 : duration,
         position: 'bottom',
       });
-      setTimeout(() => setToastConfig(null), duration);
+      
+      if (!persistent) {
+        setTimeout(() => setToastConfig(null), duration);
+      }
     }
-  };
+  }, []);
 
-  const showAlert = (message: string, type: FeedbackType) => {
-    Alert.alert(
-      type === 'error' ? 'Erro' :
-        type === 'success' ? 'Sucesso' :
-          type === 'warning' ? 'Aviso' : 'Informação',
-      message,
-      [{ text: 'OK', onPress: () => { } }]
-    );
-  };
-
-
+  // Função para esconder feedback
   const hideFeedback = useCallback(() => {
     setFeedbackConfig(prev => ({ ...prev, visible: false }));
     setToastConfig(null);
   }, []);
 
   return {
-    // Para componentes de UI
+    // Estado e configurações
     toastConfig,
     feedbackConfig,
-
+    
     // Métodos principais
     showFeedback,
     hideFeedback,
-
+    
     // Métodos específicos (opcionais)
-    showToast,
-    showAlert,
+    showToast: showPlatformToast,
+    showAlert: showPlatformAlert,
   };
 };

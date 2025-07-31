@@ -1,54 +1,255 @@
-import React, { useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, Easing, TouchableOpacity } from 'react-native';
+import React, { useEffect, useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  AccessibilityInfo,
+  Keyboard,
+  Platform,
+  Dimensions,
+  EmitterSubscription,
+  findNodeHandle,
+  Animated
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FeedbackPosition, FeedbackType } from '../../types/feedback';
 import { useTheme } from '../../context/ThemeContext';
-
-interface FeedbackAction {
-  text: string;
-  onPress: () => void;
-  style?: 'primary' | 'secondary';
-}
+import { useAnimation } from '../../hooks/useAnimation';
+import { FeedbackAction, FeedbackOptions, FeedbackType } from '../../types/feedback';
 
 interface FeedbackProps {
   visible: boolean;
-  options: {
-    type: FeedbackType;
-    position?: FeedbackPosition;
-    duration?: number;
-    title?: string;
-    message: string;
-    actions?: FeedbackAction[];
-  };
+  options: FeedbackOptions;
   onHide: () => void;
 }
 
-const iconMap = {
-  success: Ionicons,
-  error: Ionicons,
-  warning: Ionicons,
-  info: Ionicons
-};
-
-const iconNameMap: Record<FeedbackType, keyof typeof Ionicons.glyphMap> = {
-  success: 'checkmark-circle',
-  error: 'close-circle',
-  warning: 'warning',
-  info: 'information-circle'
+const iconNameMap = {
+  success: 'checkmark-circle' as const,
+  error: 'close-circle' as const,
+  warning: 'warning' as const,
+  info: 'information-circle' as const
 };
 
 const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
   const { colors } = useTheme();
-  const opacity = useRef(new Animated.Value(0.5)).current;
-  const translateY = useRef(new Animated.Value(30)).current;
-  const scale = useRef(new Animated.Value(0.95)).current;
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const windowHeight = Dimensions.get('window').height;
+  const feedbackRef = useRef<View>(null);
+
+  const {
+    opacity,
+    translateY,
+    scale,
+    animateIn,
+    animateOut
+  } = useAnimation({
+    initialOpacity: 0.5,
+    initialTranslateY: 30,
+    initialScale: 0.95,
+    duration: 300,
+    pressDuration: 100,
+    releaseDuration: 200,
+    useNativeDriver: true
+  });
+
+  useEffect(() => {
+    let keyboardDidShowListener: EmitterSubscription;
+    let keyboardDidHideListener: EmitterSubscription;
+
+    if (options.avoidKeyboard) {
+      keyboardDidShowListener = Keyboard.addListener(
+        Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+        (e) => {
+          setKeyboardHeight(e.endCoordinates.height);
+          setKeyboardVisible(true);
+        }
+      );
+
+      keyboardDidHideListener = Keyboard.addListener(
+        Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+        () => {
+          setKeyboardHeight(0);
+          setKeyboardVisible(false);
+        }
+      );
+    }
+
+    return () => {
+      keyboardDidShowListener?.remove();
+      keyboardDidHideListener?.remove();
+    };
+  }, [options.avoidKeyboard]);
+
+  // Configurações de acessibilidade
+  useEffect(() => {
+    if (visible && feedbackRef.current) {
+      AccessibilityInfo.announceForAccessibility(
+        options.title ? `${options.title}. ${options.message}` : options.message || ''
+      );
+
+      // Usando findNodeHandle para obter o reactTag
+      const reactTag = findNodeHandle(feedbackRef.current);
+      if (reactTag) {
+        AccessibilityInfo.setAccessibilityFocus(reactTag);
+      }
+    }
+  }, [visible, options.title, options.message]);
+
+  // Configuração das animações
+  useEffect(() => {
+    if (visible) {
+      animateIn(() => {
+        // Callback após a animação de entrada
+      });
+
+      let timer: NodeJS.Timeout;
+      if (options.duration !== 0) {
+        timer = setTimeout(() => {
+          hideFeedback();
+        }, options.duration || 3000);
+      }
+
+      return () => {
+        if (timer) clearTimeout(timer);
+      };
+    }
+  }, [visible]);
 
 
-  const positionStyles = {
-    top: { top: 60 },
-    bottom: { bottom: 60 },
-    center: { top: '50%' as const, marginTop: -50 }
+  const calculatePosition = () => {
+    const baseOffset = options.offset || 0;
+    const horizontalOffset = options.horizontalOffset || 20;
+    const keyboardOffset = options.keyboardOffset || 20;
+
+    // Definindo um tipo mais amplo para o estilo de posição
+    let positionStyle: {
+      left: number;
+      right: number;
+      top?: number;
+      bottom?: number;
+      transform?: any[];
+    } = {
+      left: horizontalOffset,
+      right: horizontalOffset,
+    };
+
+    const verticalPosition = options.position || 'bottom';
+
+    switch (verticalPosition) {
+      case 'top':
+        positionStyle = {
+          ...positionStyle,
+          top: baseOffset + (keyboardVisible ? keyboardOffset : 0),
+        };
+        break;
+      case 'center':
+        positionStyle = {
+          ...positionStyle,
+          top: windowHeight / 2 - 50 + baseOffset,
+          transform: [
+            {
+              translateY: translateY.interpolate({
+                inputRange: [0, 30],
+                outputRange: [0, 30 - baseOffset]
+              })
+            },
+            { scale }
+          ],
+        };
+        break;
+      case 'bottom':
+      default:
+        positionStyle = {
+          ...positionStyle,
+          bottom: baseOffset + (keyboardVisible ? keyboardHeight + keyboardOffset : 0),
+        };
+        break;
+    }
+
+    return positionStyle;
   };
+
+  // Renderização de ícone customizado
+  const renderIcon = () => {
+    if (options.icon === null) return null;
+
+    const iconColor = variantColors[options.type];
+    const iconSize = 24;
+
+    if (options.icon) {
+      const CustomIcon = options.icon;
+      return (
+        <CustomIcon
+          color={iconColor}
+          size={iconSize}
+          {...options.iconProps}
+          style={[styles.icon, options.iconProps?.style]}
+        />
+      );
+    }
+
+    return (
+      <Ionicons
+        name={iconNameMap[options.type]}
+        size={iconSize}
+        color={iconColor}
+        style={styles.icon}
+        accessibilityElementsHidden={true}
+        importantForAccessibility="no"
+      />
+    );
+  };
+
+  // Renderização de conteúdo customizado
+  const renderContent = () => {
+    if (options.content) {
+      const CustomContent = options.content;
+      return (
+        <CustomContent
+          type={options.type}
+          title={options.title}
+          message={options.message}
+          color={variantColors[options.type]}
+          {...options.contentProps}
+        />
+      );
+    }
+
+    return (
+      <>
+        {options.title && (
+          <Text
+            style={[styles.title, { color: variantColors[options.type] }]}
+            accessibilityRole="header"
+          >
+            {options.title}
+          </Text>
+        )}
+        {options.message && (
+          <Text
+            style={[styles.message, { color: colors.text.primary }]}
+            accessibilityRole="text"
+          >
+            {options.message}
+          </Text>
+        )}
+      </>
+    );
+  };
+
+  const hideFeedback = () => {
+    animateOut(() => {
+      onHide();
+    });
+  };
+
+  const handlePressAction = (action: FeedbackAction) => {
+    action.onPress();
+    hideFeedback();
+  };
+
+  if (!visible) return null;
 
   const variantColors = {
     success: colors.feedback.success,
@@ -68,142 +269,84 @@ const Feedback: React.FC<FeedbackProps> = ({ visible, options, onHide }) => {
     }
   };
 
-  useEffect(() => {
-    if (visible) {
-      Animated.parallel([
-        Animated.timing(opacity, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(translateY, {
-          toValue: 0,
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-        Animated.timing(scale, {
-          toValue: 1,
-          duration: 300,
-          easing: Easing.out(Easing.cubic),
-          useNativeDriver: true,
-        }),
-      ]).start();
-
-      let timer: NodeJS.Timeout;
-      if (options.duration !== 0) {
-        timer = setTimeout(() => {
-          hideFeedback();
-        }, options.duration || 3000);
-      }
-
-      return () => {
-        if (timer) clearTimeout(timer);
-      };
-    }
-  }, [visible]);
-
-  const hideFeedback = () => {
-    Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 0,
-        duration: 200,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 30,
-        duration: 200,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-      Animated.timing(scale, {
-        toValue: 0.95,
-        duration: 200,
-        easing: Easing.in(Easing.cubic),
-        useNativeDriver: true,
-      }),
-    ]).start(() => onHide());
-  };
-
-  const handlePressAction = (action: FeedbackAction) => {
-    action.onPress();
-    hideFeedback();
-  };
-
-  if (!visible) return null;
-
-  const IconComponent = iconMap[options.type];
-  const iconName = iconNameMap[options.type];
-  const position = options.position || 'bottom';
-
   return (
-    <Animated.View
-      style={[
-        styles.container,
-        positionStyles[position],
-        {
-          opacity,
-          transform: [{ translateY }, { scale }],
-          backgroundColor: variantColors[options.type] + '20',
-          borderLeftColor: variantColors[options.type],
-        }
-      ]}
+    <View
+      ref={feedbackRef}
+      accessible={true}
+      accessibilityRole="alert"
+      accessibilityLabel={options.accessibilityLabel ||
+        (options.title ? `${options.title}. ${options.message}` : options.message || '')}
+      importantForAccessibility="yes"
     >
-      <TouchableOpacity
-        activeOpacity={0.8}
-        onPress={hideFeedback}
-        style={styles.touchableContainer}
+      <Animated.View style={[styles.container, calculatePosition(), {
+        opacity,
+        transform: [{ translateY }, { scale }],
+        backgroundColor: variantColors[options.type] + '20',
+        borderLeftColor: variantColors[options.type],
+      }
+      ]}
       >
-        <View style={styles.content}>
-          <IconComponent
-            name={iconName}
-            size={24}
-            color={variantColors[options.type]}
-            style={styles.icon}
-          />
-          <View style={styles.textContainer}>
-            {options.title && (
-              <Text style={[styles.title, { color: variantColors[options.type] }]}>
-                {options.title}
-              </Text>
-            )}
-            <Text style={[styles.message, { color: colors.text.primary }]}>
-              {options.message}
-            </Text>
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={hideFeedback}
+          style={styles.touchableContainer}
+          accessible={false}
+        >
+          <View style={styles.content}>
+            {renderIcon()}
+            <View style={styles.textContainer}>
+              {renderContent()}
+            </View>
           </View>
-        </View>
 
-        {options.actions && options.actions.length > 0 && (
-          <View style={styles.actionsContainer}>
-            {options.actions.map((action, index) => (
-              <TouchableOpacity
-                key={index}
-                onPress={() => handlePressAction(action)}
-                style={[
-                  styles.actionButton,
-                  actionButtonStyles[action.style || 'primary'],
-                  { borderColor: variantColors[options.type] }
-                ]}
-              >
-                <Text style={[
-                  styles.actionText,
-                  {
-                    color: action.style === 'secondary' ?
-                      variantColors[options.type] : colors.text.onPrimary
-                  }
-                ]}>
-                  {action.text}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-        )}
-      </TouchableOpacity>
-    </Animated.View>
+          {options.actions && options.actions.length > 0 && (
+            <View style={styles.actionsContainer}>
+              {options.actions.map((action, index) => (
+                <TouchableOpacity
+                  key={index}
+                  onPress={() => handlePressAction(action)}
+                  style={[
+                    styles.actionButton,
+                    actionButtonStyles[action.style || 'primary'],
+                    { borderColor: variantColors[options.type] }
+                  ]}
+                  accessibilityRole="button"
+                  accessibilityLabel={action.text}
+                  accessibilityHint={action.accessibilityHint || `Executa a ação ${action.text}`}
+                >
+                  <Text style={[
+                    styles.actionText,
+                    {
+                      color: action.style === 'secondary' ?
+                        variantColors[options.type] : colors.text.onPrimary
+                    }
+                  ]}>
+                    {action.text}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          )}
+        </TouchableOpacity>
+      </Animated.View>
+    </View>
   );
 };
+
+declare global {
+  interface FeedbackIconProps {
+    color: string;
+    size: number;
+    style?: any;
+  }
+
+  interface FeedbackContentProps {
+    type: FeedbackType;
+    title?: string;
+    message?: string;
+    color: string;
+  }
+}
 
 const styles = StyleSheet.create({
   container: {

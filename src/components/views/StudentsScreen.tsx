@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import {
   View, Text, Animated, ScrollView,
-  StatusBar, TouchableOpacity, TextInput,
+  StatusBar, TouchableOpacity,
   FlatList, Platform,
   UIManager, LayoutAnimation
 } from 'react-native';

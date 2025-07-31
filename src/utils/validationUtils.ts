@@ -1,7 +1,7 @@
 import { Image } from "react-native";
 import * as tf from '@tensorflow/tfjs';
+import * as yup from 'yup';
 
-// src/utils/validationUtils.ts
 interface ValidationResult {
   isValid: boolean;
   message?: string;
@@ -82,3 +82,22 @@ const getImageDimensions = (uri: string): Promise<{width: number, height: number
     }, reject);
   });
 };
+
+
+export const studentSchema = yup.object().shape({
+  id: yup.string().required('ID é obrigatório'),
+  name: yup.string()
+    .required('Nome é obrigatório')
+    .min(3, 'Nome deve ter pelo menos 3 caracteres')
+    .max(100, 'Nome não pode exceder 100 caracteres'),
+  registrationNumber: yup.string()
+    .required('Matrícula é obrigatória')
+    .matches(/^[A-Za-z0-9]+$/, 'Matrícula deve conter apenas letras e números'),
+  class: yup.string()
+    .required('Turma é obrigatória')
+    .max(10, 'Turma não pode exceder 10 caracteres')
+});
+
+export const searchInputSchema = yup.string()
+  .max(50, 'Busca muito longa (máx. 50 caracteres)')
+  .matches(/^[A-Za-z0-9\sáàâãéèêíïóôõöúçñÁÀÂÃÉÈÊÍÏÓÔÕÖÚÇÑ]*$/, 'Busca contém caracteres inválidos');

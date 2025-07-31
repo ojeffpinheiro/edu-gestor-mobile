@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { TouchableOpacity, View, Text, StyleSheet, Animated } from 'react-native';
 import { Check } from 'lucide-react-native';
 import { useTheme } from '../context/ThemeContext';
 import { useAnimation } from '../hooks/useAnimation';
 import { Student } from '../types/newTypes';
+import { studentSchema } from '../utils/validationUtils';
 
 interface StudentCardProps {
   student: Student;
@@ -12,17 +13,19 @@ interface StudentCardProps {
   disabled?: boolean;
 }
 
-const StudentCard: React.FC<StudentCardProps> = ({ 
-  student, 
-  isSelected, 
-  onSelect, 
-  disabled = false 
+const StudentCard: React.FC<StudentCardProps> = ({
+  student,
+  isSelected,
+  onSelect,
+  disabled = false
 }) => {
   const { colors } = useTheme();
+  const styles = createStyles(colors, isSelected);
   const { pressAnimation } = useAnimation({
     pressScale: 0.97,
     enableHapticFeedback: true
   });
+  const [isValid, setIsValid] = useState(true);
 
   const handlePress = () => {
     pressAnimation({
@@ -31,7 +34,19 @@ const StudentCard: React.FC<StudentCardProps> = ({
     });
   };
 
-  const styles = createStyles(colors, isSelected);
+  useEffect(() => {
+    studentSchema.isValid(student)
+      .then(valid => setIsValid(valid))
+      .catch(() => setIsValid(false));
+  }, [student]);
+
+  if (!isValid) {
+    return (
+      <View style={styles.invalidContainer}>
+        <Text style={styles.invalidText}>Dados do aluno inválidos</Text>
+      </View>
+    );
+  }
 
   return (
     <Animated.View style={[styles.container,]}>
@@ -52,7 +67,7 @@ const StudentCard: React.FC<StudentCardProps> = ({
           </View>
 
           <View style={styles.infoContainer}>
-            <Text 
+            <Text
               style={styles.name}
               numberOfLines={1}
               ellipsizeMode="tail"
@@ -75,17 +90,17 @@ const StudentCard: React.FC<StudentCardProps> = ({
   );
 };
 
-const createStyles = (colors: any, isSelected: boolean) => 
+const createStyles = (colors: any, isSelected: boolean) =>
   StyleSheet.create({
     container: {
       borderRadius: 12,
       marginBottom: 8,
-      backgroundColor: isSelected 
-        ? `${colors.primary.main}15` 
+      backgroundColor: isSelected
+        ? `${colors.primary.main}15`
         : colors.component.card,
       borderWidth: 1,
-      borderColor: isSelected 
-        ? colors.primary.main 
+      borderColor: isSelected
+        ? colors.primary.main
         : colors.border.light,
       overflow: 'hidden',
     },
@@ -98,8 +113,8 @@ const createStyles = (colors: any, isSelected: boolean) =>
       width: 48,
       height: 48,
       borderRadius: 24,
-      backgroundColor: isSelected 
-        ? colors.primary.main 
+      backgroundColor: isSelected
+        ? colors.primary.main
         : `${colors.primary.main}15`,
       justifyContent: 'center',
       alignItems: 'center',
@@ -108,8 +123,8 @@ const createStyles = (colors: any, isSelected: boolean) =>
     avatarText: {
       fontSize: 18,
       fontWeight: '600',
-      color: isSelected 
-        ? colors.text.onPrimary 
+      color: isSelected
+        ? colors.text.onPrimary
         : colors.primary.main,
     },
     infoContainer: {
@@ -129,14 +144,25 @@ const createStyles = (colors: any, isSelected: boolean) =>
       width: 24,
       height: 24,
       borderRadius: 12,
-      backgroundColor: isSelected 
-        ? colors.primary.main 
+      backgroundColor: isSelected
+        ? colors.primary.main
         : 'transparent',
       borderWidth: isSelected ? 0 : 2,
       borderColor: colors.primary.main,
       justifyContent: 'center',
       alignItems: 'center',
       marginLeft: 8,
+    },
+    invalidContainer: {
+      padding: 16,
+      backgroundColor: colors.feedback.error + '20',
+      borderColor: colors.feedback.error,
+      borderWidth: 1,
+      borderRadius: 12,
+    },
+    invalidText: {
+      color: colors.feedback.error,
+      fontWeight: '500',
     },
   });
 

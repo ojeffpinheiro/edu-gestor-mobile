@@ -1,4 +1,4 @@
-import { ExamResult } from "../hooks/useExams";
+import { ExamResult } from "../types/examTypes";
 import { ExamTemplate, Student } from "../types/newTypes";
 
 // mocks/scannerMocks.ts
@@ -65,7 +65,7 @@ export const mockStudents = [
     id: '5',
     name: 'Lucas Pereira',
     registrationNumber: '567890',
-    // Aqui, sem a classe e a foto
+    class: '3B',
   },
   {
     id: '6',
@@ -92,7 +92,7 @@ export const mockStudents = [
     id: '9',
     name: 'Ricardo Lima',
     registrationNumber: '456789',
-    // sem class
+    class: 'Matemática',
     photo: 'https://example.com/photos/ricardo.jpg'
   },
   {

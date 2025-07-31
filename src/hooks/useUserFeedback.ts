@@ -8,6 +8,13 @@ import { getFeedbackConfig, showPlatformAlert, showPlatformToast } from '../util
 type FeedbackType = 'success' | 'error' | 'info' | 'warning';
 type FeedbackPosition = 'top' | 'bottom' | 'center';
 
+const DEFAULT_DURATIONS = {
+  success: 3000,
+  error: 4000,
+  warning: 3500,
+  info: 2500
+};
+
 interface FeedbackOptions {
   type: FeedbackType;
   message: string;
@@ -49,10 +56,10 @@ export const useUserFeedback = () => {
 
   // Função principal para mostrar feedback
   const showFeedback = useCallback((options: FeedbackOptions) => {
+    const duration = options.duration || DEFAULT_DURATIONS[options.type];
     const {
       type = 'info',
       message,
-      duration = 3000,
       position = 'bottom',
       useToast = false,
       useAlert = false,
@@ -83,11 +90,11 @@ export const useUserFeedback = () => {
       showPlatformToast(message, persistent ? 0 : duration);
     } else if (useAlert) {
       showPlatformAlert(
-        type === 'error' ? 'Erro' : 
-          type === 'success' ? 'Sucesso' : 
+        type === 'error' ? 'Erro' :
+          type === 'success' ? 'Sucesso' :
             type === 'warning' ? 'Aviso' : 'Informação',
         message,
-        [{ text: 'OK', onPress: () => {} }]
+        [{ text: 'OK', onPress: () => { } }]
       );
     } else {
       // Atualiza o estado para feedback customizado
@@ -106,7 +113,7 @@ export const useUserFeedback = () => {
         duration: persistent ? 0 : duration,
         position: 'bottom',
       });
-      
+
       if (!persistent) {
         setTimeout(() => setToastConfig(null), duration);
       }
@@ -123,11 +130,11 @@ export const useUserFeedback = () => {
     // Estado e configurações
     toastConfig,
     feedbackConfig,
-    
+
     // Métodos principais
     showFeedback,
     hideFeedback,
-    
+
     // Métodos específicos (opcionais)
     showToast: showPlatformToast,
     showAlert: showPlatformAlert,

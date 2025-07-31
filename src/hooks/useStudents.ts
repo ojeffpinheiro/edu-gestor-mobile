@@ -5,6 +5,7 @@ import { Student } from '../types/newTypes';
 import { useUserFeedback } from './useUserFeedback';
 import { useSelection } from './useSelection';
 import { usePagination } from './usePagination';
+import { searchInputSchema, studentSchema } from '../utils/validationUtils';
 
 interface UseStudentsProps {
   initialSelectedStudents?: Student[];
@@ -16,7 +17,7 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-  
+
   const { showFeedback } = useUserFeedback();
   const {
     selectedItems: selectedStudents,
@@ -49,12 +50,22 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
         // Simula chamada assíncrona
         const initialStudents = await fetchStudents(1);
 
+        // Validar todos os alunos
+        const validationResults = await Promise.all(
+          initialStudents.map(student => validateStudent(student))
+        );
+
+        // Filtrar apenas alunos válidos
+        const validStudents = initialStudents.filter(
+          (_, index) => validationResults[index]
+        );
+
         // Aqui viria a chamada real à API
         // const response = await api.get('/students');
         // setStudents(response.data);
 
         // Usando mock por enquanto
-        setStudents(initialStudents);
+        setStudents(validStudents);
       } catch (err) {
         setError('Falha ao carregar alunos');
         console.error('Error loading students:', err);
@@ -105,6 +116,41 @@ export const useStudents = ({ initialSelectedStudents = [] }: UseStudentsProps =
       return mockStudents.slice(startIndex, endIndex);
     } catch (error) {
       throw error;
+    }
+  };
+
+  const validateStudent = async (student: Student) => {
+    try {
+      await studentSchema.validate(student);
+      return true;
+    } catch (err) {
+      console.error('Erro na validação do aluno:', err.message);
+      showFeedback({
+        type: 'error',
+        message: `Dados inválidos para o aluno ${student.name}: ${err.message}`,
+        useAlert: true
+      });
+      return false;
+    }
+  };
+
+  const validateSearchTerm = async (term: string) => {
+    try {
+      await searchInputSchema.validate(term);
+      return true;
+    } catch (err) {
+      showFeedback({
+        type: 'warning',
+        message: err.message,
+        duration: 2000
+      });
+      return false;
+    }
+  };
+
+  const handleSearch = async (text: string) => {
+    if (await validateSearchTerm(text)) {
+      setSearchTerm(text);
     }
   };
 

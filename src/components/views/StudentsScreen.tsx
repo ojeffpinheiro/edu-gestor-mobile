@@ -1,38 +1,20 @@
 import React, { useEffect, useMemo } from 'react';
-import {
-  View, Text, Animated, ScrollView,
-  StatusBar, TouchableOpacity,
-  FlatList, Platform,
-  UIManager, LayoutAnimation
-} from 'react-native';
-import {
-  CheckCircle, Users, Sparkles,
-  ArrowRight, ChevronLeft,
-  SearchIcon, X, Check
-} from 'lucide-react-native';
+import { View, ScrollView, StatusBar, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
-import * as Haptics from 'expo-haptics';
 
 import { useTheme } from '../../context/ThemeContext';
 
 import { useStudents } from '../../hooks/useStudents';
-import useErrorSystem from '../../hooks/useErrorSystem';
-import { useAnimation } from '../../hooks/useAnimation';
 import { useSelection } from '../../hooks/useSelection';
-import { useStudentSelection } from '../../hooks/useStudentSelection';
 
 import { AuthView, Student } from '../../types/newTypes';
 
-import Button from '../common/Button';
-import SectionHeader from '../common/SectionHeader';
-import SearchBar from '../common/SearchBar';
-import SelectionBar from '../common/SelectionBar';
-
-import { createStudentsScreenStyles } from '../features/studentsScreenStyles';
-import SelectionCounter from '../features/SelectionCounter';
-
-import StudentCard from '../StudentCard';
+import StudentsHeader from '../features/StudentsHeader';
+import ScannedCodeCard from '../features/ScannedCodeCard';
+import StudentsList from '../features/StudentsList';
+import StudentsFooter from '../features/StudentsFooter';
+import SelectedStudentPreview from '../features/SelectedStudentPreview';
 
 interface StudentsScreenProps {
   scannedCode?: string;
@@ -41,17 +23,6 @@ interface StudentsScreenProps {
   setCurrentView: (view: AuthView) => void;
 }
 
-const ANIMATION_CONFIG = {
-  duration: 200,
-  useNativeDriver: true
-};
-
-const STUDENT_LIST_CONFIG = {
-  maxItemsToShow: 50,
-  itemHeight: 80
-};
-
-
 const StudentsScreen = ({
   scannedCode,
   selectedStudent,
@@ -59,82 +30,29 @@ const StudentsScreen = ({
   setCurrentView
 }: StudentsScreenProps) => {
   const { colors } = useTheme();
-  const styles = createStudentsScreenStyles(colors);
   const navigation = useNavigation();
-  const errorSystem = useErrorSystem();
-  const { opacity, scale, animateIn, animateOut } = useAnimation({
-    initialOpacity: 0,
-    initialScale: 0.9
-  });
 
-  const { students, isLoading, searchTerm, filteredStudents,
-    setSearchTerm, confirmSelection, handleSearch
-  } = useStudents();
+  const { students, isLoading, searchTerm, filteredStudents, setSearchTerm, handleSearch } = useStudents();
+  const { selectedItems: selectedStudents, toggleSelection: toggleStudentSelection, hasSelection } = useSelection<Student>({ initialSelectedItems: students });
 
-  const { selectedItems: selectedStudents, toggleSelection: toggleStudentSelection,
-    toggleSelectAll, clearSelection, isAllSelected, hasSelection, selectionBatch,
-  } = useSelection<Student>({ initialSelectedItems: students });
-
-  const { handleStudentSelect, handleSelectAll,  } = useStudentSelection(students);
-
-  useEffect(() => {
-    if (students.length > 0) {
-      animateIn();
-    } else {
-      animateOut();
-    }
-  }, [students]);
-
-  const selectedStudentData = useMemo(() =>
+  const selectedStudentData = useMemo(() => 
     students.find(s => s.id === selectedStudent),
     [selectedStudent, students]
   );
 
+  const handleContinue = () => {
+    navigation.navigate('Capture' as never);
+  };
+
+  const handleBack = () => {
+    setCurrentView('scanner');
+  };
+
   if (isLoading) {
     return (
-      <View style={[styles.container, { backgroundColor: colors.background.primary }]}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.background.primary }}>
         <Text style={{ color: colors.text.primary }}>Carregando alunos...</Text>
       </View>
-    );
-  }
-
-  if (students.length === 0) {
-    return (
-      <LinearGradient
-        colors={[colors.background.primary, colors.background.secondary]}
-        style={styles.screenContainer}
-      >
-        <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
-        <View style={styles.emptyState}>
-          <Users size={64} color={colors.text.secondary} />
-          <View style={styles.emptyContainer}>
-            <View style={styles.emptyIllustration}>
-              <Users size={72} color={colors.text.secondary} />
-            </View>
-            <Text style={styles.emptyTitle}>Nenhum aluno encontrado</Text>
-            <Text style={styles.emptyDescription}>
-              {searchTerm
-                ? 'Nenhum aluno corresponde à sua busca. Tente outro termo.'
-                : 'Verifique sua conexão ou contate o administrador.'}
-            </Text>
-            {searchTerm ? (
-              <TouchableOpacity
-                onPress={() => setSearchTerm('')}
-                style={styles.emptyActionButton}
-              >
-                <Text style={styles.emptyActionText}>Limpar busca</Text>
-              </TouchableOpacity>
-            ) : (
-              <TouchableOpacity
-                onPress={() => clearSelection()}
-                style={styles.emptyActionButton}
-              >
-                <Text style={styles.emptyActionText}>Tentar novamente</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-      </LinearGradient>
     );
   }
 
@@ -143,173 +61,31 @@ const StudentsScreen = ({
       <StatusBar barStyle="light-content" backgroundColor="transparent" translucent />
       <LinearGradient
         colors={[colors.background.primary, colors.background.secondary]}
-        style={styles.screenContainer}
+        style={{ flex: 1 }}
       >
-        <SectionHeader
-          title="Identificação de Aluno"
-          subtitle="Selecione o aluno para esta prova"
-          icon={<Users size={24} color={colors.text.primary} />}
-          onBack={() => setCurrentView('scanner')}
+        <StudentsHeader
+          searchTerm={searchTerm}
+          onBack={handleBack}
+          onSearch={handleSearch}
         />
 
-        <ScrollView
-          style={styles.scrollContent}
-          contentContainerStyle={{ paddingBottom: 100 }}
-        >
-          {/* Header Moderno */}
-          <View style={styles.headerContainer}>
-            <View style={styles.headerRow}>
-              <TouchableOpacity
-                onPress={() => setCurrentView('scanner')}
-                style={styles.backButton}
-              >
-                <ChevronLeft size={24} color={colors.text.primary} />
-              </TouchableOpacity>
-              <Text style={styles.headerTitle}>Seleção de Alunos</Text>
-            </View>
-
-            <SearchBar
-              value={searchTerm}
-              onChangeText={handleSearch}
-              placeholder="Buscar alunos..." />
-          </View>
-
-          {/* Código Escaneado */}
-          {scannedCode && (
-            <Animated.View style={[styles.codeCard, { opacity: 1 }]}>
-              <LinearGradient
-                colors={[`${colors.primary.main}15`, `${colors.primary.main}25`]}
-                style={styles.codeCardGradient}
-              >
-                <View style={styles.codeHeader}>
-                  <Sparkles size={20} color={colors.primary.main} />
-                  <Text style={styles.codeLabel}>Código Identificado</Text>
-                </View>
-                <Text style={styles.codeValue}>{scannedCode}</Text>
-              </LinearGradient>
-            </Animated.View>
-          )}
-
-          {/* Preview do Aluno Selecionado */}
-          {selectedStudentData && (
-            <Animated.View style={styles.selectedPreview}>
-              <LinearGradient
-                colors={[colors.feedback.success + '20', colors.feedback.success + '10']}
-                style={styles.previewGradient}
-              >
-                <CheckCircle size={24} color={colors.feedback.success} />
-                <View style={styles.previewContent}>
-                  <Text style={styles.previewName}>{selectedStudentData.name}</Text>
-                  <Text style={styles.previewClass}>Turma {selectedStudentData.class}</Text>
-                </View>
-                <ArrowRight size={20} color={colors.feedback.success} />
-              </LinearGradient>
-            </Animated.View>
-          )}
-
-          {/* Lista de Alunos */}
-          <View style={styles.studentsSection}>
-            <Text style={styles.sectionTitle}>
-              Alunos Disponíveis ({students.length})
-            </Text>
-
-            <View style={styles.studentsList}>
-              <SelectionCounter
-                count={selectedStudents.length}
-                total={filteredStudents.length}
-              />
-              <FlatList
-                data={students}
-                keyExtractor={item => item.id}
-                getItemLayout={(__, index) => ({
-                  length: STUDENT_LIST_CONFIG.itemHeight,
-                  offset: STUDENT_LIST_CONFIG.itemHeight * index,
-                  index,
-                })}
-                renderItem={({ item }) => (
-                  <StudentCard
-                    student={item}
-                    isSelected={selectedStudents.some(s => s.id === item.id)}
-                    onSelect={toggleStudentSelection}
-                  />
-                )}
-                scrollEnabled={false}
-                contentContainerStyle={styles.listContent}
-                initialNumToRender={10}
-                maxToRenderPerBatch={5}
-                windowSize={5}
-                updateCellsBatchingPeriod={50}
-              />
-            </View>
-          </View>
-
-          {hasSelection && (
-            <Animated.View style={[
-              styles.floatingActionBar,
-              { backgroundColor: colors.background.secondary, shadowColor: colors.primary.main }
-            ]}>
-              <Text style={styles.selectionCountText}>
-                {selectedStudents.length} selecionado(s)
-              </Text>
-              <TouchableOpacity
-                style={styles.confirmButton}
-                onPress={confirmSelection}
-                activeOpacity={0.8}
-              >
-                <Text style={styles.confirmButtonText}>Confirmar</Text>
-                <ArrowRight size={20} color="white" style={styles.confirmIcon} />
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-
-          {/* Botões */}
-          <View style={styles.actionsContainer}>
-            <LinearGradient
-              colors={
-                selectedStudent
-                  ? [colors.primary.main, colors.primary.dark]
-                  : [colors.component.disabled, colors.component.disabled]
-              }
-              style={[styles.primaryButton, !selectedStudent && styles.disabledButton]}
-            >
-              <Button
-                title="Continuar Prova"
-                onPress={() => navigation.navigate('Capture' as never)}
-                variant="ghost"
-                disabled={!hasSelection}
-                style={styles.buttonTransparent}
-                textStyle={styles.primaryButtonText}
-                icon={<ArrowRight size={20} color="white" />}
-              />
-            </LinearGradient>
-
-            <Button
-              title="Voltar ao Scanner"
-              onPress={() => setCurrentView('scanner')}
-              variant="secondary"
-              style={styles.secondaryButton}
-            />
-          </View>
+        <ScrollView style={{ flex: 1, paddingTop: 120, paddingBottom: 180 }}>
+          {scannedCode && <ScannedCodeCard code={scannedCode} />}
+          {selectedStudentData && <SelectedStudentPreview student={selectedStudentData} />}
+          
+          <StudentsList
+            students={filteredStudents}
+            selectedStudents={selectedStudents}
+            onSelectStudent={toggleStudentSelection}
+          />
         </ScrollView>
 
-        <SelectionBar
-          selectedCount={selectedStudents.length}
-          totalCount={filteredStudents.length}
-          onSelectAll={() => toggleSelectAll(filteredStudents)}
-          onDeselectAll={clearSelection}
-          onConfirm={confirmSelection}
-          isAllSelected={isAllSelected(filteredStudents)}
-          confirmLabel="Confirmar seleção"
-          style={styles.selectionBar}
+        <StudentsFooter
+          hasSelection={hasSelection}
+          onContinue={handleContinue}
+          onBack={handleBack}
         />
       </LinearGradient>
-      {selectionBatch > 1 && (
-        <View style={styles.batchSelectionIndicator}>
-          <Text style={styles.batchSelectionText}>
-            +{selectionBatch}
-          </Text>
-        </View>
-      )}
     </>
   );
 };

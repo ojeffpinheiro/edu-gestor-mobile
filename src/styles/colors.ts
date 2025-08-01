@@ -99,7 +99,7 @@ export const lightColors: ColorPalette = {
     primary: '#111827', // Preto suave
     secondary: '#4B5563', // Cinza médio
     tertiary: '#6B7280', // Cinza mais claro
-    card: '#1F2937', // Texto para cards
+    card: '#EEEEEE', // Texto para cards
     onPrimary: '#FFFFFF', // Texto sobre cores primárias
   },
   border: {

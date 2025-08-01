@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Text, View } from 'react-native';
+import { Platform, StatusBar, Text, View } from 'react-native';
 import 'react-native-gesture-handler';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -15,7 +15,7 @@ import IdentificationScreen from './src/screens/IdentificationScreen';
 import ProcessingScreen from './src/screens/ProcessingScreen';
 import ReportScreen from './src/screens/ReportScreen';
 import CorrectionScreen from './src/screens/CorretionScreen';
-import { loadModels } from './src/utils/imageProcessor'; // Importe loadModels
+import { loadModels } from './src/utils/imageProcessor';
 import CaptureScreen from './src/screens/CaptureScreen';
 
 const Stack = createStackNavigator();
@@ -69,51 +69,46 @@ const AppContent = () => {
   }
 
   return (
-    <SafeAreaProvider>
+    <SafeAreaProvider style={{  paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight : 25 }} >
       <NavigationContainer>
         <Stack.Navigator
           initialRouteName="Home"
-          screenOptions={{
-            headerStyle: { backgroundColor: '#2196F3' },
-            headerTintColor: '#fff',
-            headerTitleStyle: { fontWeight: 'bold' },
-          }}
         >
           <Stack.Screen name='Cam' component={CaptureScreen}  />
           <Stack.Screen
             name="Home"
             component={HomeScreen}
-            options={{ title: 'Correção de Provas' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Auth"
             component={AuthScreen}
-            options={{ title: 'Autenticação' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Identification"
             component={IdentificationScreen}
-            options={{ title: 'Identificação' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Capture"
             component={CaptureScreen}
-            options={{ title: 'Captura' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Processing"
             component={ProcessingScreen}
-            options={{ title: 'Processamento' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Report"
             component={ReportScreen}
-            options={{ title: 'Relatório' }}
+            options={{ headerShown: false }}
           />
           <Stack.Screen
             name="Correction"
             component={CorrectionScreen}
-            options={{ title: 'Correção' }}
+            options={{ headerShown: false }}
           />
         </Stack.Navigator>
       </NavigationContainer>

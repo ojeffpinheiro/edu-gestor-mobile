@@ -9,7 +9,7 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
   return StyleSheet.create({
     screenContainer: {
       ...baseStyles.screenContainer,
-      padding: Spacing.md,
+      flex: 1,
     },
     scrollContent: {
       flexGrow: 1,
@@ -84,7 +84,8 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       marginLeft: 8,
       textTransform: 'uppercase',
       letterSpacing: 0.5,
-    },// Preview do Aluno Selecionado
+    },
+    // Preview do Aluno Selecionado
     selectedPreview: {
       marginHorizontal: 24,
       marginBottom: 32,
@@ -130,13 +131,6 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       textTransform: 'uppercase' as const,
       letterSpacing: 1,
     },
-    studentsList: {
-      // Espaçamento já definido nos items
-    },
-    studentCard: {
-      // Animação aplicada aqui
-    },
-
     // Botões de Ação
     actionsContainer: {
       paddingHorizontal: 24,
@@ -372,7 +366,8 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
       fontSize: 16,
       fontWeight: '600',
       marginRight: 8,
-    }, emptyContainer: {
+    }, 
+    emptyContainer: {
       flex: 1,
       justifyContent: 'center',
       alignItems: 'center',
@@ -380,6 +375,35 @@ export const createStudentsScreenStyles = (colors: ColorScheme) => {
     },
     emptyIllustration: {
       marginBottom: 24,
+    },
+    fixedHeader: {
+      paddingHorizontal: Spacing.md,
+      paddingTop: Spacing.lg,
+      paddingBottom: Spacing.md,
+      backgroundColor: colors.background.primary,
+      zIndex: 10,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.border.light,
+    },
+    scrollContainer: {
+      flex: 1,
+      paddingTop: 120,
+      paddingBottom: 100,
+    },
+    fixedFooter: {
+      position: 'absolute',
+      bottom: 0,
+      left: 0,
+      right: 0,
+      padding: Spacing.md,
+      backgroundColor: colors.background.primary,
+      borderTopWidth: 1,
+      borderTopColor: colors.border.light,
+      zIndex: 10,
+    },
+    studentsListContainer: {
+      flex: 1,
+      paddingHorizontal: Spacing.md,
     },
     emptyDescription: {
       fontSize: 16,

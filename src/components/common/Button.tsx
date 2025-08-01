@@ -207,6 +207,7 @@ const createButtonStyles = (colors: ColorScheme) => {
     },
     textBase: {
       fontWeight: Typography.fontWeight.semibold,
+      color: colors.text.card,
     },
     fullWidth: {
       width: '100%',

@@ -136,6 +136,7 @@ const createStyles = (colors: any, isSelected: boolean) =>
       borderColor: isSelected
         ? colors.primary.main
         : colors.border.light,
+      marginHorizontal: isSelected ? -4 : 0,
     },
     content: {
       flexDirection: 'row',

@@ -62,6 +62,21 @@ export const validateImageQuality = async (imageUri: string): Promise<Validation
   }
 };
 
+export const validateCapturedImage = async (imageUri: string) => {
+  const [fileValidation, qualityValidation] = await Promise.all([
+    validateImageFile({ uri: imageUri }),
+    validateImageQuality(imageUri)
+  ]);
+
+  return {
+    isValid: fileValidation.isValid && qualityValidation.isValid,
+    errors: [
+      ...(fileValidation.message ? [fileValidation.message] : []),
+      ...(qualityValidation.message ? [qualityValidation.message] : [])
+    ]
+  };
+};
+
 export const validateLightingConditions = (imageTensor: tf.Tensor3D): ValidationResult => {
   // Implementar análise de iluminação usando tensor
   const meanBrightness = tf.mean(imageTensor).dataSync()[0];

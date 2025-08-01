@@ -1,7 +1,7 @@
 // src/hooks/useImageCapture.ts
 import { useState, useEffect, useCallback } from 'react';
 import { Dimensions } from 'react-native';
-import { CameraCapturedPicture } from 'expo-camera';
+import { CameraCapturedPicture, CameraView } from 'expo-camera';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
 import * as tf from '@tensorflow/tfjs';
@@ -36,7 +36,7 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const [analysisResult, setAnalysisResult] = useState<{ correctPoints: number; totalPoints: number } | null>(null);
   const [autoCaptureMode, setAutoCaptureMode] = useState<'OFF' | 'FAST' | 'SLOW'>('OFF');
   const [isLandscape, setIsLandscape] = useState(false);
-  
+
   const { showError } = useErrorSystem();
 
   // Solicitar permissões da câmera e galeria
@@ -87,7 +87,7 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
   const analyzePoints = async (imageUri: string, landscape: boolean): Promise<PointAnalysisResult> => {
     try {
       setIsProcessing(true);
-      
+
       // Validação do arquivo de imagem
       const fileValidation = validateImageFile({ uri: imageUri });
       if (!fileValidation.isValid) {
@@ -206,6 +206,11 @@ const useImageCapture = (onPhotoCaptured: (uri: string) => void) => {
     } finally {
       setIsProcessing(false);
     }
+  };
+
+  const captureImage = async (cameraRef: React.RefObject<CameraView>) => {
+    if (!cameraRef.current) throw new Error('Camera not ready');
+    return await cameraRef.current.takePictureAsync();
   };
 
   const handleImageCapture = useCallback(async (imageResult: ImageCaptureResult) => {

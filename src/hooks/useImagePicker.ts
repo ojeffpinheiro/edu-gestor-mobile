@@ -1,4 +1,3 @@
-// hooks/useImagePicker.js
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import { Alert, Platform } from 'react-native';

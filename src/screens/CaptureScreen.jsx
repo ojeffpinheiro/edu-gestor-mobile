@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -9,84 +9,33 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialIcons, FontAwesome, MaterialCommunityIcons } from '@expo/vector-icons';
+
+import { useTheme } from '../context/ThemeContext';
+
+import useOrientation from '../hooks/useOrientation';
+import useImagePicker from '../hooks/useImagePicker';
 
 import CameraCapture from '../components/capture/CameraCapture';
 import BlueColorDetector from '../components/capture/BlueColorDetector';
 import AppButton from '../components/capture/AppButton';
-import { BorderRadius, Shadow, Spacing, Typography } from '../styles/designTokens';
-import { useTheme } from '../context/ThemeContext';
-import { createContainerStyles, createButtonStyles, createTextStyles, createCardStyles } from '../styles/globalStyles';
+
+import ImagePlaceholder from '../components/features/capture/ImagePlaceholder';
+import ProcessingIndicator from '../components/features/capture/ProcessingIndicator';
+import { createCaptureScreenStyles } from './styles';
 
 const CaptureScreen = () => {
   const [currentScreen, setCurrentScreen] = useState('main'); // 'main', 'camera', 'colorDetector'
   const [selectedImage, setSelectedImage] = useState(null);
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [orientation, setOrientation] = useState('PORTRAIT');
-  const { colors } = useTheme()
+  const orientation = useOrientation();
+  const { colors } = useTheme();
+  const { openGallery, isProcessing } = useImagePicker();
 
-  const styles = createCaptureScreenStyles(colors)
-
-  // Monitorar orientação do dispositivo
-  useEffect(() => {
-    const updateOrientation = () => {
-      const { width, height } = Dimensions.get('window');
-      setOrientation(width > height ? 'LANDSCAPE' : 'PORTRAIT');
-    };
-
-    const subscription = Dimensions.addEventListener('change', updateOrientation);
-    updateOrientation(); // Chamada inicial
-
-    return () => subscription?.remove();
-  }, []);
-
-  // Abrir galeria com tratamento de erros melhorado
-  const openGallery = async () => {
-    if (Platform.OS !== 'web') {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert(
-          'Permissão necessária',
-          'Precisamos da permissão para acessar sua galeria para que você possa selecionar imagens.',
-          [{ text: 'OK' }]
-        );
-        return;
-      }
-    }
-
-    setIsProcessing(true);
-    try {
-      let result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [4, 3],
-        quality: 1,
-        allowsMultipleSelection: false,
-      });
-
-      if (!result.canceled && result.assets.length > 0) {
-        setSelectedImage({
-          uri: result.assets[0].uri,
-          width: result.assets[0].width,
-          height: result.assets[0].height,
-        });
-      }
-    } catch (error) {
-      console.error('Gallery error:', error);
-      Alert.alert(
-        'Erro',
-        'Não foi possível acessar a galeria. Por favor, tente novamente.',
-        [{ text: 'OK' }]
-      );
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+  const styles = createCaptureScreenStyles(colors);
 
   const handlePhotoCaptured = (uri) => {
     setSelectedImage({ uri });
-    setCurrentScreen('main'); // Volta para a tela principal após captura
+    setCurrentScreen('main');
   };
 
   const handleNextStudent = () => {
@@ -94,8 +43,15 @@ const CaptureScreen = () => {
     Alert.alert(
       'Próximo aluno',
       'Pronto para capturar o próximo aluno',
-      [{ text: 'OK', onPress: () => { } }]
+      [{ text: 'OK' }]
     );
+  };
+
+  const handleSelectImage = async () => {
+    const image = await openGallery();
+    if (image) {
+      setSelectedImage(image);
+    }
   };
 
   // Tela do Detector de Cor Azul
@@ -135,35 +91,25 @@ const CaptureScreen = () => {
   // Tela Principal
   return (
     <View style={styles.screenContainer}>
+
       <Text style={styles.title}>
         Selecione uma imagem
       </Text>
 
-      {!selectedImage && !isProcessing && (
-        <View style={styles.imagePlaceholder}>
-          <Text style={styles.placeholderText}>
-            Nenhuma imagem selecionada
-          </Text>
-        </View>
-      )}
-
-      {isProcessing ? (
-        <View style={styles.processingContainer}>
-          <ActivityIndicator size="large" color="#4285F4" />
-          <Text style={styles.processingText}>
-            Processando...
-          </Text>
-        </View>
-      ) : selectedImage && (
-        <View style={styles.imageContainer}>
-          <Image
-            source={{ uri: selectedImage.uri }}
-            style={styles.image}
-            resizeMode="contain"
-            accessibilityLabel="Imagem selecionada"
-          />
-        </View>
-      )}
+      {!selectedImage && !isProcessing && <ImagePlaceholder />}
+      {isProcessing
+        ? <ProcessingIndicator />
+        : selectedImage && (
+          <View style={styles.imageContainer}>
+            <Image
+              source={{ uri: selectedImage.uri }}
+              style={styles.image}
+              resizeMode="contain"
+              accessibilityLabel="Imagem selecionada"
+            />
+          </View>
+        )}
+      {isProcessing && <ProcessingIndicator />}
 
       <View style={styles.buttonContainer}>
         <AppButton
@@ -221,118 +167,6 @@ const CaptureScreen = () => {
       )}
     </View>
   );
-};
-
-export const createCaptureScreenStyles = (colors) => {
-  const containers = createContainerStyles(colors);
-  const buttons = createButtonStyles(colors);
-  const text = createTextStyles(colors);
-  const cards = createCardStyles(colors);
-
-  return StyleSheet.create({
-    screenContainer: {
-      ...containers.screenContainer,
-    },
-    title: {
-      ...text.heading1,
-      textAlign: 'center',
-      marginBottom: Spacing.xl,
-    },
-    imagePlaceholder: {
-      ...cards.base,
-      height: 200,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginVertical: Spacing.lg,
-    },
-    placeholderText: {
-      color: colors.text.primary
-    },
-    buttonContainer: {
-      ...containers.buttonContainer,
-    },
-    button: {
-      ...buttons.primary,
-      width: '100%',
-      marginBottom: Spacing.md,
-      borderRadius: 12,
-      paddingVertical: 16,
-      paddingHorizontal: 24,
-      minWidth: 160,
-      alignItems: 'center',
-    },
-    cameraButton: {
-      backgroundColor: colors.primary.main,
-    },
-    galleryButton: {
-      backgroundColor: colors.secondary.main,
-      color: colors.text.card
-    },
-    colorDetectorButton: {
-      backgroundColor: colors.primary.light,
-      marginTop: Spacing.md,
-    },
-    buttonText: {
-      color: colors.text.onPrimary,
-      fontWeight: Typography.fontWeight.bold,
-      fontSize: Typography.fontSize.md,
-    },
-    imageContainer: {
-      width: '100%',
-      height: 300,
-      marginVertical: Spacing.lg,
-      borderRadius: BorderRadius.md,
-      overflow: 'hidden',
-      borderWidth: 1,
-      borderColor: colors.border.light,
-    },
-    image: {
-      width: '100%',
-      height: '100%',
-    },
-    processingContainer: {
-      marginTop: Spacing.xl,
-      alignItems: 'center',
-    },
-    processingText: {
-      marginTop: Spacing.md,
-      fontSize: Typography.fontSize.md,
-      color: colors.text.secondary,
-    },
-    navigationButtons: {
-      flexDirection: 'row',
-      justifyContent: 'space-between',
-      width: '100%',
-      marginTop: Spacing.xl,
-    },
-    navButton: {
-      padding: Spacing.lg,
-      borderRadius: BorderRadius.md,
-      width: '45%',
-      alignItems: 'center',
-      ...Shadow(colors).xs,
-    },
-    backButtonNav: {
-      backgroundColor: colors.feedback.error,
-    },
-    nextButton: {
-      backgroundColor: colors.feedback.warning,
-    },
-    navButtonText: {
-      color: colors.text.onPrimary,
-      fontWeight: Typography.fontWeight.bold,
-      fontSize: Typography.fontSize.md,
-    },
-    backButton: {
-      position: 'absolute',
-      top: Spacing.xxl,
-      left: Spacing.lg,
-      padding: Spacing.md,
-      backgroundColor: colors.feedback.error + 'CC',
-      borderRadius: BorderRadius.sm,
-      zIndex: 10,
-    },
-  });
 };
 
 export default CaptureScreen;

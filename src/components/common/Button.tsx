@@ -22,7 +22,8 @@ type ButtonVariant =
   | 'success'       // Ações positivas
   | 'outline'       // Botões com borda
   | 'ghost'         // Botões sem fundo
-  | 'text';         // Links estilizados como botões
+  | 'text'       // Links estilizados como botões
+  | 'floating';
 
 type ButtonSize = 'xs' | 'sm' | 'md' | 'lg' | 'xl'; // Escala consistente
 
@@ -39,12 +40,36 @@ type ButtonStyles = {
   // Variantes
   primary: ViewStyle;
   primaryText: TextStyle;
+  secondary: ViewStyle;
+  secondaryText: TextStyle;
+  tertiary: ViewStyle;
+  tertiaryText: TextStyle;
+  danger: ViewStyle;
+  dangerText: TextStyle;
+  success: ViewStyle;
+  successText: TextStyle;
+  outline: ViewStyle;
+  outlineText: TextStyle;
+  ghost: ViewStyle;
+  ghostText: TextStyle;
+  text: ViewStyle;
+  textText: TextStyle;
+  floating: ViewStyle;
+  floatingText: TextStyle;
   // ... outras variantes
   // Tamanhos
+  sm: ViewStyle;
+  md: ViewStyle;
+  lg: ViewStyle;
+  xl: ViewStyle;
   xs: ViewStyle;
   // ... outros tamanhos
   // Text sizes
   xsText: TextStyle;
+  smText: TextStyle;
+  mdText: TextStyle;
+  lgText: TextStyle;
+  xlText: TextStyle;
   // ... outros tamanhos de texto
 };
 
@@ -230,28 +255,130 @@ const createButtonStyles = (colors: ColorScheme) => {
     iconRight: {
       marginLeft: Spacing.sm,
     },
-    primary: {},
-    primaryText: {},
-    xs: {},
-    xsText: {},
-  };
-  baseStyles.primary = {
-    backgroundColor: colors.primary.main,
-    borderColor: colors.primary.main,
-  };
 
-  baseStyles.primaryText = {
-    color: colors.text.onPrimary,
-  };
+    // Variantes
+    primary: {
+      backgroundColor: colors.primary.main,
+      borderColor: colors.primary.main,
+    },
+    primaryText: {
+      color: colors.text.onPrimary,
+    },
+    secondary: {
+      backgroundColor: colors.secondary.main,
+      borderColor: colors.secondary.main,
+    },
+    secondaryText: {
+      color: colors.text.secondary,
+    },
 
-  baseStyles.xs = {
-    paddingVertical: Spacing.xxs,
-    paddingHorizontal: Spacing.xs,
-    minHeight: 32,
-  };
+    tertiary: {
+      backgroundColor: colors.background.tertiary,
+      borderColor: colors.background.tertiary,
+    },
+    tertiaryText: {
+      color: colors.text.tertiary,
+    },
 
-  baseStyles.xsText = {
-    fontSize: Typography.fontSize.xs,
+    danger: {
+      backgroundColor: colors.feedback.error,
+      borderColor: colors.feedback.error,
+    },
+    dangerText: {
+      color: colors.text.onPrimary,
+    },
+
+    success: {
+      backgroundColor: colors.feedback.success,
+      borderColor: colors.feedback.success,
+    },
+    successText: {
+      color: colors.text.onPrimary,
+    },
+
+    outline: {
+      backgroundColor: 'transparent',
+      borderColor: colors.primary.main,
+    },
+    outlineText: {
+      color: colors.primary.main,
+    },
+
+    ghost: {
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+    },
+    ghostText: {
+      color: colors.primary.main,
+    },
+
+    text: {
+      backgroundColor: 'transparent',
+      borderColor: 'transparent',
+      paddingHorizontal: 0,
+      paddingVertical: 0,
+    },
+    textText: {
+      color: colors.primary.main,
+      textDecorationLine: 'underline',
+    },
+
+    floating: {
+      backgroundColor: colors.background.secondary,
+      borderColor: colors.border.medium,
+      shadowColor: colors.border.light,
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.2,
+      shadowRadius: 4,
+      elevation: 2,
+    },
+    floatingText: {
+      color: colors.text.primary,
+    },
+
+    // Tamanhos
+    xs: {
+      paddingVertical: Spacing.xxs,
+      paddingHorizontal: Spacing.xs,
+      minHeight: 32,
+    },
+    sm: {
+      paddingVertical: Spacing.xs,
+      paddingHorizontal: Spacing.sm,
+      minHeight: 36,
+    },
+    md: {
+      paddingVertical: Spacing.sm,
+      paddingHorizontal: Spacing.md,
+      minHeight: 40,
+    },
+    lg: {
+      paddingVertical: Spacing.md,
+      paddingHorizontal: Spacing.lg,
+      minHeight: 48,
+    },
+    xl: {
+      paddingVertical: Spacing.lg,
+      paddingHorizontal: Spacing.xl,
+      minHeight: 56,
+    },
+
+    // Tamanhos de texto
+    xsText: {
+      fontSize: Typography.fontSize.xs,
+    },
+    smText: {
+      fontSize: Typography.fontSize.sm,
+    },
+    mdText: {
+      fontSize: Typography.fontSize.md,
+    },
+    lgText: {
+      fontSize: Typography.fontSize.lg,
+    },
+    xlText: {
+      fontSize: Typography.fontSize.xl,
+    },
   };
 
   return StyleSheet.create(baseStyles);

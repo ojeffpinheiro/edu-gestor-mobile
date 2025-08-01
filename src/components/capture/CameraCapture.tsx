@@ -3,19 +3,24 @@ import React, { useEffect, useRef, useState } from 'react';
 import { View, StyleSheet, Animated, Easing, Dimensions, TextInput, Text } from 'react-native';
 import { CameraView } from 'expo-camera';
 import { useTheme } from '../../context/ThemeContext';
+
+import useImageCapture from '../../hooks/useImageCapture';
+
+import { validateQuestionCount } from '../../utils/validationUtils';
+
+import ScreenTransition from '../common/ScreenTransition';
+import ProgressIndicator from '../common/ProgressIndicator';
+import SkeletonLoader from '../common/SkeletonLoader';
+
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import { createContainerStyles, createTextStyles } from '../../styles/globalStyles';
 import { Spacing } from '../../styles/designTokens';
-import LoadingOverlay from '../LoadingOverlay';
+
 import ReferencePoints from './ReferencePoints';
 import CaptureControls from './CaptureControls';
 import ImagePreview from './ImagePreview';
 import MarkAnalysis from './MarkAnalysis';
-import ScreenTransition from '../common/ScreenTransition';
-import ProgressIndicator from '../common/ProgressIndicator';
-import SkeletonLoader from '../common/SkeletonLoader';
-import useImageCapture from '../../hooks/useImageCapture';
-import { validateQuestionCount } from '../../utils/validationUtils';
+
 
 const CameraCapture: React.FC<{ onPhotoCaptured: (uri: string) => void }> = ({ onPhotoCaptured }) => {
   const { colors } = useTheme();

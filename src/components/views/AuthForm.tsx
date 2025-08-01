@@ -5,8 +5,7 @@ import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import { useAuthForm } from '../../hooks/useAuthForm';
 import useErrorSystem from '../../hooks/useErrorSystem';
-
-import createAuthStyles from './authStyles';
+import createAuthStyles from '../auth/authStyles';
 
 const AuthForm = ({ setCurrentView }) => {
   const { colors } = useTheme();

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet, Text, TouchableOpacity } from 'react-native';
-import { useTheme } from '../context/ThemeContext';
-import PermissionRequestCard from './features/scanner/PermissionRequestCard';
+import { useTheme } from '../../../context/ThemeContext';
+import PermissionRequestCard from './PermissionRequestCard';
 
 interface PermissionStatusViewProps {
   status: 'denied' | 'undetermined' | 'null' | 'false';

@@ -1,10 +1,11 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { CheckCircle, ArrowRight } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import { Text } from 'react-native';
+import { View, StyleSheet, ViewStyle, TextStyle, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Student } from '../../types/newTypes';
+import { CheckCircle, ArrowRight } from 'lucide-react-native';
+
+import { useTheme } from '../../../context/ThemeContext';
+
+import { Student } from '../../../types/newTypes';
 
 interface SelectedStudentPreviewProps {
   student: Student;

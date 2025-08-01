@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle, TextStyle, Text } from 'react-native';
-import { Sparkles } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
+import { View, StyleSheet, Text } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Sparkles } from 'lucide-react-native';
+
+import { useTheme } from '../../../context/ThemeContext';
 
 interface ScannedCodeCardProps {
   code: string;

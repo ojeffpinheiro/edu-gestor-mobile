@@ -12,7 +12,8 @@ import { AuthView } from '../../types/newTypes';
 
 import MainButtons from '../common/MainButtons';
 import BottomBar from '../common/layout/BottomBar';
-import PermissionStatusView from '../PermissionStatusView';
+
+import PermissionStatusView from '../features/scanner/PermissionStatusView';
 import ScannerModeRenderer from '../features/scanner/ScannerRouter';
 import DevTooltip from '../features/scanner/DevTooltip';
 
@@ -22,7 +23,7 @@ interface ScannerProps {
   isAuthenticated: boolean;
 }
 
-const ScannerScreen: React.FC<ScannerProps> = ({
+const ScannerView: React.FC<ScannerProps> = ({
   setCurrentView,
   setIsAuthenticated,
   isAuthenticated
@@ -182,4 +183,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ScannerScreen;
+export default ScannerView;

@@ -6,9 +6,10 @@ import { useTheme } from '../../context/ThemeContext';
 import Card from '../common/Card';
 import Button from '../common/Button';
 import InfoBox from '../common/InfoBox';
+
 import { createHomeScreenStyles } from '../auth/styles';
 
-const HomeScreen = ({ setCurrentView }) => {
+const HomeView = ({ setCurrentView }) => {
   const { colors } = useTheme();
   const styles = createHomeScreenStyles(colors);
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -57,4 +58,4 @@ const HomeScreen = ({ setCurrentView }) => {
   );
 };
 
-export default HomeScreen;
+export default HomeView;

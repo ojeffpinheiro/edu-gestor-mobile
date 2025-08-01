@@ -1,9 +1,10 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet, ViewStyle, TextStyle } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, ViewStyle, TextStyle, Text } from 'react-native';
 import { ChevronLeft } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import SearchBar from '../common/SearchBar';
-import { Text } from 'react-native';
+
+import { useTheme } from '../../../context/ThemeContext';
+
+import SearchBar from '../../common/SearchBar';
 
 interface StudentsHeaderProps {
   searchTerm: string;
@@ -41,7 +42,7 @@ const StudentsHeader = ({ searchTerm, onBack, onSearch }: StudentsHeaderProps) =
   );
 };
 
-const createStudentsHeaderStyles = (colors: any): StudentsHeaderStyles => 
+const createStudentsHeaderStyles = (colors: any): StudentsHeaderStyles =>
   StyleSheet.create({
     container: {
       paddingHorizontal: 16,

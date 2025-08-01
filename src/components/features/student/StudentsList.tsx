@@ -1,10 +1,12 @@
 import React from 'react';
-import { FlatList, View, StyleSheet, ViewStyle, TextStyle } from 'react-native';
-import { useTheme } from '../../context/ThemeContext';
-import { Text } from 'react-native';
-import StudentCard from '../StudentCard';
-import { Student } from '../../types/newTypes';
-import SelectionCounter from './SelectionCounter';
+import { FlatList, View, StyleSheet, ViewStyle, TextStyle, Text } from 'react-native';
+
+import { useTheme } from '../../../context/ThemeContext';
+
+import { Student } from '../../../types/newTypes';
+
+import SelectionCounter from '../SelectionCounter';
+import StudentCard from './StudentCard';
 
 interface StudentsListProps {
   students: Student[];

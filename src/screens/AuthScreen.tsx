@@ -3,10 +3,10 @@ import { View } from 'react-native';
 
 import { AuthView } from '../types/newTypes';
 
-import AuthForm from '../components/auth/AuthForm';
-import ScannerScreen from '../components/views/ScannerScreen';
-import StudentsScreen from '../components/views/StudentsScreen';
-import HomeScreen from '../components/views/HomeScreen';
+import AuthForm from '../components/views/AuthForm';
+import HomeView from '../components/views/HomeView';
+import ScannerView from '../components/views/ScannerView';
+import StudentsView from '../components/views/StudentsView';
 
 const AuthScreen = () => {
   const [currentView, setCurrentView] = useState<AuthView>('home');
@@ -22,7 +22,7 @@ const AuthScreen = () => {
         );
       case 'scanner':
         return (
-          <ScannerScreen
+          <ScannerView
             setCurrentView={setCurrentView}
             setIsAuthenticated={setIsAuthenticated}
             isAuthenticated={isAuthenticated}
@@ -30,7 +30,7 @@ const AuthScreen = () => {
         );
       case 'students':
         return (
-          <StudentsScreen
+          <StudentsView
             setCurrentView={setCurrentView}
             scannedCode={scannedCode}
             selectedStudent={selectedStudent}
@@ -38,7 +38,7 @@ const AuthScreen = () => {
           />
         );
       default:
-        return <HomeScreen setCurrentView={setCurrentView} />;
+        return <HomeView setCurrentView={setCurrentView} />;
     }
   };
 

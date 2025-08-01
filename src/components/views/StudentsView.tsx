@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { View, ScrollView, StatusBar, Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -10,25 +10,25 @@ import { useSelection } from '../../hooks/useSelection';
 
 import { AuthView, Student } from '../../types/newTypes';
 
-import StudentsHeader from '../features/StudentsHeader';
-import ScannedCodeCard from '../features/ScannedCodeCard';
-import StudentsList from '../features/StudentsList';
-import StudentsFooter from '../features/StudentsFooter';
-import SelectedStudentPreview from '../features/SelectedStudentPreview';
+import StudentsHeader from '../features/student/StudentsHeader';
+import ScannedCodeCard from '../features/student/ScannedCodeCard';
+import StudentsList from '../features/student/StudentsList';
+import StudentsFooter from '../features/student/StudentsFooter';
+import SelectedStudentPreview from '../features/student/SelectedStudentPreview';
 
-interface StudentsScreenProps {
+interface StudentsViewProps {
   scannedCode?: string;
   selectedStudent?: string | null;
   setSelectedStudent: (id: string) => void;
   setCurrentView: (view: AuthView) => void;
 }
 
-const StudentsScreen = ({
+const StudentsView = ({
   scannedCode,
   selectedStudent,
   setSelectedStudent,
   setCurrentView
-}: StudentsScreenProps) => {
+}: StudentsViewProps) => {
   const { colors } = useTheme();
   const navigation = useNavigation();
 
@@ -90,4 +90,4 @@ const StudentsScreen = ({
   );
 };
 
-export default StudentsScreen;
+export default StudentsView;

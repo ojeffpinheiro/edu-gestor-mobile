@@ -1,10 +1,13 @@
 import React from 'react';
 import { View, StyleSheet, TextStyle, ViewStyle } from 'react-native';
-import { ArrowRight } from 'lucide-react-native';
-import { useTheme } from '../../context/ThemeContext';
-import Button from '../common/Button';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ColorScheme } from '../../styles/colors';
+import { ArrowRight } from 'lucide-react-native';
+
+import { useTheme } from '../../../context/ThemeContext';
+
+import Button from '../../common/Button';
+
+import { ColorScheme } from '../../../styles/colors';
 
 interface StudentsFooterProps {
   hasSelection: boolean;

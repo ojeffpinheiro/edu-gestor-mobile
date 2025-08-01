@@ -109,7 +109,6 @@ export const createCaptureScreenStyles = (colors: ColorScheme) => {
       top: Spacing.xxl,
       left: Spacing.lg,
       padding: Spacing.md,
-      backgroundColor: colors.feedback.error + 'CC',
       borderRadius: BorderRadius.sm,
       zIndex: 10,
     },

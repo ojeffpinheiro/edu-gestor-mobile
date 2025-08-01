@@ -10,8 +10,9 @@ import CameraCapture from '../components/capture/CameraCapture';
 import BlueColorDetector from '../components/capture/BlueColorDetector';
 import AppButton from '../components/capture/AppButton';
 import MainScreen from '../components/capture/MainScreen';
-import { createCaptureScreenStyles } from './styles';
+
 import MarkAnalysis from '../components/capture/MarkAnalysis';
+import { createCaptureScreenStyles } from './styles';
 
 const CaptureScreen = () => {
   const [currentScreen, setCurrentScreen] = useState<'main' | 'camera' | 'colorDetector' | 'analysis'>('main');
@@ -39,10 +40,9 @@ const CaptureScreen = () => {
   
   const renderBackButton = (onPress: () => void) => (
     <AppButton
-      title="Voltar"
       onPress={onPress}
       style={styles.backButton}
-      icon={<Ionicons name="arrow-back" size={20} color="white" />}
+      icon={<Ionicons name="close-outline" size={50} color={colors.gray[500]} />}
       accessibilityLabel="Voltar para tela anterior"
       accessibilityHint="Retorna para a tela de seleção de imagem"
     />

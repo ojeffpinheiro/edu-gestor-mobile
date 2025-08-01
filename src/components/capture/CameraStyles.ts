@@ -7,7 +7,7 @@ import { createButtonStyles, createTextStyles } from "../../styles/globalStyles"
 // Estilos base que podem ser reutilizados em outros componentes de câmera
 export const createCameraBaseStyles = (colors: ColorScheme) => {
   const POINT_RADIUS = 10;
-  
+
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -139,7 +139,6 @@ export const createCaptureControlsStyles = (colors: ColorScheme) => {
 // Estilos para análise de marcação
 export const createMarkAnalysisStyles = (colors: ColorScheme) => {
   const text = createTextStyles(colors);
-
   return StyleSheet.create({
     container: {
       flex: 1,
@@ -203,7 +202,57 @@ export const createMarkAnalysisStyles = (colors: ColorScheme) => {
       ...text.caption,
       color: colors.text.onPrimary,
       fontWeight: Typography.fontWeight.bold,
-    }
+    },
+    errorText: {
+      ...text.body,
+      color: colors.feedback.error,
+      textAlign: 'center',
+      marginBottom: Spacing.md,
+    },
+    retryButton: {
+      backgroundColor: colors.primary.main,
+      padding: Spacing.md,
+      borderRadius: BorderRadius.sm,
+      alignSelf: 'center',
+    },
+    retryButtonText: {
+      ...text.body,
+      color: colors.text.onPrimary,
+    },
+    processingOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      justifyContent: 'center',
+      alignItems: 'center',
+      backgroundColor: colors.background.overlay.main,
+    },
+    processingText: {
+      ...text.body,
+      color: colors.text.onPrimary,
+    },
+    testButton: {
+      position: 'absolute',
+      bottom: Spacing.xl,
+      right: Spacing.lg,
+      backgroundColor: colors.secondary.main,
+      padding: Spacing.md,
+      borderRadius: BorderRadius.sm,
+    },
+    testButtonText: {
+      ...text.body,
+      color: colors.text.onPrimary,
+    },
+    backButton: {
+      position: 'absolute',
+      bottom: Spacing.xl,
+      left: Spacing.lg,
+      backgroundColor: colors.feedback.error,
+      padding: Spacing.md,
+      borderRadius: BorderRadius.sm,
+    },
+    backButtonText: {
+      ...text.body,
+      color: colors.text.onPrimary,
+    },
   });
 };
 

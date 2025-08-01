@@ -1,56 +1,81 @@
-import React, { useState, useEffect } from 'react';
-import { View, Image, StyleSheet, Text, Dimensions } from 'react-native';
-import * as tf from '@tensorflow/tfjs';
-import { calculateCentroids, detectShapes, loadAndProcessImage } from '../../utils/markUtils';
+import React from 'react';
+import { View, StyleSheet, Text, Alert, TouchableOpacity, Image } from 'react-native';
 
 import { useTheme } from '../../context/ThemeContext';
 import { createMarkAnalysisStyles } from './CameraStyles';
-import { mapCentroidsToGrid, Mark } from '../../utils/coordinateUtils';
+import { useMarkDetection } from '../../hooks/useMarkDetection';
+import { getFixedUri } from '../../utils/imageUtils';
 
 interface MarkAnalysisProps {
-  imageUri: string;
+  image: { uri: string } | null;
   gridSize?: { rows: number; cols: number };
   onBack?: () => void;
 }
 
 const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
-  imageUri,
-  gridSize = { rows: 5, cols: 5 }
+  image,
+  gridSize = { rows: 5, cols: 5 },
+  onBack
 }) => {
-  const [marks, setMarks] = useState<Mark[]>([]);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
+  console.log(`URI DA IMAGEM: ${image.uri}`);
   const { colors } = useTheme();
   const styles = createMarkAnalysisStyles(colors);
 
+  const { uri } = image
 
-  useEffect(() => {
-    const analyzeImage = async () => {
-      // 1. Carregar e processar imagem
-      const imageTensor = await loadAndProcessImage(imageUri);
-      // 2. Detectar marcações
-      const detectedShapes = await detectShapes(imageTensor);
-      // 3. Calcular centroides
-      const centroids = calculateCentroids(detectedShapes);
+  const {
+    marks,
+    isProcessing,
+    error,
+    analyzeImage // Função para reanalisar manualmente
+  } = useMarkDetection({ imageUri: uri, gridSize });
 
-      // 4. Mapear para grid
-      const mappedMarks = mapCentroidsToGrid(
-        centroids,
-        gridSize.rows,
-        gridSize.cols,
-        imageTensor.shape[1],
-        imageTensor.shape[0]
-      );
+  const handleRetry = () => {
+    Alert.alert(
+      'Reanalisar Imagem',
+      'Deseja processar a imagem novamente?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Reanalisar', onPress: analyzeImage }
+      ]
+    );
+  };
 
-      setMarks(mappedMarks);
-      tf.dispose(imageTensor);
-    };
+  if (error) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.errorText}>{error}</Text>
+        <TouchableOpacity style={styles.retryButton} onPress={analyzeImage}>
+          <Text style={styles.retryButtonText}>Tentar Novamente</Text>
+        </TouchableOpacity>
+      </View>
+    );
+  }
 
-    analyzeImage();
-  }, [imageUri]);
+  if (!image.uri) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.errorText}>Nenhuma imagem selecionada</Text>
+      {onBack && (
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: imageUri }} />
+      {isProcessing && (
+        <View style={styles.processingOverlay}>
+          <Text style={styles.processingText}>Processando imagem...</Text>
+        </View>
+      )}
+
+      <Image
+        source={{ uri: getFixedUri(uri) }}
+        style={{ width: '100%', height: '100%', resizeMode: 'contain' }} />
 
       {/* Overlay com grade e marcações */}
       <View style={[StyleSheet.absoluteFill, styles.overlay]}>
@@ -84,6 +109,24 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
           })
         ))}
       </View>
+
+      {/* Botão de teste para reanálise */}
+      <TouchableOpacity
+        style={styles.testButton}
+        onPress={handleRetry}
+        disabled={isProcessing}
+      >
+        <Text style={styles.testButtonText}>
+          {isProcessing ? 'Processando...' : 'Testar Reanálise'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Botão de voltar (se necessário) */}
+      {onBack && (
+        <TouchableOpacity style={styles.backButton} onPress={onBack}>
+          <Text style={styles.backButtonText}>Voltar</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };

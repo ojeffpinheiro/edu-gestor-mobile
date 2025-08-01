@@ -8,6 +8,7 @@ import useCaptureAnimation from '../../hooks/useCaptureAnimation';
 import { Spacing } from '../../styles/designTokens';
 import Button from '../common/Button';
 import { createCameraBaseStyles } from './CameraStyles';
+import { getFixedUri } from '../../utils/imageUtils';
 
 const ImagePreview = ({ imageUri, onRetry, onConfirm }) => {
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation();
@@ -33,19 +34,12 @@ const ImagePreview = ({ imageUri, onRetry, onConfirm }) => {
     ]).start();
   }, []);
 
-  const getFixedUri = () => {
-    if (Platform.OS === 'ios') {
-      return decodeURIComponent(imageUri.replace('file://', ''));
-    }
-    return imageUri;
-  };
-
   return (
     // Atualizar estilos usando createThemeStyles
     <View style={cameraStyles.container}>
       <View style={[cameraStyles.card, { flex: 1, width: '100%', height: '100%', padding: 0, overflow: 'hidden' }]}>
         <Image
-          source={{ uri: getFixedUri() }}
+          source={{ uri: getFixedUri(imageUri) }}
           style={{
             width: '100%',
             height: '100%',

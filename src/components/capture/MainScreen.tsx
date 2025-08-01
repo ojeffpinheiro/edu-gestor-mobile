@@ -1,12 +1,15 @@
 import React, { memo } from 'react';
 import { View, Text } from 'react-native';
+
+import { useTheme } from '../../context/ThemeContext';
+
 import ProcessingIndicator from '../features/capture/ProcessingIndicator';
 import ImagePlaceholder from '../features/capture/ImagePlaceholder';
+
 import ActionButtons from './ActionButtons';
-import NavigationButtons from './NavigationButtons';
-import { useTheme } from '../../context/ThemeContext';
-import { createMainScreenStyles } from '../../screens/styles';
 import ImagePreview from './ImagePreview';
+
+import { createMainScreenStyles } from '../../screens/styles';
 
 interface MainScreenProps {
   selectedImage: { uri: string } | null;
@@ -15,7 +18,7 @@ interface MainScreenProps {
   onResetImage: () => void;
   onNextStudent: () => void;
   orientation: 'PORTRAIT' | 'LANDSCAPE';
-  onScreenChange: (screen: 'main' | 'camera' | 'colorDetector') => void;
+  onScreenChange: (screen: 'main' | 'camera' | 'colorDetector' | 'analysis') => void;
 }
 
 const MainScreen = memo(({
@@ -52,6 +55,7 @@ const MainScreen = memo(({
 
       <ActionButtons
         onCameraPress={() => onScreenChange('camera')}
+        onAnalysis={() => onScreenChange('analysis')}
         onGalleryPress={onSelectImage}
         onDetectorPress={() => onScreenChange('colorDetector')}
         disabled={isProcessing}

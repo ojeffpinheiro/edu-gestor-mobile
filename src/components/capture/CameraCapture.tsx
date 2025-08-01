@@ -1,11 +1,13 @@
-import React, { useRef, useState, useEffect, useCallback } from 'react';
+import React, { useRef, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Animated, Alert } from 'react-native';
-import { CameraView } from 'expo-camera';
-import { useTheme } from '../../context/ThemeContext';
-import { useFadeAnimation } from '../../hooks/useAnimation';
-import AppButton from './AppButton';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { CameraView } from 'expo-camera';
+
+import { useTheme } from '../../context/ThemeContext';
+
+import { useFadeAnimation } from '../../hooks/useAnimation';
 import { createCameraBaseStyles } from '../../styles/componentStyles';
+import AppButton from './AppButton';
 
 interface CameraCaptureProps {
   onPhotoCaptured: (uri: string) => void;

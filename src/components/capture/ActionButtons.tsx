@@ -5,6 +5,7 @@ import Button from '../common/Button';
 
 const ActionButtons = ({ 
   onCameraPress, 
+  onAnalysis,
   onGalleryPress, 
   onDetectorPress,
   disabled,
@@ -65,6 +66,11 @@ const ActionButtons = ({
         }}
         disabled={disabled}
       />
+
+      <Button 
+        title='Analise'
+        onPress={onAnalysis}
+        style={[buttonStyle, { backgroundColor: colors.component.card }]}  />
     </View>
   );
 };

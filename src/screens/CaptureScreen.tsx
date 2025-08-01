@@ -11,9 +11,10 @@ import BlueColorDetector from '../components/capture/BlueColorDetector';
 import AppButton from '../components/capture/AppButton';
 import MainScreen from '../components/capture/MainScreen';
 import { createCaptureScreenStyles } from './styles';
+import MarkAnalysis from '../components/capture/MarkAnalysis';
 
 const CaptureScreen = () => {
-  const [currentScreen, setCurrentScreen] = useState<'main' | 'camera' | 'colorDetector'>('main');
+  const [currentScreen, setCurrentScreen] = useState<'main' | 'camera' | 'colorDetector' | 'analysis'>('main');
   const [selectedImage, setSelectedImage] = useState<{ uri: string } | null>(null);
 
   const orientation = useOrientation();
@@ -47,6 +48,8 @@ const CaptureScreen = () => {
     />
   );
 
+  console.log(`URI DA IMAGEM: ${selectedImage?.uri}`);
+
   const renderScreen = () => {
     switch (currentScreen) {
       case 'colorDetector':
@@ -63,6 +66,8 @@ const CaptureScreen = () => {
             {renderBackButton(() => setCurrentScreen('main'))}
           </View>
         );
+      case 'analysis': 
+        return (<MarkAnalysis image={selectedImage || null} />);
       default:
         return (
           <MainScreen

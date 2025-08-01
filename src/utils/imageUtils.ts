@@ -4,6 +4,7 @@ import '@tensorflow/tfjs-react-native';
 import * as FileSystem from 'expo-file-system';
 import { decode } from 'jpeg-js';
 import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 
 export async function getTensorFromURI(uri: string): Promise<tf.Tensor3D> {
   try {
@@ -17,13 +18,13 @@ export async function getTensorFromURI(uri: string): Promise<tf.Tensor3D> {
 
     // 3. Decodificar JPEG para obter dimensões exatas
     const { width, height, data } = decode(raw);
-    
+
     // 4. Criar tensor com dimensões corretas
     const tensor = tf.tensor3d(data, [height, width, 4]); // 4 canais (RGBA)
-    
+
     // 5. Converter para RGB (remover canal alpha se existir)
     const rgbTensor = tensor.slice([0, 0, 0], [height, width, 3]);
-    
+
     // 6. Redimensionar se necessário (opcional)
     const targetSize = 800;
     if (height > targetSize || width > targetSize) {
@@ -34,7 +35,7 @@ export async function getTensorFromURI(uri: string): Promise<tf.Tensor3D> {
       tf.dispose([tensor, rgbTensor]);
       return resized as tf.Tensor3D;
     }
-    
+
     tf.dispose(tensor);
     return rgbTensor;
   } catch (error) {
@@ -55,7 +56,7 @@ function base64ToUint8Array(base64: string): Uint8Array {
 
 export const usePersistedImages = () => {
   const [images, setImages] = useState([]);
-  
+
   useEffect(() => {
     const loadImages = async () => {
       try {
@@ -67,10 +68,10 @@ export const usePersistedImages = () => {
         console.error('Failed to load images:', error);
       }
     };
-    
+
     loadImages();
   }, []);
-  
+
   const saveImages = useCallback(async (newImages) => {
     try {
       await AsyncStorage.setItem('capturedImages', JSON.stringify(newImages));
@@ -79,7 +80,7 @@ export const usePersistedImages = () => {
       console.error('Failed to save images:', error);
     }
   }, []);
-  
+
   return { images, saveImages };
 };
 
@@ -89,3 +90,11 @@ export async function convertImageToGrayscale(uri: string): Promise<tf.Tensor3D>
   tf.dispose(tensor);
   return grayscale;
 }
+
+export const getFixedUri = (uri: string | null) => {
+  if (!uri) return '';
+  if (Platform.OS === 'ios') {
+    return decodeURIComponent(uri.replace('file://', ''));
+  }
+  return uri;
+};

@@ -1,24 +1,36 @@
 import * as tf from '@tensorflow/tfjs';
+import { decode } from 'jpeg-js';
+import * as FileSystem from 'expo-file-system';
 import * as ImageManipulator from 'expo-image-manipulator';
 
 interface Contour {
   points: Array<{ x: number; y: number }>;
 }
 
+
 export async function loadAndProcessImage(uri: string): Promise<tf.Tensor3D> {
-  const response = await fetch(uri);
-  const blob = await response.blob();
-  const bitmap = await createImageBitmap(blob);
-  
-  const canvas = document.createElement('canvas');
-  canvas.width = bitmap.width;
-  canvas.height = bitmap.height;
-  const ctx = canvas.getContext('2d');
-  if (!ctx) throw new Error('Could not get canvas context');
-  ctx.drawImage(bitmap, 0, 0);
-  
-  const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  return tf.browser.fromPixels(imageData);
+  try {
+    // 1. Ler a imagem como base64
+    const base64 = await FileSystem.readAsStringAsync(uri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    // 2. Converter base64 para Uint8Array
+    const raw = base64ToUint8Array(base64);
+
+    // 3. Decodificar JPEG
+    const { width, height, data } = decode(raw);
+
+    // 4. Criar tensor com dimensões corretas (removendo canal alpha se existir)
+    const tensor = tf.tensor3d(data, [height, width, 4]);
+    const rgbTensor = tensor.slice([0, 0, 0], [height, width, 3]);
+
+    tf.dispose(tensor);
+    return rgbTensor;
+  } catch (error) {
+    console.error('Erro ao carregar imagem:', error);
+    throw error;
+  }
 }
 
 // Implementação simplificada do algoritmo de busca de contornos
@@ -120,4 +132,13 @@ export function calculateCentroids(shapes: Contour[]): Array<{
       confidence: Math.min(1, area / 100)
     };
   });
+}
+
+function base64ToUint8Array(base64: string): Uint8Array {
+  const binaryString = atob(base64);
+  const bytes = new Uint8Array(binaryString.length);
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
 }

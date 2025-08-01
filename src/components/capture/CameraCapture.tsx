@@ -1,5 +1,5 @@
-import React, { useRef, useEffect, useCallback } from 'react';
-import { View, StyleSheet, Animated, Alert } from 'react-native';
+import React, { useRef, useEffect, useCallback, useState } from 'react';
+import { View, StyleSheet, Animated, Alert, Linking } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 
@@ -8,12 +8,14 @@ import { useTheme } from '../../context/ThemeContext';
 import { useFadeAnimation } from '../../hooks/useAnimation';
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import AppButton from './AppButton';
+import { triggerHapticFeedback } from '../../utils/hapticUtils';
 
 interface CameraCaptureProps {
   onPhotoCaptured: (uri: string) => void;
 }
 
 const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
+  const [isCapturing, setIsCapturing] = useState(false);
   const cameraRef = useRef<CameraView>(null);
   const { colors } = useTheme();
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation(0);
@@ -25,15 +27,64 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
   }, [fadeIn, fadeOut]);
 
   const handleTakePicture = useCallback(async () => {
-    if (!cameraRef.current) return;
-    
+    if (!cameraRef.current) {
+      Alert.alert(
+        'Câmera não disponível',
+        'Não foi possível acessar a câmera. Verifique se:',
+        [
+          { text: 'OK' },
+          {
+            text: 'Configurações',
+            onPress: () => Linking.openSettings()
+          }
+        ],
+        {
+          cancelable: true
+        }
+      );
+      return;
+    }
+
     try {
-      const photo = await cameraRef.current.takePictureAsync();
+      setIsCapturing(true);
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+        skipProcessing: true,
+      });
+
+      if (!photo.uri) {
+        throw new Error('Foto capturada sem URI');
+      }
+
+      // Feedback visual de sucesso
+      triggerHapticFeedback('success');
       fadeOut(300);
       setTimeout(() => onPhotoCaptured(photo.uri), 300);
     } catch (error) {
       console.error('Failed to take picture:', error);
-      Alert.alert('Erro', 'Não foi possível capturar a foto');
+      triggerHapticFeedback('error');
+
+      let errorMessage = 'Erro desconhecido ao capturar foto';
+      if (error.message.includes('permission')) {
+        errorMessage = 'Permissão da câmera negada. Por favor, conceda permissão nas configurações.';
+      } else if (error.message.includes('URI')) {
+        errorMessage = 'A foto foi capturada mas não pôde ser salva. Tente novamente.';
+      }
+
+      Alert.alert('Erro na Captura', errorMessage, [
+        { text: 'Entendi' },
+        error.message.includes('permission')
+          ? {
+            text: 'Abrir Configurações',
+            onPress: () => Linking.openSettings()
+          }
+          : {
+            text: 'Tentar Novamente',
+            onPress: handleTakePicture
+          }
+      ]);
+    } finally {
+      setIsCapturing(false);
     }
   }, [fadeOut, onPhotoCaptured]);
 

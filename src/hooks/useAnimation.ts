@@ -152,3 +152,51 @@ export const useAnimation = ({
     }
   };
 };
+
+export const useFadeAnimation = (initialValue = 0) => {
+  const fadeAnim = useRef(new Animated.Value(initialValue)).current;
+
+  const fadeIn = (duration = 300) => {
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration,
+      easing: Easing.ease,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const fadeOut = (duration = 300) => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration,
+      easing: Easing.ease,
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return { fadeAnim, fadeIn, fadeOut };
+};
+
+export const useSlideAnimation = (initialValue = 100) => {
+  const slideAnim = useRef(new Animated.Value(initialValue)).current;
+
+  const slideIn = (duration = 300) => {
+    Animated.timing(slideAnim, {
+      toValue: 0,
+      duration,
+      easing: Easing.out(Easing.exp),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  const slideOut = (duration = 300) => {
+    Animated.timing(slideAnim, {
+      toValue: initialValue,
+      duration,
+      easing: Easing.in(Easing.exp),
+      useNativeDriver: true,
+    }).start();
+  };
+
+  return { slideAnim, slideIn, slideOut };
+};

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Text, TouchableOpacity, View, StyleProp, ViewStyle, TextStyle } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
 interface AppButtonProps {
   title: string;

@@ -9,16 +9,6 @@ interface ValidationResult {
   errorCode?: string;
 }
 
-export const validateQuestionCount = (count: number): ValidationResult => {
-  if (isNaN(count) || !Number.isInteger(count)) {
-    return { isValid: false, message: 'O número de questões deve ser um valor inteiro' };
-  }
-  if (count < 1 || count > 100) {
-    return { isValid: false, message: 'O número de questões deve estar entre 1 e 100' };
-  }
-  return { isValid: true };
-};
-
 export const validateImageFile = (fileInfo: { uri: string; size?: number }): ValidationResult => {
   // Verificar extensão do arquivo
   const validExtensions = ['.jpg', '.jpeg', '.png'];

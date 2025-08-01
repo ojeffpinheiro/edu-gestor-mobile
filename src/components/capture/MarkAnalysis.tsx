@@ -5,22 +5,7 @@ import { calculateCentroids, detectShapes, loadAndProcessImage } from '../../uti
 
 import { useTheme } from '../../context/ThemeContext';
 import { createMarkAnalysisStyles } from './CameraStyles';
-
-interface Point {
-  x: number;
-  y: number;
-}
-
-interface Cell {
-  row: number;
-  col: number;
-}
-
-interface Mark {
-  centroid: Point;
-  cell: Cell;
-  confidence: number;
-}
+import { mapCentroidsToGrid, Mark } from '../../utils/coordinateUtils';
 
 interface MarkAnalysisProps {
   imageUri: string;
@@ -28,45 +13,34 @@ interface MarkAnalysisProps {
   onBack?: () => void;
 }
 
-const MarkAnalysis: React.FC<MarkAnalysisProps> = ({ 
-  imageUri, 
-  gridSize = { rows: 5, cols: 5 } 
+const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
+  imageUri,
+  gridSize = { rows: 5, cols: 5 }
 }) => {
   const [marks, setMarks] = useState<Mark[]>([]);
   const [processedImage, setProcessedImage] = useState<string | null>(null);
   const { colors } = useTheme();
   const styles = createMarkAnalysisStyles(colors);
 
+
   useEffect(() => {
     const analyzeImage = async () => {
       // 1. Carregar e processar imagem
       const imageTensor = await loadAndProcessImage(imageUri);
-      
       // 2. Detectar marcações
       const detectedShapes = await detectShapes(imageTensor);
-      
       // 3. Calcular centroides
       const centroids = calculateCentroids(detectedShapes);
-      
+
       // 4. Mapear para grid
-      const cellSize = {
-        width: imageTensor.shape[1] / gridSize.cols,
-        height: imageTensor.shape[0] / gridSize.rows
-      };
-      
-      const mappedMarks = centroids.map(centroid => {
-  const cell = {
-    row: Math.floor(centroid.y / cellSize.height),
-    col: Math.floor(centroid.x / cellSize.width)
-  };
-  
-  return {
-    centroid: { x: centroid.x, y: centroid.y },
-    cell,
-    confidence: centroid.confidence
-  } as Mark;
-});
-      
+      const mappedMarks = mapCentroidsToGrid(
+        centroids,
+        gridSize.rows,
+        gridSize.cols,
+        imageTensor.shape[1],
+        imageTensor.shape[0]
+      );
+
       setMarks(mappedMarks);
       tf.dispose(imageTensor);
     };
@@ -76,8 +50,8 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
 
   return (
     <View style={styles.container}>
-      <Image source={{ uri: imageUri }} style={styles.image} />
-      
+      <Image source={{ uri: imageUri }} />
+
       {/* Overlay com grade e marcações */}
       <View style={[StyleSheet.absoluteFill, styles.overlay]}>
         {/* Renderizar grade */}
@@ -85,12 +59,12 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
           Array.from({ length: gridSize.cols }).map((_, col) => {
             const cellMark = marks.find(m => m.cell.row === row && m.cell.col === col);
             return (
-              <View 
+              <View
                 key={`${row}-${col}`}
                 style={[
                   styles.cell,
                   cellMark && styles.markedCell,
-                  { 
+                  {
                     left: `${(col / gridSize.cols) * 100}%`,
                     top: `${(row / gridSize.rows) * 100}%`,
                     width: `${100 / gridSize.cols}%`,

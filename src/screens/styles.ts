@@ -115,3 +115,89 @@ export const createCaptureScreenStyles = (colors: ColorScheme) => {
     },
   });
 };
+
+export const createMainScreenStyles = (colors: ColorScheme, orientation) => {
+  const isLandscape = orientation === 'LANDSCAPE';
+
+  return StyleSheet.create({
+    screenContainer: {
+      flex: 1,
+      padding: isLandscape ? Spacing.xl : Spacing.lg,
+      backgroundColor: colors.background.primary,
+    },
+    title: {
+      fontSize: isLandscape ? 20 : 24,
+      fontWeight: 'bold',
+      color: colors.text.primary,
+      marginBottom: Spacing.xl,
+      textAlign: 'center',
+    },
+    imageContainer: {
+      flex: 1,
+      maxHeight: '45%',
+      justifyContent: 'center',
+      marginVertical: Spacing.lg,
+      borderRadius: 12,
+      backgroundColor: colors.background.secondary,
+      shadowColor: colors.border.medium,
+      shadowOffset: {
+        width: 0,
+        height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+      elevation: 5,
+      overflow: 'hidden',
+    },
+    contentContainer: {
+      flex: isLandscape ? 0.8 : 1,
+      justifyContent: 'center',
+    },
+    buttonContainer: {
+      flexDirection: isLandscape ? 'row' : 'column',
+      justifyContent: 'space-between',
+      marginTop: Spacing.lg,
+      gap: Spacing.md,
+    },
+    button: {
+      flex: isLandscape ? 1 : undefined,
+      paddingVertical: Spacing.md,
+      borderRadius: 8,
+    },
+    cameraButton: {
+      backgroundColor: colors.primary.main,
+    },
+    galleryButton: {
+      backgroundColor: colors.secondary.main,
+    },
+    detectorButton: {
+      backgroundColor: colors.component.card,
+    },
+    navigationButtons: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      marginTop: Spacing.xl,
+      gap: Spacing.md,
+    },
+    navButton: {
+      flex: 1,
+      paddingVertical: Spacing.md,
+      borderRadius: 8,
+    },
+    backButtonNav: {
+      backgroundColor: colors.feedback.error,
+    },
+    nextButton: {
+      backgroundColor: colors.feedback.success,
+    },
+    // Estilos para orientação específica
+    landscapeContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    landscapeContent: {
+      flex: 1,
+      marginLeft: Spacing.xl,
+    },
+  });
+};

@@ -1,11 +1,11 @@
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { Alert, Platform } from 'react-native';
 
 const useImagePicker = () => {
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const openGallery = async () => {
+  const openGallery = useCallback(async () => {
     setIsProcessing(true);
     
     try {
@@ -26,10 +26,9 @@ const useImagePicker = () => {
         allowsEditing: true,
         aspect: [4, 3],
         quality: 1,
-        allowsMultipleSelection: false,
       });
 
-      if (!result.canceled && result.assets.length > 0) {
+      if (!result.canceled && result.assets?.[0]) {
         return {
           uri: result.assets[0].uri,
           width: result.assets[0].width,
@@ -39,16 +38,12 @@ const useImagePicker = () => {
       return null;
     } catch (error) {
       console.error('Gallery error:', error);
-      Alert.alert(
-        'Erro',
-        'Não foi possível acessar a galeria. Por favor, tente novamente.',
-        [{ text: 'OK' }]
-      );
+      Alert.alert('Erro', 'Não foi possível acessar a galeria. Por favor, tente novamente.', [{ text: 'OK' }]);
       return null;
     } finally {
       setIsProcessing(false);
     }
-  };
+  }, []);
 
   return { openGallery, isProcessing };
 };

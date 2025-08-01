@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { View, Animated, Easing, StyleSheet, Text } from 'react-native';
 import { useTheme } from '../../context/ThemeContext';
 import { createReferencePointsStyles } from './CameraStyles';
+import { calculateGridPositions } from '../../utils/coordinateUtils';
 
 interface ReferencePointsProps {
   pointsStatus: { [key: number]: boolean };
@@ -27,27 +28,11 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 }) => {
   const { colors } = useTheme();
   const styles = createReferencePointsStyles(colors);
-
   const scanAnim = useRef(new Animated.Value(0)).current;
   const pulseAnims = useRef<{ [key: number]: Animated.Value }>({}).current;
 
-  const referencePoints = isLandscape
-    ? [
-      { id: 1, x: 0.26, y: 0.1 },
-      { id: 2, x: 0.26, y: 0.85 },
-      { id: 3, x: 0.35, y: 0.1 },
-      { id: 4, x: 0.5, y: 0.85 },
-      { id: 5, x: 0.8, y: 0.1 },
-      { id: 6, x: 0.8, y: 0.85 }
-    ]
-    : [
-      { id: 1, x: 0.1, y: 0.2 },
-      { id: 2, x: 1, y: 0.2 },
-      { id: 3, x: 0.1, y: 0.55 },
-      { id: 4, x: 1, y: 0.55 },
-      { id: 5, x: 0.1, y: 0.84 },
-      { id: 6, x: 1, y: 0.84 }
-    ];
+  
+  const referencePoints = calculateGridPositions(6, 6, isLandscape);
 
   referencePoints.forEach(point => {
     if (!pulseAnims[point.id]) {
@@ -117,17 +102,12 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 
       {/* Pontos de referência */}
       {referencePoints.map((point) => {
-        const pointData = pointsColors[point.id];
-        const percentage = pointData?.percentage ?? 0;
-        const color = pointData
-          ? `rgb(${pointData.r}, ${pointData.g}, ${pointData.b})`
-          : pointsStatus[point.id] ? '#00FF00' : '#FF0000';
-
-        return (
-          <View key={point.id} style={[styles.pointContainer, {
-            left: `${point.x * 100}%`,
-            top: `${point.y * 100}%`,
-          }]}>
+          const pointData = pointsColors[point.id];
+          return (
+            <View key={point.id} style={[styles.pointContainer, {
+              left: `${point.position.x * 100}%`,
+              top: `${point.position.y * 100}%`,
+            }]}>
             <View style={[styles.point]}>
               <Text style={styles.pointText}>{point.id}</Text>
             </View>

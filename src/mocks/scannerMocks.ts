@@ -204,3 +204,9 @@ export const initialExams: ExamResult[] = [
     totalQuestions: 10
   }
 ]
+
+export const mockExamData = {
+  questionCount: 20,
+  examName: "Prova Modelo 2023",
+  subject: "Matemática"
+};

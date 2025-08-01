@@ -13,7 +13,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "Precisamos acessar sua câmera para capturar fotos",
         "NSPhotoLibraryUsageDescription": "Precisamos acessar sua galeria para selecionar fotos"
-      }
+      },
+      "usesIcloudStorage": true
     },
     "packagerOpts": {
       "assetExts": [

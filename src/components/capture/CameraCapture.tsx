@@ -1,18 +1,25 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { forwardRef, useRef, useEffect, useCallback, useState, useImperativeHandle } from 'react';
 import { View, StyleSheet, Animated, Alert, Linking, Image, Dimensions, ActivityIndicator, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 
 import { useTheme } from '../../context/ThemeContext';
-
 import { useFadeAnimation } from '../../hooks/useAnimation';
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import AppButton from './AppButton';
 import { triggerHapticFeedback } from '../../utils/hapticUtils';
 import { detectPoints, getReferencePoints, ReferencePoint } from '../../utils/coordinateUtils';
+import AlignmentGuide from '../features/capture/AlignmentGuide';
+import CaptureControls from '../features/capture/CaptureControls';
+import PreviewOverlay from '../features/capture/PreviewOverlay';
 
 interface CameraCaptureProps {
   onPhotoCaptured: (uri: string) => void;
+}
+
+export interface CameraCaptureRef {
+  retakePicture: () => void;
+  startAnalysis: () => void;
 }
 
 interface AlignmentPoint {
@@ -21,11 +28,12 @@ interface AlignmentPoint {
   matched: boolean;
 }
 
-const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
-  const [isCapturing, setIsCapturing] = useState(false);
+type CaptureStep = 'positioning' | 'captured' | 'analyzing' | 'results';
+
+const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhotoCaptured }, ref) => {
+  const [currentStep, setCurrentStep] = useState<CaptureStep>('positioning');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [alignmentPoints, setAlignmentPoints] = useState<AlignmentPoint[]>([]);
-  const [isAnalyzing, setIsAnalyzing] = useState(false); // New state for analysis
   const cameraRef = useRef<CameraView>(null);
   const { colors } = useTheme();
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation(0);
@@ -33,6 +41,11 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
 
   const [referencePoints, setReferencePoints] = useState<ReferencePoint[]>([]);
   const [isLandscape, setIsLandscape] = useState(false);
+
+  useImperativeHandle(ref, () => ({
+    retakePicture,
+    startAnalysis,
+  }));
 
   useEffect(() => {
     const updateOrientation = () => {
@@ -42,8 +55,6 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
     };
 
     updateOrientation();
-    Dimensions.addEventListener('change', updateOrientation);
-
     const subscription = Dimensions.addEventListener('change', updateOrientation);
     return () => subscription.remove();
   }, []);
@@ -54,7 +65,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
   }, [fadeIn, fadeOut]);
 
   const detectAlignmentPoints = async (uri: string) => {
-    setIsAnalyzing(true); // Start analyzing
+    setCurrentStep('analyzing');
     try {
       const detectedPoints = await detectPoints(uri);
       const pointsWithStatus = detectedPoints.map(point => ({
@@ -64,10 +75,10 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
       }));
       setAlignmentPoints(pointsWithStatus);
       setReferencePoints(detectedPoints);
+      setCurrentStep('results');
     } catch (error) {
       console.error('Error detecting points:', error);
-    } finally {
-      setIsAnalyzing(false); // Finish analyzing
+      setCurrentStep('captured');
     }
   };
 
@@ -89,7 +100,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
     }
 
     try {
-      setIsCapturing(true);
+      setCurrentStep('captured');
       const photo = await cameraRef.current.takePictureAsync({
         quality: 0.8,
         skipProcessing: true,
@@ -100,21 +111,26 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
       }
 
       setCapturedImage(photo.uri);
-      await detectAlignmentPoints(photo.uri);
       triggerHapticFeedback('success');
 
     } catch (error) {
       console.error('Failed to take picture:', error);
       triggerHapticFeedback('error');
       Alert.alert('Erro na Captura', 'Não foi possível capturar a imagem. Tente novamente.');
-    } finally {
-      setIsCapturing(false);
+      setCurrentStep('positioning');
     }
   }, [fadeOut, onPhotoCaptured]);
 
   const retakePicture = () => {
     setCapturedImage(null);
     setAlignmentPoints([]);
+    setCurrentStep('positioning');
+  };
+
+  const startAnalysis = () => {
+    if (capturedImage) {
+      detectAlignmentPoints(capturedImage);
+    }
   };
 
   const confirmPicture = () => {
@@ -124,159 +140,38 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
     }
   };
 
-  const AlignmentGuide = () => (
-    <View style={styles.alignmentContainer}>
-      {referencePoints.map((point) => (
-        <View
-          key={point.id}
-          style={[
-            styles.alignmentPoint,
-            {
-              left: `${point.position.x * 100}%`,
-              top: `${point.position.y * 100}%`,
-              backgroundColor: point.matched ? '#4CAF50' : '#F44336',
-            }
-          ]}
-        />
-      ))}
-      <View style={styles.centerPoint} />
-    </View>
-  );
-
-  const PreviewOverlay = () => (
-    <View style={styles.previewOverlay}>
-      {alignmentPoints.map((point, index) => (
-        <View
-          key={index}
-          style={[
-            styles.detectedPoint,
-            {
-              left: `${point.x * 100}%`,
-              top: `${point.y * 100}%`,
-              backgroundColor: point.matched ? '#4CAF50' : '#F44336',
-            }
-          ]}
-        />
-      ))}
-    </View>
-  );
-
   return (
     <Animated.View style={[cameraStyles.container, { opacity: fadeAnim }]}>
-      {capturedImage ? (
-        <View style={styles.previewContainer}>
-          <Image source={{ uri: capturedImage }} style={styles.previewImage} />
-          <PreviewOverlay />
-
-          {isAnalyzing && (
-            <View style={styles.analyzingOverlay}>
-              <ActivityIndicator size="large" color="#4CAF50" />
-              <Text style={styles.analyzingText}>Analisando pontos...</Text>
-            </View>
-          )}
-
-          <View style={styles.previewButtons}>
-            <AppButton
-              title="Tirar Novamente"
-              onPress={retakePicture}
-              style={[styles.captureButton, { backgroundColor: '#F44336' }]}
-              icon={<MaterialIcons name="replay" size={24} color="white" />}
-            />
-            <AppButton
-              title="Confirmar"
-              onPress={confirmPicture}
-              style={[styles.captureButton, { backgroundColor: '#4CAF50' }]}
-              icon={<MaterialIcons name="check" size={24} color="white" />}
-              disabled={isAnalyzing}
-            />
-          </View>
-        </View>
-      ) : (
+      {currentStep === 'positioning' ? (
         <>
           <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
-          <AlignmentGuide />
-
-          <View style={styles.controls}>
-            <AppButton
-              title="Capturar"
-              onPress={handleTakePicture}
-              style={styles.captureButton}
-              icon={<MaterialIcons name="camera" size={24} color="white" />}
-              disabled={isCapturing}
-            />
-          </View>
+          <AlignmentGuide referencePoints={referencePoints} isLandscape={isLandscape} />
+          <CaptureControls
+            currentStep={currentStep}
+            onTakePicture={handleTakePicture}
+            onRetake={retakePicture}
+            onAnalyze={startAnalysis}
+            onConfirm={confirmPicture}
+          />
         </>
+      ) : (
+        <View style={styles.previewContainer}>
+          <Image source={{ uri: capturedImage || '' }} style={styles.previewImage} />
+          {currentStep === 'results' && <PreviewOverlay alignmentPoints={alignmentPoints} />}
+          <CaptureControls
+            currentStep={currentStep}
+            onTakePicture={handleTakePicture}
+            onRetake={retakePicture}
+            onAnalyze={startAnalysis}
+            onConfirm={confirmPicture}
+          />
+        </View>
       )}
     </Animated.View>
   );
-};
-
+});
 
 const styles = StyleSheet.create({
-  alignmentContainer: {
-    position: 'absolute',
-    top: '10%',
-    left: '10%',
-    right: '10%',
-    bottom: '20%',
-    borderWidth: 2,
-    borderColor: 'rgba(0, 150, 255, 0.6)',
-    borderRadius: 8,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  alignmentBorder: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    borderWidth: 2,
-    borderColor: 'rgba(0, 150, 255, 0.3)',
-    borderRadius: 8,
-  },
-  alignmentPoint: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    backgroundColor: 'rgba(0, 150, 255, 0.8)',
-    borderWidth: 3,
-    borderColor: 'white',
-  },
-  topLeftPoint: {
-    top: -8,
-    left: -8,
-  },
-  topRightPoint: {
-    top: -8,
-    right: -8,
-  },
-  bottomLeftPoint: {
-    bottom: -8,
-    left: -8,
-  },
-  bottomRightPoint: {
-    bottom: -8,
-    right: -8,
-  },
-  middleLeftPoint: {
-    top: '50%',
-    left: -8,
-    marginTop: -8,
-  },
-  middleRightPoint: {
-    top: '50%',
-    right: -8,
-    marginTop: -8,
-  },
-  centerPoint: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-    borderWidth: 2,
-    borderColor: 'rgba(0, 150, 255, 0.8)',
-  },
   previewContainer: {
     flex: 1,
     backgroundColor: 'black',
@@ -286,68 +181,6 @@ const styles = StyleSheet.create({
     flex: 1,
     resizeMode: 'contain',
     backgroundColor: 'black',
-  },
-  previewOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-  },
-  detectedPoint: {
-    position: 'absolute',
-    width: 16,
-    height: 16,
-    borderRadius: 8,
-    marginLeft: -8,
-    marginTop: -8,
-    borderWidth: 2,
-    borderColor: 'white',
-  },
-  previewButtons: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
-  },
-  controls: {
-    position: 'absolute',
-    bottom: 20,
-    left: 0,
-    right: 0,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 20,
-  },
-  captureButton: {
-    backgroundColor: '#4CAF50',
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 50,
-  },
-  backButton: {
-    backgroundColor: '#F44336',
-    paddingVertical: 15,
-    paddingHorizontal: 25,
-    borderRadius: 50,
-  },
-  analyzingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
-  },
-  analyzingText: {
-    color: 'white',
-    marginTop: 16,
-    fontSize: 18,
   },
 });
 

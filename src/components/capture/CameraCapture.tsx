@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { View, StyleSheet, Animated, Alert, Linking, Image, Dimensions } from 'react-native';
+import { View, StyleSheet, Animated, Alert, Linking, Image, Dimensions, ActivityIndicator, Text } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import { CameraView } from 'expo-camera';
 
@@ -25,6 +25,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
   const [isCapturing, setIsCapturing] = useState(false);
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [alignmentPoints, setAlignmentPoints] = useState<AlignmentPoint[]>([]);
+  const [isAnalyzing, setIsAnalyzing] = useState(false); // New state for analysis
   const cameraRef = useRef<CameraView>(null);
   const { colors } = useTheme();
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation(0);
@@ -43,7 +44,6 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
     updateOrientation();
     Dimensions.addEventListener('change', updateOrientation);
 
-
     const subscription = Dimensions.addEventListener('change', updateOrientation);
     return () => subscription.remove();
   }, []);
@@ -54,8 +54,21 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
   }, [fadeIn, fadeOut]);
 
   const detectAlignmentPoints = async (uri: string) => {
-    const detectedPoints = await detectPoints(uri);
-    setReferencePoints(detectedPoints);
+    setIsAnalyzing(true); // Start analyzing
+    try {
+      const detectedPoints = await detectPoints(uri);
+      const pointsWithStatus = detectedPoints.map(point => ({
+        x: point.position.x,
+        y: point.position.y,
+        matched: point.matched || false
+      }));
+      setAlignmentPoints(pointsWithStatus);
+      setReferencePoints(detectedPoints);
+    } catch (error) {
+      console.error('Error detecting points:', error);
+    } finally {
+      setIsAnalyzing(false); // Finish analyzing
+    }
   };
 
   const handleTakePicture = useCallback(async () => {
@@ -86,7 +99,6 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
         throw new Error('Foto capturada sem URI');
       }
 
-      // Solução simplificada - removendo a manipulação inicialmente
       setCapturedImage(photo.uri);
       await detectAlignmentPoints(photo.uri);
       triggerHapticFeedback('success');
@@ -156,6 +168,13 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
           <Image source={{ uri: capturedImage }} style={styles.previewImage} />
           <PreviewOverlay />
 
+          {isAnalyzing && (
+            <View style={styles.analyzingOverlay}>
+              <ActivityIndicator size="large" color="#4CAF50" />
+              <Text style={styles.analyzingText}>Analisando pontos...</Text>
+            </View>
+          )}
+
           <View style={styles.previewButtons}>
             <AppButton
               title="Tirar Novamente"
@@ -168,6 +187,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
               onPress={confirmPicture}
               style={[styles.captureButton, { backgroundColor: '#4CAF50' }]}
               icon={<MaterialIcons name="check" size={24} color="white" />}
+              disabled={isAnalyzing}
             />
           </View>
         </View>
@@ -190,6 +210,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ onPhotoCaptured }) => {
     </Animated.View>
   );
 };
+
 
 const styles = StyleSheet.create({
   alignmentContainer: {
@@ -312,6 +333,21 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     paddingHorizontal: 25,
     borderRadius: 50,
+  },
+  analyzingOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+  },
+  analyzingText: {
+    color: 'white',
+    marginTop: 16,
+    fontSize: 18,
   },
 });
 

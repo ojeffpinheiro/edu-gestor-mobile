@@ -31,7 +31,7 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
   const scanAnim = useRef(new Animated.Value(0)).current;
   const pulseAnims = useRef<{ [key: number]: Animated.Value }>({}).current;
 
-  
+
   const referencePoints = calculateGridPositions(6, 6, isLandscape);
 
   referencePoints.forEach(point => {
@@ -102,15 +102,30 @@ const ReferencePoints: React.FC<ReferencePointsProps> = ({
 
       {/* Pontos de referência */}
       {referencePoints.map((point) => {
-          const pointData = pointsColors[point.id];
-          return (
-            <View key={point.id} style={[styles.pointContainer, {
-              left: `${point.position.x * 100}%`,
-              top: `${point.position.y * 100}%`,
-            }]}>
-            <View style={[styles.point]}>
+        const pointStatus = pointsStatus[point.id];
+        const pointColor = pointsColors[point.id];
+
+        return (
+          <View key={point.id} style={[styles.pointContainer, {
+            left: `${point.position.x * 100}%`,
+            top: `${point.position.y * 100}%`,
+          }]}>
+            <Animated.View style={[
+              styles.point,
+              {
+                transform: [{ scale: pulseAnims[point.id] }],
+                backgroundColor: pointStatus ? colors.feedback.success : colors.feedback.error
+              }
+            ]}>
               <Text style={styles.pointText}>{point.id}</Text>
-            </View>
+            </Animated.View>
+
+            {pointColor && (
+              <View style={[
+                styles.colorIndicator,
+                { backgroundColor: `rgb(${pointColor.r}, ${pointColor.g}, ${pointColor.b})` }
+              ]} />
+            )}
           </View>
         );
       })}

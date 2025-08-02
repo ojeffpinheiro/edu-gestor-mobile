@@ -48,8 +48,6 @@ const CaptureScreen = () => {
     />
   );
 
-  console.log(`URI DA IMAGEM: ${selectedImage?.uri}`);
-
   const renderScreen = () => {
     switch (currentScreen) {
       case 'colorDetector':

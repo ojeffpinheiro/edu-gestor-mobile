@@ -252,7 +252,7 @@ export const createMarkAnalysisStyles = (colors: ColorScheme) => {
     backButtonText: {
       ...text.body,
       color: colors.text.onPrimary,
-    },
+    }
   });
 };
 
@@ -344,6 +344,14 @@ export const createReferencePointsStyles = (colors: ColorScheme) => {
       ...text.caption,
       fontSize: 10,
       marginTop: 2,
+    },
+    colorIndicator: {
+      width: 12,
+      height: 12,
+      borderRadius: 6,
+      marginTop: 4,
+      borderWidth: 1,
+      borderColor: colors.border.medium,
     }
   });
 };

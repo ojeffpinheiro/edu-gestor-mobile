@@ -39,7 +39,6 @@ let edgeDetectionModel: tf.GraphModel | null = null;
 
 async function initializeTF() {
   await tf.ready();
-  console.log('TensorFlow.js está pronto');
 }
 
 export const loadModels = async (): Promise<void> => {

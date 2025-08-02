@@ -9,6 +9,7 @@ interface CaptureControlsProps {
   onRetake: () => void;
   onAnalyze: () => void;
   onConfirm: () => void;
+  isProcessing?: boolean; // Optional prop to indicate processing state
 }
 
 const CaptureControls: React.FC<CaptureControlsProps> = ({
@@ -17,6 +18,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
   onRetake,
   onAnalyze,
   onConfirm,
+  isProcessing = false, // Default to false if not provided
 }) => {
   switch (currentStep) {
     case 'positioning':
@@ -24,6 +26,7 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
         <View style={styles.controlsCard}>
           <AppButton
             title="Capturar"
+            disabled={isProcessing} // Disable button if processing
             onPress={onTakePicture}
             style={styles.captureButton}
             icon={<MaterialIcons name="camera" size={24} color="white" />}
@@ -37,11 +40,13 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
             <AppButton
               title="Tirar Novamente"
               onPress={onRetake}
+              disabled={isProcessing} // Disable button if processing
               style={[styles.actionButton, { backgroundColor: '#F44336' }]}
               icon={<MaterialIcons name="replay" size={24} color="white" />}
             />
             <AppButton
               title="Analisar"
+              disabled={isProcessing} // Disable button if processing
               onPress={onAnalyze}
               style={[styles.actionButton, { backgroundColor: '#2196F3' }]}
               icon={<MaterialIcons name="search" size={24} color="white" />}
@@ -62,12 +67,14 @@ const CaptureControls: React.FC<CaptureControlsProps> = ({
           <View style={styles.buttonRow}>
             <AppButton
               title="Repetir"
+              disabled={isProcessing} // Disable button if processing
               onPress={onRetake}
               style={[styles.actionButton, { backgroundColor: '#F44336' }]}
               icon={<MaterialIcons name="replay" size={24} color="white" />}
             />
             <AppButton
               title="Confirmar"
+              disabled={isProcessing} // Disable button if processing
               onPress={onConfirm}
               style={[styles.actionButton, { backgroundColor: '#4CAF50' }]}
               icon={<MaterialIcons name="check" size={24} color="white" />}

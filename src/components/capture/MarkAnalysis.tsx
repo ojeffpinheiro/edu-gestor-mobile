@@ -17,7 +17,6 @@ const MarkAnalysis: React.FC<MarkAnalysisProps> = ({
   gridSize = { rows: 5, cols: 5 },
   onBack
 }) => {
-  console.log(`URI DA IMAGEM: ${image.uri}`);
   const { colors } = useTheme();
   const styles = createMarkAnalysisStyles(colors);
 

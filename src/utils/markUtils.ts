@@ -142,3 +142,10 @@ function base64ToUint8Array(base64: string): Uint8Array {
   }
   return bytes;
 }
+
+export const convertBlobToBase64 = (blob: Blob) => new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onerror = reject;
+  reader.onload = () => resolve(reader.result as string);
+  reader.readAsDataURL(blob);
+});

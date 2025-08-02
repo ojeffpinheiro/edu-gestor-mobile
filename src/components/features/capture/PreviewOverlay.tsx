@@ -1,40 +1,50 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image, Text } from 'react-native';
+import { View, StyleSheet, Image, Text, Dimensions } from 'react-native';
 import { DetectedPoint } from '../../../utils/coordinateUtils';
+import { useTheme } from '../../../context/ThemeContext';
 
 interface PreviewOverlayProps {
   alignmentPoints: DetectedPoint[];
   imageUri: string;
+  imageWidth?: number;
+  imageHeight?: number;
 }
 
 const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   alignmentPoints,
-  imageUri
+  imageUri,
+  imageWidth = Dimensions.get('window').width,
+  imageHeight = Dimensions.get('window').height * 0.7
 }) => {
+  const { colors } = useTheme();
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
-  useEffect(() => {
-    if (imageUri) {
-      Image.getSize(imageUri, (width, height) => {
-        setImageSize({ width, height });
-      });
-    }
-  }, [imageUri]);
+  if (!alignmentPoints || alignmentPoints.length === 0) return null;
 
   return (
     <View style={StyleSheet.absoluteFill}>
-      {alignmentPoints.map((point, index) => (
+      {alignmentPoints.map((point) => (
         <View
-          key={point.id} // Use o id em vez do index
-          style={[
-            styles.detectedPoint,
-            {
-              left: `${point.position.x * 100}%`,
-              top: `${point.position.y * 100}%`,
-              backgroundColor: point.matched ? '#4CAF50' : '#F44336',
-            }
-          ]}
-        ><Text>{point.id}</Text></View>
+          key={`${point.id}-${point.cell.row}-${point.cell.col}`}
+          style={{
+            position: 'absolute',
+            left: point.position?.x ? point.position.x * imageWidth : 0,
+            top: point.position?.y ? point.position.y * imageHeight : 0,
+            width: 20,
+            height: 20,
+            borderRadius: 10,
+            backgroundColor: point.success ? colors.feedback.success : colors.feedback.error,
+            borderWidth: 2,
+            borderColor: 'white',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 10,
+          }}
+        >
+          <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 10 }}>
+            {point.id}
+          </Text>
+        </View>
       ))}
     </View>
   );

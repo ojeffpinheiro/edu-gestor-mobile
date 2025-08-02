@@ -1,3 +1,11 @@
+import * as tf from '@tensorflow/tfjs';
+import '@tensorflow/tfjs-react-native';
+import * as jpeg from 'jpeg-js';
+import chroma from 'chroma-js';
+
+
+const BLACK_EDGE_THRESHOLD = 30;
+
 // Interfaces base
 export interface Point {
   x: number;
@@ -19,17 +27,48 @@ export interface Mark {
 export interface ReferencePoint {
   id: number;
   position: Point;
-  color?: string;
+  color?: {  // Mude de string para objeto RGB
+    r: number;
+    g: number;
+    b: number;
+  };
   status?: boolean;
   percentage?: number;
 }
 
+interface EdgeDetectionResult {
+  cell: {
+    row: number;
+    col: number;
+  };
+  confidence: number;
+  color?: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  success: boolean;
+}
+
 // Interfaces específicas para pontos detectados (pré-visualização)
 export interface DetectedPoint {
-  id: number;
-  position: Point;
-  matched: boolean;
-  confidence?: number;
+  id: number; // Tornar obrigatório
+  cell: {
+    row: number;
+    col: number;
+  };
+  confidence: number;
+  color?: {
+    r: number;
+    g: number;
+    b: number;
+  };
+  success?: boolean;
+  position?: {
+    x: number;
+    y: number;
+  };
+  matched?: boolean; // Indica se o ponto foi encontrado corretamente
 }
 
 const TEMPLATE_DIMENSIONS = {
@@ -49,22 +88,96 @@ const REFERENCE_POINTS: ReferencePoint[] = [
 
 // Ponto detectado padrão (para a pré-visualização)
 const REAL_PORTRAIT_POINTS: DetectedPoint[] = [
-  { id: 1, position: { x: 116.27, y: 266.58 }, matched: false },   // Superior esquerdo
-  { id: 2, position: { x: 780.7, y: 266.6 }, matched: false },   // Superior direito
-  { id: 3, position: { x: 116.27, y: 546.5 }, matched: false },   // Meio esquerdo
-  { id: 4, position: { x: 780.7, y: 547 }, matched: false },   // Meio direito
-  { id: 5, position: { x: 116.27, y: 750 }, matched: false },   // Inferior esquerdo
-  { id: 6, position: { x: 780.7, y: 750 }, matched: false },   // Inferior direito
+  {
+    id: 1,
+    position: { x: 116.27, y: 266.58 },
+    cell: { row: 1, col: 1 },
+    confidence: 0.99,
+    success: true
+  },   // Superior esquerdo
+  {
+    id: 2,
+    position: { x: 780.7, y: 266.6 },
+    cell: { row: 1, col: 2 },
+    confidence: 0.98,
+    success: true
+  },   // Superior direito
+  {
+    id: 3,
+    position: { x: 116.27, y: 546.5 },
+    cell: { row: 2, col: 1 },
+    confidence: 0.95,
+    success: true
+  },   // Meio esquerdo
+  {
+    id: 4,
+    position: { x: 780.7, y: 547 },
+    cell: { row: 2, col: 2 },
+    confidence: 0.97,
+    success: true
+  },   // Meio direito
+  {
+    id: 5,
+    position: { x: 116.27, y: 750 },
+    cell: { row: 3, col: 1 },
+    confidence: 0.92,
+    success: true
+  },   // Inferior esquerdo
+  {
+    id: 6,
+    position: { x: 780.7, y: 750 },
+    cell: { row: 3, col: 2 },
+    confidence: 0.93,
+    success: true
+  }    // Inferior direito
 ];
 
+
 const REAL_LANDSCAPE_POINTS: DetectedPoint[] = [
-  { id: 1, position: { x: 50, y: 400 }, matched: false },    // Superior esquerdo
-  { id: 2, position: { x: 450, y: 400 }, matched: false  },   // Superior centro
-  { id: 3, position: { x: 850, y: 400 }, matched: false  },   // Superior direito
-  { id: 4, position: { x: 50, y: 750 }, matched: false  },    // Inferior esquerdo
-  { id: 5, position: { x: 450, y: 750 }, matched: false  },   // Inferior centro
-  { id: 6, position: { x: 850, y: 750 }, matched: false  }    // Inferior direito
+  {
+    id: 1,
+    position: { x: 50, y: 400 },
+    cell: { row: 1, col: 1 },
+    confidence: 0.99,
+    success: true
+  },    // Superior esquerdo
+  {
+    id: 2,
+    position: { x: 450, y: 400 },
+    cell: { row: 1, col: 2 },
+    confidence: 0.98,
+    success: true
+  },   // Superior centro
+  {
+    id: 3,
+    position: { x: 850, y: 400 },
+    cell: { row: 1, col: 3 },
+    confidence: 0.97,
+    success: true
+  },   // Superior direito
+  {
+    id: 4,
+    position: { x: 50, y: 750 },
+    cell: { row: 2, col: 1 },
+    confidence: 0.96,
+    success: true
+  },    // Inferior esquerdo
+  {
+    id: 5,
+    position: { x: 450, y: 750 },
+    cell: { row: 2, col: 2 },
+    confidence: 0.95,
+    success: true
+  },   // Inferior centro
+  {
+    id: 6,
+    position: { x: 850, y: 750 },
+    cell: { row: 2, col: 3 },
+    confidence: 0.94,
+    success: true
+  }    // Inferior direito
 ];
+
 
 // Funções para pontos de referência (câmera)
 export const getReferencePoints = (): ReferencePoint[] => {
@@ -80,20 +193,99 @@ const normalizePoints = (points: DetectedPoint[], isLandscape: boolean): Detecte
       y: point.position.y / dimensions.height
     }
   }));
-  console.log("Dimensões do template:", TEMPLATE_DIMENSIONS.portrait);
-  console.log('Pontos normalizados:', normalized); // Adicione esta linha
   return normalized;
 };
 
 // Funções para pontos detectados (pré-visualização)
-export const detectPoints = (isLandscape: boolean = false): Promise<DetectedPoint[]> => {
-  return new Promise((resolve) => {
-    const realPoints = isLandscape ? REAL_PORTRAIT_POINTS : REAL_PORTRAIT_POINTS;
-    const normalizedPoints = normalizePoints(realPoints, isLandscape);
-    // Simula um pequeno delay como se fosse uma operação assíncrona
-    setTimeout(() => resolve(normalizedPoints), 100);
-  });
+export const detectPoints = async (uri: string, isLandscape: boolean = false): Promise<DetectedPoint[]> => {
+  try {
+    // Simulação - substitua por sua lógica real de detecção
+    const realPoints = isLandscape ? REAL_LANDSCAPE_POINTS : REAL_PORTRAIT_POINTS;
+
+    // Adiciona verificação de sucesso baseada na cor (simulação)
+    const pointsWithStatus = realPoints.map(point => ({
+      ...point,
+      success: true, // Ou sua lógica real de detecção
+      confidence: 0.95, // Valor simulado
+      color: { r: 0, g: 0, b: 0 } // Preto por padrão
+    }));
+
+    return pointsWithStatus;
+  } catch (error) {
+    console.error('Error detecting points:', error);
+    return [];
+  }
 };
+
+
+export const detectRealEdges = async (uri: string) => {
+  try {
+    // 1. Carregar a imagem
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const base64 = await convertBlobToBase64(blob);
+    const base64Data = base64.split(',')[1];
+
+    // 2. Decodificar JPEG
+    const rawImageData = Buffer.from(base64Data, 'base64');
+    const imageData = jpeg.decode(rawImageData, { useTArray: true });
+
+    // 3. Analisar bordas (5% da imagem em cada lado)
+    const borderWidth = Math.floor(imageData.width * 0.05);
+    const borderHeight = Math.floor(imageData.height * 0.05);
+
+    let edgePixels = [];
+
+    // Coletar pixels das bordas
+    for (let y = 0; y < imageData.height; y++) {
+      for (let x = 0; x < imageData.width; x++) {
+        if (x < borderWidth || x >= imageData.width - borderWidth ||
+          y < borderHeight || y >= imageData.height - borderHeight) {
+          const idx = (y * imageData.width + x) * 4;
+          edgePixels.push([
+            imageData.data[idx],     // R
+            imageData.data[idx + 1], // G
+            imageData.data[idx + 2]  // B
+          ]);
+        }
+      }
+    }
+
+    // 4. Calcular média das bordas
+    const sum = edgePixels.reduce((acc, pixel) => {
+      return [acc[0] + pixel[0], acc[1] + pixel[1], acc[2] + pixel[2]];
+    }, [0, 0, 0]);
+
+    const avg = sum.map(v => v / edgePixels.length);
+    const avgColor = { r: avg[0], g: avg[1], b: avg[2] };
+
+    // 5. Verificar se é preto
+    const color = chroma(avg[0], avg[1], avg[2]);
+    const blackDistance = chroma.distance(color, '#000000');
+    const isBlackEdges = blackDistance < BLACK_EDGE_THRESHOLD;
+
+    return [{
+      cell: { row: 0, col: 0 }, // Usamos (0,0) para representar bordas
+      confidence: 1 - (blackDistance / 100),
+      color: avgColor,
+      success: isBlackEdges
+    }];
+  } catch (error) {
+    return [{
+      cell: { row: 0, col: 0 },
+      confidence: 0,
+      success: false
+    }];
+  }
+};
+
+// Função auxiliar para converter Blob para Base64
+const convertBlobToBase64 = (blob: Blob) => new Promise<string>((resolve, reject) => {
+  const reader = new FileReader();
+  reader.onerror = reject;
+  reader.onload = () => resolve(reader.result as string);
+  reader.readAsDataURL(blob);
+});
 
 export const calculateGridPositions = (
   rows: number,

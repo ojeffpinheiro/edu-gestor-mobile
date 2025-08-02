@@ -19,6 +19,7 @@ import PreviewOverlay from '../features/capture/PreviewOverlay';
 import { createCameraBaseStyles } from '../../styles/componentStyles';
 import { convertBlobToBase64 } from '../../utils/markUtils';
 import ProcessingOverlay from '../common/ProcessingOverlay';
+import { useCameraPermission } from '../../hooks/useCameraPermission';
 
 interface CameraCaptureProps {
   onPhotoCaptured: (uri: string) => void;
@@ -48,6 +49,13 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
   const { colors } = useTheme();
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation(0);
   const cameraStyles = createCameraBaseStyles(colors);
+
+  const {
+    status,
+    hasPermission,
+    requestPermission,
+    openSettings
+  } = useCameraPermission();
 
   useImperativeHandle(ref, () => ({
     retakePicture,
@@ -134,17 +142,12 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
   };
 
   const handleTakePicture = useCallback(async () => {
-    if (!cameraRef.current || !cameraReady || isProcessing) {
-      Alert.alert(
-        'Câmera não disponível',
-        'Não foi possível acessar a câmera. Verifique se:',
-        [
-          { text: 'OK' },
-          { text: 'Configurações', onPress: () => Linking.openSettings() }
-        ],
-        { cancelable: true }
-      );
-      return;
+    if (!hasPermission) {
+      const permissionStatus = await requestPermission();
+      if (permissionStatus !== 'granted') {
+        openSettings();
+        return;
+      }
     }
     setIsProcessing(true);
 
@@ -285,7 +288,7 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
 
   return (
     <Animated.View style={[cameraStyles.container, { opacity: fadeAnim }]}>
-      {currentStep === 'positioning' ? (
+      {hasPermission && currentStep === 'positioning' ? (
         <>
           <CameraView
             ref={cameraRef}

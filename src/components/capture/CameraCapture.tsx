@@ -1,17 +1,18 @@
 import React, { forwardRef, useRef, useEffect, useCallback, useState, useImperativeHandle } from 'react';
-import { View, StyleSheet, Animated, Alert, Linking, Image, Dimensions, ActivityIndicator, Text } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { CameraView } from 'expo-camera';
+import { View, StyleSheet, Animated, Alert, Linking, Image, Dimensions, Platform } from 'react-native';
+import { Camera, CameraCapturedPicture, CameraView } from 'expo-camera';
 
 import { useTheme } from '../../context/ThemeContext';
 import { useFadeAnimation } from '../../hooks/useAnimation';
-import { createCameraBaseStyles } from '../../styles/componentStyles';
-import AppButton from './AppButton';
+
 import { triggerHapticFeedback } from '../../utils/hapticUtils';
-import { detectPoints, getReferencePoints, ReferencePoint } from '../../utils/coordinateUtils';
+import { DetectedPoint, detectPoints, getReferencePoints, ReferencePoint } from '../../utils/coordinateUtils';
+
 import AlignmentGuide from '../features/capture/AlignmentGuide';
 import CaptureControls from '../features/capture/CaptureControls';
 import PreviewOverlay from '../features/capture/PreviewOverlay';
+
+import { createCameraBaseStyles } from '../../styles/componentStyles';
 
 interface CameraCaptureProps {
   onPhotoCaptured: (uri: string) => void;
@@ -22,25 +23,20 @@ export interface CameraCaptureRef {
   startAnalysis: () => void;
 }
 
-interface AlignmentPoint {
-  x: number;
-  y: number;
-  matched: boolean;
-}
-
 type CaptureStep = 'positioning' | 'captured' | 'analyzing' | 'results';
 
 const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhotoCaptured }, ref) => {
+  const [referencePoints, setReferencePoints] = useState<ReferencePoint[]>(getReferencePoints());
+  const [alignmentPoints, setAlignmentPoints] = useState<DetectedPoint[]>([]);
   const [currentStep, setCurrentStep] = useState<CaptureStep>('positioning');
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
-  const [alignmentPoints, setAlignmentPoints] = useState<AlignmentPoint[]>([]);
+  const [isLandscape, setIsLandscape] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+
   const cameraRef = useRef<CameraView>(null);
   const { colors } = useTheme();
   const { fadeAnim, fadeIn, fadeOut } = useFadeAnimation(0);
   const cameraStyles = createCameraBaseStyles(colors);
-
-  const [referencePoints, setReferencePoints] = useState<ReferencePoint[]>([]);
-  const [isLandscape, setIsLandscape] = useState(false);
 
   useImperativeHandle(ref, () => ({
     retakePicture,
@@ -48,10 +44,15 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
   }));
 
   useEffect(() => {
+    fadeIn(500);
+    return () => fadeOut(300);
+  }, [fadeIn, fadeOut]);
+
+  useEffect(() => {
     const updateOrientation = () => {
       const { width, height } = Dimensions.get('window');
       setIsLandscape(width > height);
-      setReferencePoints(getReferencePoints(width > height));
+      setReferencePoints(getReferencePoints()); // Remova o parâmetro isLandscape
     };
 
     updateOrientation();
@@ -59,22 +60,11 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
     return () => subscription.remove();
   }, []);
 
-  useEffect(() => {
-    fadeIn(500);
-    return () => fadeOut(300);
-  }, [fadeIn, fadeOut]);
-
   const detectAlignmentPoints = async (uri: string) => {
     setCurrentStep('analyzing');
     try {
       const detectedPoints = await detectPoints(uri);
-      const pointsWithStatus = detectedPoints.map(point => ({
-        x: point.position.x,
-        y: point.position.y,
-        matched: point.matched || false
-      }));
-      setAlignmentPoints(pointsWithStatus);
-      setReferencePoints(detectedPoints);
+      setAlignmentPoints(detectedPoints); // Já está no formato correto
       setCurrentStep('results');
     } catch (error) {
       console.error('Error detecting points:', error);
@@ -82,17 +72,72 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
     }
   };
 
+  // Novo método para ajustar a câmera
+  const checkCameraPermissions = async () => {
+    try {
+      const permission = await Camera.requestCameraPermissionsAsync();
+
+      if (permission.granted) {
+        setCameraReady(true);
+      } else {
+        Alert.alert(
+          'Permissão necessária',
+          'Este aplicativo precisa de acesso à câmera para funcionar',
+          [{
+            text: 'Abrir Configurações',
+            onPress: () => Linking.openSettings()
+          },
+          { text: 'Cancelar', style: 'cancel' }
+          ]
+        );
+      }
+    } catch (error) {
+      console.error('Erro ao solicitar permissões:', error);
+      Alert.alert('Erro', 'Não foi possível acessar as permissões da câmera');
+    }
+  };
+
+  useEffect(() => {
+    checkCameraPermissions();
+  }, []);
+
+  const prepareCamera = async () => {
+    try {
+      const permission = await Camera.requestCameraPermissionsAsync();
+
+      if (!permission.granted) {
+        Alert.alert(
+          'Permissão negada',
+          'Você precisa conceder permissão para usar a câmera',
+          [
+            {
+              text: 'Configurações',
+              onPress: () => Linking.openSettings()
+            },
+            {
+              text: 'Cancelar',
+              style: 'cancel'
+            }
+          ]
+        );
+        return;
+      }
+
+      setCameraReady(true);
+    } catch (error) {
+      console.error('Erro ao configurar câmera:', error);
+      Alert.alert('Erro', 'Não foi possível configurar a câmera');
+    }
+  };
+
   const handleTakePicture = useCallback(async () => {
-    if (!cameraRef.current) {
+    if (!cameraRef.current || !cameraReady) {
       Alert.alert(
         'Câmera não disponível',
         'Não foi possível acessar a câmera. Verifique se:',
         [
           { text: 'OK' },
-          {
-            text: 'Configurações',
-            onPress: () => Linking.openSettings()
-          }
+          { text: 'Configurações', onPress: () => Linking.openSettings() }
         ],
         { cancelable: true }
       );
@@ -101,18 +146,21 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
 
     try {
       setCurrentStep('captured');
-      const photo = await cameraRef.current.takePictureAsync({
+      const photo: CameraCapturedPicture = await cameraRef.current.takePictureAsync({
         quality: 0.8,
-        skipProcessing: true,
+        skipProcessing: true, // Importante para manter a orientação original
+        exif: true, // Preserva metadados de orientação
       });
 
-      if (!photo.uri) {
-        throw new Error('Foto capturada sem URI');
-      }
+      if (!photo.uri) throw new Error('Foto capturada sem URI');
 
-      setCapturedImage(photo.uri);
+      // Corrige a URI se necessário (para Android)
+      const correctedUri = Platform.OS === 'android'
+        ? photo.uri
+        : photo.uri.replace('file://', '');
+
+      setCapturedImage(correctedUri);
       triggerHapticFeedback('success');
-
     } catch (error) {
       console.error('Failed to take picture:', error);
       triggerHapticFeedback('error');
@@ -144,7 +192,12 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
     <Animated.View style={[cameraStyles.container, { opacity: fadeAnim }]}>
       {currentStep === 'positioning' ? (
         <>
-          <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing='back' />
+          <CameraView
+            ref={cameraRef}
+            style={StyleSheet.absoluteFill}
+            facing='back'
+            onCameraReady={prepareCamera}
+          />
           <AlignmentGuide referencePoints={referencePoints} isLandscape={isLandscape} />
           <CaptureControls
             currentStep={currentStep}
@@ -156,8 +209,17 @@ const CameraCapture = forwardRef<CameraCaptureRef, CameraCaptureProps>(({ onPhot
         </>
       ) : (
         <View style={styles.previewContainer}>
-          <Image source={{ uri: capturedImage || '' }} style={styles.previewImage} />
-          {currentStep === 'results' && <PreviewOverlay alignmentPoints={alignmentPoints} />}
+          <Image
+            source={{ uri: capturedImage || '' }}
+            style={styles.previewImage}
+            resizeMode="contain"
+          />
+          {currentStep === 'results' && (
+            <PreviewOverlay
+              alignmentPoints={alignmentPoints}
+              imageUri={capturedImage || ''}
+            />
+          )}
           <CaptureControls
             currentStep={currentStep}
             onTakePicture={handleTakePicture}

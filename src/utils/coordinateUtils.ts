@@ -1,3 +1,4 @@
+// Interfaces base
 export interface Point {
   x: number;
   y: number;
@@ -14,49 +15,81 @@ export interface Mark {
   confidence: number;
 }
 
+// Interfaces específicas para pontos de referência (câmera)
 export interface ReferencePoint {
   id: number;
   position: Point;
   color?: string;
   status?: boolean;
   percentage?: number;
-  matched?: boolean;
 }
 
+// Interfaces específicas para pontos detectados (pré-visualização)
+export interface DetectedPoint {
+  id: number;
+  position: Point;
+  matched: boolean;
+  confidence?: number;
+}
 
-
-const PORTRAIT_POINTS: ReferencePoint[] = [
-  { id: 1, position: { x: 70 / 950, y: 180 / 1320 } },  // Superior esquerdo
-  { id: 2, position: { x: 930 / 950, y: 180 / 1320 } }, // Superior direito
-  { id: 3, position: { x: 70 / 950, y: 720 / 1320 } },  // Meio esquerdo
-  { id: 4, position: { x: 930 / 950, y: 720 / 1320 } },  // Meio direito
-  { id: 5, position: { x: 70 / 950, y: 1140 / 1320 } }, // Inferior esquerdo
-  { id: 6, position: { x: 930 / 950, y: 1140 / 1320 } }  // Inferior direito
-];
-
-// Pontos de referência para paisagem (celular na horizontal)
-const LANDSCAPE_POINTS: ReferencePoint[] = [
-  { id: 1, position: { x: 50 / 830, y: 380 / 880 } },   // Superior esquerdo
-  { id: 2, position: { x: 370 / 830, y: 380 / 880 } },  // Superior centro
-  { id: 3, position: { x: 780 / 830, y: 380 / 880 } },  // Superior direito
-  { id: 4, position: { x: 50 / 830, y: 680 / 880 } },    // Inferior esquerdo
-  { id: 5, position: { x: 370 / 830, y: 680 / 880 } },  // Inferior centro
-  { id: 6, position: { x: 780 / 830, y: 680 / 880 } }   // Inferior direito
-];
-
-export const getReferencePoints = (isLandscape: boolean): ReferencePoint[] => {
-  return isLandscape ? [...LANDSCAPE_POINTS] : [...PORTRAIT_POINTS];
+const TEMPLATE_DIMENSIONS = {
+  portrait: { width: 1000, height: 1400 }, // Novas dimensões em pixels
+  landscape: { width: 900, height: 950 }   // Novas dimensões em pixels
 };
 
-export const detectPoints = async (imageUri: string): Promise<ReferencePoint[]> => {
-  await new Promise(resolve => setTimeout(resolve, 1500));
+// Pontos de referência padrão (para a câmera)
+const REFERENCE_POINTS: ReferencePoint[] = [
+  { id: 1, position: { x: -.01, y: 0.26 } },
+  { id: 2, position: { x: 0.96, y: 0.26 } },
+  { id: 3, position: { x: -.01, y: 0.65 } },
+  { id: 4, position: { x: 0.96, y: 0.65 } },
+  { id: 5, position: { x: -.01, y: .983 } },
+  { id: 6, position: { x: 0.96, y: .983 } }
+];
 
-  const points = getReferencePoints(false);
+// Ponto detectado padrão (para a pré-visualização)
+const REAL_PORTRAIT_POINTS: DetectedPoint[] = [
+  { id: 1, position: { x: 116.7, y: 266.7 }, matched: false },   // Superior esquerdo
+  { id: 2, position: { x: 780.2, y: 266.5 }, matched: false },   // Superior direito
+  { id: 3, position: { x: 116.7, y: 700 }, matched: false },   // Meio esquerdo
+  { id: 4, position: { x: 779, y: 700 }, matched: false },   // Meio direito
+  { id: 5, position: { x: 116.7, y: 1300 }, matched: false },   // Inferior esquerdo
+  { id: 6, position: { x: 779, y: 1290 }, matched: false },   // Inferior direito
+];
+
+const REAL_LANDSCAPE_POINTS: DetectedPoint[] = [
+  { id: 1, position: { x: 50, y: 400 }, matched: false },    // Superior esquerdo
+  { id: 2, position: { x: 450, y: 400 }, matched: false  },   // Superior centro
+  { id: 3, position: { x: 850, y: 400 }, matched: false  },   // Superior direito
+  { id: 4, position: { x: 50, y: 750 }, matched: false  },    // Inferior esquerdo
+  { id: 5, position: { x: 450, y: 750 }, matched: false  },   // Inferior centro
+  { id: 6, position: { x: 850, y: 750 }, matched: false  }    // Inferior direito
+];
+
+// Funções para pontos de referência (câmera)
+export const getReferencePoints = (): ReferencePoint[] => {
+  return [...REFERENCE_POINTS];
+};
+
+const normalizePoints = (points: DetectedPoint[], isLandscape: boolean): DetectedPoint[] => {
+  const dimensions = isLandscape ? TEMPLATE_DIMENSIONS.landscape : TEMPLATE_DIMENSIONS.portrait;
   return points.map(point => ({
     ...point,
-    matched: Math.random() > 0.3, // 70% chance of being matched
-    color: Math.random() > 0.3 ? '#4CAF50' : '#F44336'
+    position: {
+      x: point.position.x / dimensions.width,
+      y: point.position.y / dimensions.height
+    }
   }));
+};
+
+// Funções para pontos detectados (pré-visualização)
+export const detectPoints = (isLandscape: boolean = false): Promise<DetectedPoint[]> => {
+  return new Promise((resolve) => {
+    const realPoints = isLandscape ? REAL_PORTRAIT_POINTS : REAL_PORTRAIT_POINTS;
+    const normalizedPoints = normalizePoints(realPoints, isLandscape);
+    // Simula um pequeno delay como se fosse uma operação assíncrona
+    setTimeout(() => resolve(normalizedPoints), 100);
+  });
 };
 
 export const calculateGridPositions = (

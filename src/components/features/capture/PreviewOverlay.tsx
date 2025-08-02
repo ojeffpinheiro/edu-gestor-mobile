@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Image } from 'react-native';
+import { View, StyleSheet, Image, Text } from 'react-native';
 import { DetectedPoint } from '../../../utils/coordinateUtils';
 
 interface PreviewOverlayProps {
@@ -34,7 +34,7 @@ const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
               backgroundColor: point.matched ? '#4CAF50' : '#F44336',
             }
           ]}
-        />
+        ><Text>{point.id}</Text></View>
       ))}
     </View>
   );

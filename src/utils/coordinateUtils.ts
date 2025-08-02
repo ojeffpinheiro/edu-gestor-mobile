@@ -49,12 +49,12 @@ const REFERENCE_POINTS: ReferencePoint[] = [
 
 // Ponto detectado padrão (para a pré-visualização)
 const REAL_PORTRAIT_POINTS: DetectedPoint[] = [
-  { id: 1, position: { x: 116.7, y: 266.7 }, matched: false },   // Superior esquerdo
-  { id: 2, position: { x: 780.2, y: 266.5 }, matched: false },   // Superior direito
-  { id: 3, position: { x: 116.7, y: 700 }, matched: false },   // Meio esquerdo
-  { id: 4, position: { x: 779, y: 700 }, matched: false },   // Meio direito
-  { id: 5, position: { x: 116.7, y: 1300 }, matched: false },   // Inferior esquerdo
-  { id: 6, position: { x: 779, y: 1290 }, matched: false },   // Inferior direito
+  { id: 1, position: { x: 116.27, y: 266.58 }, matched: false },   // Superior esquerdo
+  { id: 2, position: { x: 780.7, y: 266.6 }, matched: false },   // Superior direito
+  { id: 3, position: { x: 116.27, y: 546.5 }, matched: false },   // Meio esquerdo
+  { id: 4, position: { x: 780.7, y: 547 }, matched: false },   // Meio direito
+  { id: 5, position: { x: 116.27, y: 750 }, matched: false },   // Inferior esquerdo
+  { id: 6, position: { x: 780.7, y: 750 }, matched: false },   // Inferior direito
 ];
 
 const REAL_LANDSCAPE_POINTS: DetectedPoint[] = [
@@ -73,13 +73,16 @@ export const getReferencePoints = (): ReferencePoint[] => {
 
 const normalizePoints = (points: DetectedPoint[], isLandscape: boolean): DetectedPoint[] => {
   const dimensions = isLandscape ? TEMPLATE_DIMENSIONS.landscape : TEMPLATE_DIMENSIONS.portrait;
-  return points.map(point => ({
+  const normalized = points.map(point => ({
     ...point,
     position: {
       x: point.position.x / dimensions.width,
       y: point.position.y / dimensions.height
     }
   }));
+  console.log("Dimensões do template:", TEMPLATE_DIMENSIONS.portrait);
+  console.log('Pontos normalizados:', normalized); // Adicione esta linha
+  return normalized;
 };
 
 // Funções para pontos detectados (pré-visualização)

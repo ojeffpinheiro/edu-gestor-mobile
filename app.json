@@ -16,12 +16,6 @@
       },
       "usesIcloudStorage": true
     },
-    "packagerOpts": {
-      "assetExts": [
-        "bin",
-        "json"
-      ]
-    },
     "plugins": [
       [
         "expo-camera",

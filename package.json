@@ -32,6 +32,7 @@
     "expo-media-library": "~17.1.7",
     "expo-permissions": "^14.4.0",
     "expo-status-bar": "~2.2.3",
+    "expo-updates": "~0.28.17",
     "install": "^0.13.0",
     "jpeg-js": "^0.4.4",
     "lucide-react-native": "^0.525.0",

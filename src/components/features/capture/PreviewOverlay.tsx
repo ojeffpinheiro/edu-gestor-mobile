@@ -19,6 +19,13 @@ const PreviewOverlay: React.FC<PreviewOverlayProps> = ({
   const { colors } = useTheme();
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
 
+  console.log("PreviewOverlay - Props:", {
+    alignmentPoints,
+    imageUri,
+    imageWidth,
+    imageHeight
+  });
+
   if (!alignmentPoints || alignmentPoints.length === 0) return null;
 
   return (

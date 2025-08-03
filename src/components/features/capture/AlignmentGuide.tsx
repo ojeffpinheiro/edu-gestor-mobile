@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { View, StyleSheet, Text, Animated, Easing } from 'react-native';
-import { ReferencePoint } from '../../../utils/coordinateUtils';
+import { debugLog, ReferencePoint } from '../../../utils/coordinateUtils';
 import { useTheme } from '../../../context/ThemeContext';
 
 interface AlignmentGuideProps {
@@ -81,7 +81,8 @@ const AlignmentGuide: React.FC<AlignmentGuideProps> = ({
   };
 
 
-  console.log('Rendering points:', {
+
+  debugLog('AlignmentGuide - rendering points', {
     referencePoints,
     pointsStatus,
     pointsColors
@@ -110,31 +111,25 @@ const AlignmentGuide: React.FC<AlignmentGuideProps> = ({
         const pointStatus = pointsStatus[point.id] || false;
         const pointColor = pointsColors[point.id];
 
-        // Corrige coordenadas negativas
-        const posX = Math.max(0, point.position.x);
-        const posY = Math.max(0, point.position.y);
-
         return (
           <View key={point.id} style={[styles.pointContainer, {
-            left: `${posX * 100}%`,
-            top: `${posY * 100}%`,
+            left: `${point.position.x * 100}%`,
+            top: `${point.position.y * 100}%`,
           }]}>
             <Animated.View style={[
               styles.alignmentPoint,
               {
                 transform: [{ scale: pulseAnims[point.id] }],
-                backgroundColor: pointStatus ? colors.feedback.success : colors.feedback.error
+                backgroundColor: pointStatus ? colors.feedback.success : colors.feedback.error,
+                width: pointStatus ? 40 : 30, // Aumenta quando detectado
+                height: pointStatus ? 40 : 30,
               }
             ]}>
               <Text style={styles.pointText}>{point.id}</Text>
+              {pointStatus && (
+                <Text style={styles.statusText}>✓</Text>
+              )}
             </Animated.View>
-
-            {pointColor && (
-              <View style={[
-                styles.colorIndicator,
-                { backgroundColor: `rgb(${Math.round(pointColor.r)}, ${Math.round(pointColor.g)}, ${Math.round(pointColor.b)})` }
-              ]} />
-            )}
           </View>
         );
       })}
@@ -264,6 +259,13 @@ const styles = StyleSheet.create({
     height: 2,
     backgroundColor: 'rgba(0, 255, 0, 0.7)',
     left: 0,
+  },
+  statusText: {
+    position: 'absolute',
+    bottom: -15,
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 });
 

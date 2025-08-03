@@ -2,9 +2,16 @@ import * as tf from '@tensorflow/tfjs';
 import '@tensorflow/tfjs-react-native';
 import * as jpeg from 'jpeg-js';
 import chroma from 'chroma-js';
+import { ImageManipulator } from 'expo-image-manipulator';
 
 
 const BLACK_EDGE_THRESHOLD = 30;
+
+const TEMPLATE_DIMENSIONS = {
+  portrait: { width: 1000, height: 1400 }, // Novas dimensões em pixels
+  landscape: { width: 900, height: 950 }   // Novas dimensões em pixels
+};
+const SIMPLE_LOGS = true; // Ativar logs simples para desenvolvimento
 
 // Interfaces base
 export interface Point {
@@ -70,11 +77,6 @@ export interface DetectedPoint {
   };
   matched?: boolean; // Indica se o ponto foi encontrado corretamente
 }
-
-const TEMPLATE_DIMENSIONS = {
-  portrait: { width: 1000, height: 1400 }, // Novas dimensões em pixels
-  landscape: { width: 900, height: 950 }   // Novas dimensões em pixels
-};
 
 // Pontos de referência padrão (para a câmera)
 const REFERENCE_POINTS: ReferencePoint[] = [
@@ -179,6 +181,36 @@ const REAL_LANDSCAPE_POINTS: DetectedPoint[] = [
 ];
 
 
+// Função de log simplificada
+export const debugLog = (context: string, data: any, important = false) => {
+  if (!__DEV__ && !important) return;
+  
+  const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+  const header = `=== ${context} (${timestamp}) ===`;
+  
+  console.groupCollapsed(header);
+  
+  if (typeof data === 'object') {
+    // Formatar objetos de pontos de forma mais legível
+    if (Array.isArray(data) && data.some(item => item.id !== undefined)) {
+      console.table(data.map(item => ({
+        id: item.id,
+        x: item.position?.x?.toFixed(2),
+        y: item.position?.y?.toFixed(2),
+        status: item.status ?? item.success,
+        color: item.color ? `rgb(${Math.round(item.color.r)}, ${Math.round(item.color.g)}, ${Math.round(item.color.b)})` : 'N/A',
+        confidence: item.confidence?.toFixed(2)
+      })));
+    } else {
+      console.dir(data, { depth: 4, colors: true });
+    }
+  } else {
+    console.log(data);
+  }
+  
+  console.groupEnd();
+};
+
 // Funções para pontos de referência (câmera)
 export const getReferencePoints = (): ReferencePoint[] => {
   return [...REFERENCE_POINTS];
@@ -196,27 +228,78 @@ const normalizePoints = (points: DetectedPoint[], isLandscape: boolean): Detecte
   return normalized;
 };
 
+const calculateCellPosition = (id: number) => ({
+  row: Math.ceil(id / 2),
+  col: id % 2 === 0 ? 2 : 1
+});
+
+const createDefaultPoint = (id: number): DetectedPoint => ({
+  id,
+  position: { x: 0, y: 0 },
+  cell: calculateCellPosition(id),
+  color: { r: 0, g: 0, b: 0 },
+  confidence: 0,
+  success: false,
+  matched: false
+});
+
+
 // Funções para pontos detectados (pré-visualização)
-export const detectPoints = async (uri: string, isLandscape: boolean = false): Promise<DetectedPoint[]> => {
+export const detectPoints = async (uri: string): Promise<DetectedPoint[]> => {
   try {
-    // Simulação - substitua por sua lógica real de detecção
-    const realPoints = isLandscape ? REAL_LANDSCAPE_POINTS : REAL_PORTRAIT_POINTS;
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const base64 = await convertBlobToBase64(blob);
+    const base64Data = base64.split(',')[1];
+    
+    // Decodificação com parâmetros corretos
+    const imageData = jpeg.decode(Buffer.from(base64Data, 'base64'), {
+      useTArray: true,
+      maxMemoryUsageInMB: 30,
+      maxResolutionInMP: 4 // Limite de 4 megapixels
+    });
 
-    // Adiciona verificação de sucesso baseada na cor (simulação)
-    const pointsWithStatus = realPoints.map(point => ({
-      ...point,
-      success: true, // Ou sua lógica real de detecção
-      confidence: 0.95, // Valor simulado
-      color: { r: 0, g: 0, b: 0 } // Preto por padrão
-    }));
+    // Restante da função permanece igual...
+    return getReferencePoints().map(point => {
+      const x = Math.round(point.position.x * imageData.width);
+      const y = Math.round(point.position.y * imageData.height);
+      
+      const idx = (y * imageData.width + x) * 4;
+      const r = imageData.data[idx];
+      const g = imageData.data[idx + 1];
+      const b = imageData.data[idx + 2];
+      const darkness = (r + g + b) / 3;
+      const isBlack = darkness < BLACK_EDGE_THRESHOLD;
 
-    return pointsWithStatus;
+      return {
+        id: point.id,
+        position: { x, y },
+        cell: { row: Math.ceil(point.id / 2), col: point.id % 2 === 0 ? 2 : 1 },
+        color: { r, g, b },
+        confidence: isBlack ? 0.9 : 0.1,
+        success: isBlack,
+        matched: isBlack
+      };
+    });
+
   } catch (error) {
-    console.error('Error detecting points:', error);
-    return [];
+    console.error('Erro na detecção:', error);
+    return getFallbackPoints();
   }
 };
 
+// Função auxiliar para pontos de fallback
+const getFallbackPoints = (): DetectedPoint[] => {
+  return getReferencePoints().map(p => ({
+    id: p.id,
+    position: { x: 0, y: 0 },
+    cell: { row: 0, col: 0 },
+    color: { r: 0, g: 0, b: 0 },
+    confidence: 0,
+    success: false,
+    matched: false
+  }));
+};
 
 export const detectRealEdges = async (uri: string) => {
   try {
